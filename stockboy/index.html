@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>HamSandwich</title>
+		<link rel="stylesheet" href="ham.css"/>
+		<link rel="icon" type="image/png" href="favicon.ico"/>
+	</head>
+	<body>
+		<div id="header" class="flex-row">
+			<div id="title" hidden></div>
+			<div id="spinner" class="spinner"><div class="loading-pulse"></div></div>
+			<div id="status"><noscript>JavaScript required.</noscript></div>
+			<div style="flex-grow: 1"></div>
+			<input type="button" value="Export Save" id="export"/>
+			<input type="button" value="Fullscreen" id="fullscreen"/>
+		</div>
+		<div id="canvas-container">
+			<div id="canvas-stacker">
+				<div class="canvas-notice">
+					<img src="splash.jpg" onerror="this.remove()" />
+				</div>
+				<div class="canvas-notice">
+					<div id="runstatus-notice" hidden></div>
+				</div>
+				<canvas id="canvas" width="640" height="480" oncontextmenu="event.preventDefault()"></canvas>
+			</div>
+		</div>
+		<details id="installer-upload">
+			<summary>Import assets</summary>
+			<p>To run the game, you must provide your own copy of the installer, either retail or downloaded from itch.io.</p>
+			<table class="flat-table"></table>
+		</details>
+		<details>
+			<summary>Credits</summary>
+			<table class="flat-table">
+				<tr><td>Original games</td><td><a href="http://hamumu.com/">Hamumu Games, Inc.</a></td></tr>
+				<tr><td>Web ports</td><td><a href="https://github.com/SpaceManiac/HamSandwich/">HamSandwich project</a></td></tr>
+				<tr><td>Splash art</td><td><a href="https://twitter.com/benrose_hsb">Ben Rose</a></td></tr>
+			</table>
+		</details>
+
+		<script src="jszip.min.js"></script>
+		<script id="ham-meta" type="text/json">{
+  "appdataName" : "stockboy",
+  "installers" : 
+  [
+    {
+      "description" : "Base assets for Stockboy",
+      "file_id" : 709725,
+      "filename" : "stockboy_install.EXE",
+      "kind" : "inno",
+      "link" : "https://hamumu.itch.io/stockboy",
+      "sha256sum" : "781aa144b2b49bf563990770a12529fcd9031b4feb033d9cb8538f986d0607ca"
+    },
+    {
+      "description" : "Add-ons: 2011 collection",
+      "file_id" : 834523,
+      "filename" : "stockaddon.exe",
+      "kind" : "nsis",
+      "link" : "https://hamumu.itch.io/stockboy",
+      "optional" : true,
+      "sha256sum" : "e82354f34f2ceee161f69afef90c0bc98189fcf47e558f292f4f4d8f15dfc5f4"
+    }
+  ],
+  "projectName" : "stockboy",
+  "registry_key" : "Stockboy",
+  "title" : "Stockboy"
+}</script>
+		<script src="ham.js"></script>
+	</body>
+</html>

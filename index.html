@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>HamSandwich</title>
+		<link rel="icon" type="image/png" href="favicon.ico"/>
+		<style>
+			body {
+				background-color: #f5f5f5;
+				overflow-y: scroll;
+				margin: 8px;
+			}
+			@media (max-width: 599px) {
+				body {
+					margin: 0;
+				}
+			}
+			body > div {
+				max-width: 640px;
+				margin: 8px auto;
+				background-color: white;
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="flex-row">
+			<span><a href="https://github.com/SpaceManiac/HamSandwich">HamSandwich</a></span>
+		</div>
+		<div>
+			<table id="main">
+			</table>
+			<noscript>JavaScript required.</noscript>
+		</div>
+		<script type="text/json" id="home-meta">{
+  "project_list" : 
+  [
+    "spookycastle",
+    "eddie",
+    "mystic",
+    "loonyland",
+    "stockboy",
+    "supreme",
+    "loonyland2",
+    "sleepless"
+  ],
+  "project_metadata" : 
+  {
+    "eddie" : 
+    {
+      "appdataName" : "eddie",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Eddie Galaxy",
+          "file_id" : 724529,
+          "filename" : "eddie_install.EXE",
+          "kind" : "inno",
+          "link" : "https://hamumu.itch.io/eddie-galaxy",
+          "sha256sum" : "41f454e4a5ef93d38782fc36b979cbc7507ab7c858467e45f776769c5cc16967"
+        }
+      ],
+      "projectName" : "eddie",
+      "registry_key" : "EddieGalaxy",
+      "title" : "Eddie Galaxy"
+    },
+    "loonyland" : 
+    {
+      "appdataName" : "loonyland",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Loonyland: Halloween Hill",
+          "file_id" : 702760,
+          "filename" : "loonyland_install.EXE",
+          "kind" : "inno",
+          "link" : "https://hamumu.itch.io/loonyland-halloween-hill",
+          "sha256sum" : "cf3cdc555297e41f6c2da61d89815dbbc740d6fc677c83ec6c6e1acfa117de34"
+        },
+        {
+          "description" : "Loonyland editor templates",
+          "file_id" : 782965,
+          "filename" : "loonyland_editor.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-halloween-hill",
+          "sha256sum" : "865550d077e984ca28324aaf4291211aa4009cdad9f2b74144179c6342f2be39"
+        }
+      ],
+      "projectName" : "loonyland",
+      "registry_key" : "Loonyland",
+      "title" : "Loonyland: Halloween Hill"
+    },
+    "loonyland2" : 
+    {
+      "appdataName" : "loonyland2",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Loonyland 2: Winter Woods",
+          "file_id" : 705653,
+          "filename" : "LL2CEinstall.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "sha256sum" : "0806e1615eb94332bf805128d2d3857af420e93ee6f48692eebf17c05e9b14e2"
+        },
+        {
+          "description" : "Replacement commentary by Blackduck",
+          "file_id" : 712515,
+          "filename" : "blackduck_comm.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "f0a3cb1c2cb09281adc7b9087d7dbdbfc22d3851e98b365c61960ce2e681cec2"
+        },
+        {
+          "description" : "Add-on World: Challenge",
+          "file_id" : 712518,
+          "filename" : "ll2_challenge.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "efff6dcfe00f8cb1e70cecc096524011b9e33c5b1637e5be5cb7b32d02ce10de"
+        },
+        {
+          "description" : "Add-on World: Epic Adventure",
+          "file_id" : 712516,
+          "filename" : "ll2_epicadv.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "901ab9cecbf1fe5da2a7baa3084315ec14914ab004796809acbbdc7f42117aa3"
+        },
+        {
+          "description" : "Add-on World: Knittel's Adventure",
+          "file_id" : 712519,
+          "filename" : "ll2_knittel.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "e0f6f19d2280e0443aa5945e548384a05cef98d25577d8e9e5663eb1ac916072"
+        },
+        {
+          "description" : "Add-on World: Summer Woods",
+          "file_id" : 712517,
+          "filename" : "ll2_summerwoods.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "93e641b0c3e201a81996f951cb6768956271334b82b77b89cf9d780d0f087822"
+        },
+        {
+          "description" : "Add-on World: Winter Wackiness 6 by Redbone",
+          "file_id" : 712520,
+          "filename" : "ll2_ww6rb.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "e9f697d35ead9e9ef54af9f5294bd38d9f7d766b4e79a2cf83b9e35b203aec77"
+        },
+        {
+          "description" : "Add-on World: Winter Wackiness 8 by Qwertybub",
+          "file_id" : 712521,
+          "filename" : "ll2_ww8qb.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/loonyland-2-winter-woods",
+          "optional" : true,
+          "sha256sum" : "69cae670936a978044eac4b12b705fb332ebcf68388c3ac76a3dbec1500c419d"
+        }
+      ],
+      "projectName" : "loonyland2",
+      "registry_key" : "Loonyland2CE",
+      "title" : "Loonyland 2: Winter Woods"
+    },
+    "lunatic" : 
+    {
+      "appdataName" : "lunatic",
+      "excluded" : true,
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Dr. Lunatic",
+          "file_id" : 710473,
+          "filename" : "lunatic_install.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/dr-lunatic",
+          "sha256sum" : "b8013176ea8050db20a2b170a5273d5287ccde4b4923affb7c610bda89326c84"
+        }
+      ],
+      "projectName" : "lunatic",
+      "registry_key" : "Lunatic",
+      "title" : "Dr. Lunatic"
+    },
+    "mystic" : 
+    {
+      "appdataName" : "mystic",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Kid Mystic",
+          "file_id" : 704052,
+          "filename" : "mystic_install.exe",
+          "kind" : "inno",
+          "link" : "https://hamumu.itch.io/kid-mystic",
+          "sha256sum" : "c2d618176d23b974c01c00690b6afb0aaebd4c863dfff0bf8b1f66db1bdc2f65"
+        }
+      ],
+      "projectName" : "mystic",
+      "registry_key" : "KidMystic",
+      "title" : "Kid Mystic"
+    },
+    "sleepless" : 
+    {
+      "appdataName" : "sleepless",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Sleepless Hollow",
+          "file_id" : 708909,
+          "filename" : "hollow_betainstall.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/sleepless-hollow",
+          "sha256sum" : "41660802318356fba53a21b4d368e191b3197030fb9e8eb833788f45c01c6f99"
+        }
+      ],
+      "projectName" : "sleepless",
+      "registry_key" : "SleeplessHollow",
+      "title" : "Sleepless Hollow"
+    },
+    "spookycastle" : 
+    {
+      "appdataName" : "spookycastle",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Spooky Castle",
+          "file_id" : 725936,
+          "filename" : "spookycastle_install.EXE",
+          "kind" : "inno",
+          "link" : "https://hamumu.itch.io/spooky-castle",
+          "sha256sum" : "8e6582a813ec9e723b01d53b483fb6a2e52df9f6d1cca9dbcda12fcc10c861e8"
+        }
+      ],
+      "projectName" : "spookycastle",
+      "registry_key" : "Spooky Castle",
+      "title" : "Spooky Castle"
+    },
+    "stockboy" : 
+    {
+      "appdataName" : "stockboy",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Stockboy",
+          "file_id" : 709725,
+          "filename" : "stockboy_install.EXE",
+          "kind" : "inno",
+          "link" : "https://hamumu.itch.io/stockboy",
+          "sha256sum" : "781aa144b2b49bf563990770a12529fcd9031b4feb033d9cb8538f986d0607ca"
+        },
+        {
+          "description" : "Add-ons: 2011 collection",
+          "file_id" : 834523,
+          "filename" : "stockaddon.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/stockboy",
+          "optional" : true,
+          "sha256sum" : "e82354f34f2ceee161f69afef90c0bc98189fcf47e558f292f4f4d8f15dfc5f4"
+        }
+      ],
+      "projectName" : "stockboy",
+      "registry_key" : "Stockboy",
+      "title" : "Stockboy"
+    },
+    "supreme" : 
+    {
+      "appdataName" : "supreme",
+      "installers" : 
+      [
+        {
+          "description" : "Base assets for Dr. Lunatic Supreme With Cheese",
+          "file_id" : 700882,
+          "filename" : "supreme8_install.exe",
+          "kind" : "nsis",
+          "link" : "https://hamumu.itch.io/dr-lunatic-supreme-with-cheese",
+          "sha256sum" : "1c105ad826be1e0697b5de8483c71ff943d04bce91fe3547b6f355e9bc1c42d4"
+        },
+        {
+          "description" : "Add-ons: All Supreme Worlds",
+          "file_id" : 824077,
+          "filename" : "all_supreme_worlds.zip",
+          "kind" : "zip",
+          "link" : "https://hamumu.itch.io/dr-lunatic-supreme-with-cheese",
+          "optional" : true,
+          "sha256sum" : "f0f61589788909fecb051a69a1e9e1a8967b2f4bb35de8a0b13cd19041409215"
+        }
+      ],
+      "projectName" : "supreme",
+      "registry_key" : "LunaticSupreme",
+      "title" : "Dr. Lunatic Supreme With Cheese"
+    }
+  }
+}</script>
+		<script>
+			var metadata = JSON.parse(document.getElementById('home-meta').textContent);
+			var main = document.getElementById('main');
+			for (let key of metadata.project_list) {
+				var tr = document.createElement('tr');
+				var td1 = document.createElement('td');
+				var a1 = document.createElement('a');
+				a1.href = key + '/';
+				var img = document.createElement('img');
+				img.src = key + '/favicon.ico';
+				img.height = 32;
+				var td2 = document.createElement('td');
+				var a2 = document.createElement('a');
+				a2.href = key + '/';
+
+				a1.append(img);
+				td1.append(a1);
+				a2.append(metadata.project_metadata[key].title);
+				td2.append(a2);
+				tr.append(td1, td2);
+				main.append(tr);
+			}
+		</script>
+	</body>
+</html>
