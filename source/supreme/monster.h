@@ -160,6 +160,8 @@
 #define MONS_PUMPKIN2	128
 #define MONS_CRAZYBONE	129
 #define MONS_CREEPAZOID 130
+
+// Supreme With Cheese
 #define MONS_LAZYBONE	131
 #define MONS_STAREYBAT	132
 #define MONS_MADMAN		133
@@ -241,8 +243,112 @@
 #define MONS_MINIWACKO	209
 #define MONS_JACKFROST	210
 
-#define NUM_MONSTERS  211    // Can grow as needed
-#define NUM_PROFILE_MONSTERS 211    // Do not change without redoing the profile format
+//Kid Mystic exclusive enemies
+#define MONS_MYSTIC   	211
+#define MONS_PTERO		212
+#define MONS_EYEGUY   	213
+#define MONS_PEEPER   	214
+#define MONS_TOWER    	215
+#define MONS_LOOKEYLOO 	216
+#define MONS_PINKEYE 	217
+#define MONS_MICRO  	218
+#define MONS_GOLEM 		219
+#define MONS_BOBBY  	220
+#define MONS_CRAZYBUSH 	221
+#define MONS_OCTOPUS  	222
+#define MONS_INCABOT 	223
+#define MONS_INCAGEN  	224
+#define MONS_INCAGOLD	225
+#define MONS_INCAGOLD2	226
+#define MONS_LOG	  	227
+#define MONS_INCABOSS  	228
+#define MONS_INCATONGUE 229
+#define MONS_PEEPBOMB	230
+#define MONS_PEEPBOMB2	231 //	reverse peeping bomb
+#define MONS_TRAPAZOID	232
+#define MONS_TRAPAZOID2 233 // hiding trapazoid, not meant for use on its own
+#define MONS_WHACKAZOID	234
+#define MONS_SLUG   	235
+#define MONS_SNAIL	 	236
+#define MONS_BALL		237
+#define MONS_OCTOBOSS	238
+#define MONS_OCTOTENT	239
+#define MONS_OCTOTENT2	240
+#define MONS_GOAT1		241
+#define MONS_GOAT2		242
+#define MONS_GOAT3		243
+#define MONS_STKSHROOM	244
+#define MONS_STKSPIDER	245
+#define MONS_STKCORPSE  246
+#define MONS_STKBAT		247
+#define MONS_DANCER		248
+
+// Sleepless Hollow exclusive enemies
+#define MONS_SPIDER2	249
+#define MONS_FROG		250
+#define MONS_PUMPKINFLY 251
+#define MONS_DUMBLE		252
+#define MONS_GLASSJAW	253
+#define MONS_FROG2		254
+#define MONS_FIREBUG	255
+#define MONS_FIREBAT	256
+#define MONS_STICKTREE	257
+#define MONS_GOODBONE	258
+#define MONS_BATGUARD	259
+#define MONS_RADISH		260
+#define MONS_ROLLSTONE	261
+#define MONS_BIGHEAD1	262
+#define MONS_SPOOKLEY	263
+#define MONS_SPOOKLEY2	264
+#define MONS_BIGBODY	265
+#define MONS_SPARK		266
+#define MONS_SPARKY		267
+#define MONS_MEGABURNER	268
+#define MONS_IRONSKULL	269
+#define MONS_LIGHTSWITCH 270
+#define MONS_KNIGHT2	271
+#define MONS_MADCOW		272
+#define MONS_SPATULA	273
+#define MONS_MADCOW2	274
+#define MONS_RAFE		275
+#define MONS_TURRETR	276
+#define MONS_TURRETD	277
+#define MONS_TURRETL	278
+#define MONS_TURRETU	279
+#define MONS_BOBBER		280
+#define MONS_ROLLSTONE2	281
+#define MONS_REFLECTION	282
+#define MONS_BADSIDE	283
+#define MONS_DARKNESS	284
+#define MONS_SCAREDYBAT	285
+#define MONS_BLASTER	286
+#define MONS_DEADHEAD	287
+#define MONS_SPEEDY		288
+#define MONS_GRUE		289
+#define MONS_BIGHEAD2	290
+#define MONS_BIGHEAD3	291
+#define MONS_LIGHTSLIDE	292
+#define MONS_MARSHMARROW 293
+#define MONS_BEETLEGEN	294
+#define MONS_TOADGEN	295
+#define MONS_PUMPKINFLY2 296
+
+// Kid Mystic addon enemies
+#define MONS_EYEGUY2	297		// Deadeye (Peeping Bomb)
+#define MONS_CRAZYBUSH2	298		// Burning Bush (Crazy Bush)
+#define MONS_OCTOPUS2	299		// Calamari (Octon)
+#define MONS_SLUG2		300		// Banana Slug (Slimy Slug)
+
+// Operation SCARE Editions
+#define MONS_GOLEMEVIL	301		// Evil Grumpy Golem 
+#define MONS_PUNKEVIL	302		// Evil Punk Bunny
+#define MONS_CLONESHRM	303		// Evil Clone (Shtupid Shroom)
+#define MONS_CLONEDRL	304		// Evil Clone (Dr. Lunatic)
+#define MONS_CLONELUNA	305		// Evil Clone (LunaChick)
+#define MONS_CLONEKM	306		// Evil Clone (Kid Mystic)
+
+#define NUM_MONSTERS  307    // Can grow as needed
+#define NUM_PROFILE_MONSTERS 248 // Do not change without redoing the profile format
 
 // fake monster codes
 #define MONS_GOODGUY	(-1)	// any goodguy
@@ -539,5 +645,70 @@ void AI_Microzoid(Guy *me,Map *map,world_t *world,Guy *goodguy);
 void AI_HotShroom(Guy *me,Map *map,world_t *world,Guy *goodguy);
 void AI_MiniWacko(Guy *me,Map *map,world_t *world,Guy *goodguy);
 void AI_JackFrost(Guy *me,Map *map,world_t *world,Guy *goodguy);
+
+void AI_Ptero(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Eyeguy(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Peeper(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Tower(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Lookeyloo(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Pinkeye(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Microfish(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Golem(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_BobbyKhan(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Crazybush(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Octopus(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Incabot(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Incagen(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Incagold(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Log(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Incaboss(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Incatongue(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Peepbomb(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Trapazoid(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Whackazoid(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Slug(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Snail(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Ball(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Octoboss(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Octotentacle(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Rammy(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Hoppy(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Gruffy(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Stickshroom(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Stickspider(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Stickcorpse(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Stickbat(Guy *me,Map *map,world_t *world,Guy *goodguy);
+void AI_Dancer(Guy *me,Map *map,world_t *world,Guy *goodguy);
+
+// hollow
+void AI_Frog(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_MadCow(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_MadCow2(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_PumpkinFly(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Reflection(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Goodbone(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Darkness(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Spark(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_LightSwitch(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_LightBlaster(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_LightSlide(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_BigHead(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_BigHead2(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_BigHeadBod(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Grue(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Spook(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Speedy(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_IronSkull(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Rafe(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_BatGuard(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Spatula(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_ScaredyBat(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Tree(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Horseradish(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Sparky(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Bobber(Guy* me, Map* map, world_t* world, Guy* goodguy);
+
+void AI_PunkBunny2(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_EvilClone2(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 #endif

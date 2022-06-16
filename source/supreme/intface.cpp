@@ -853,7 +853,7 @@ void UpdateInterface(Map *map)
 void RenderInterface(MGLDraw *mgl)
 {
 	int i;
-	char combo[16];
+	char combo[16],debuggy[32];
 
 	//sprintf(combo,"%d:%02d:%02d",(profile.progress.totalTime/(30*60*60)),(profile.progress.totalTime/(30*60))%60,(profile.progress.totalTime/30)%60);
 	//PrintGlow(5,240,combo,0,2);
@@ -936,6 +936,9 @@ void RenderInterface(MGLDraw *mgl)
 
 	sprintf(combo,"Combo x%d",curCombo);
 	PrintGlow(240,comboY,combo,0,2);
+
+	sprintf(debuggy, "DEBUG - x%d", player.vehicle);
+	PrintGlow(240, 80, debuggy, 0, 2);
 }
 
 void RenderCollectedStuff(int x,int y,MGLDraw *mgl)

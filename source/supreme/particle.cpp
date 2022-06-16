@@ -170,6 +170,7 @@ void Particle::Update(Map *map)
 				size=life/3;
 				break;
 			case PART_COUNTESS:
+			case PART_GHOST:
 				dz+=FIXAMT; // no gravity
 				break;
 			case PART_SMOKE:
@@ -223,6 +224,47 @@ void Particle::Update(Map *map)
 					size=life/4;
 				else
 					size=life/8;
+				break;
+			case PART_MANA:
+				dz += FIXAMT + FIXAMT;
+				v = life * 2 + 8;
+				if (v > 31)
+					v = 31;
+				color = 96 + v;
+				if (life > 20)
+					size = 2;
+				else if (life < 10)
+					size = 0;
+				else
+					size = 1;
+				break;
+			case PART_YELLOW:
+				v = life;
+				if (v > 31 - 4)
+					v = 31 - 4;
+				color = 160 + v;
+				if (life > 20)
+					size = 2;
+				else if (life < 10)
+					size = 0;
+				else
+					size = 1;
+				if (profile.progress.purchase[modeShopNum[MODE_SPLATTER]] & SIF_ACTIVE)
+					size = life / 4;
+				break;
+			case PART_SHORTYELLOW:
+				v = life * 4;
+				if (v > 31)
+					v = 31;
+				color = 160 + v;
+				if (life > 5)
+					size = 2;
+				else if (life < 2)
+					size = 0;
+				else
+					size = 1;
+				if (profile.progress.purchase[modeShopNum[MODE_SPLATTER]] & SIF_ACTIVE)
+					size = life / 4;
 				break;
 			case PART_COLOR:
 				if(profile.progress.purchase[modeShopNum[MODE_SPLATTER]]&SIF_ACTIVE)
@@ -1276,6 +1318,155 @@ void WeathermanWeather(int x,int y)
 				particleList[i]->color=3*32+16;
 			}
 			break;
+		}
+	}
+}
+
+void BlowWigglySmoke(int x, int y, int z, int dz)
+{
+	int i;
+	for (i = 0; i < maxParticles; i++)
+	{
+		if (!particleList[i]->Alive())
+		{
+			particleList[i]->x = x + MGL_randoml(FIXAMT * 4) - FIXAMT * 2;
+			particleList[i]->y = y + MGL_randoml(FIXAMT * 4) - FIXAMT * 2;
+			particleList[i]->z = z;
+			particleList[i]->dx = MGL_randoml(FIXAMT * 2) - FIXAMT;
+			particleList[i]->dy = MGL_randoml(FIXAMT * 2) - FIXAMT;
+			particleList[i]->dz = dz;
+			particleList[i]->life = 6 * 4 - MGL_random(8);
+			particleList[i]->size = 16;
+			particleList[i]->color = 64;
+			particleList[i]->type = PART_SMOKE;
+			break;
+		}
+	}
+}
+
+void ManaParticles(int x, int y)
+{
+	int i, num;
+
+	num = 30;
+
+	for (i = 0; i < maxParticles; i++)
+	{
+		if (!particleList[i]->Alive())
+		{
+			particleList[i]->GoRandom(PART_MANA, x, y, FIXAMT * 10, 2);
+			particleList[i]->dz = -((int)MGL_randoml(FIXAMT));
+			if (!--num)
+				break;
+		}
+	}
+}
+
+void TrailMe(int x, int y, byte f)
+{
+	int i;
+
+	for (i = 0; i < maxParticles; i++)
+	{
+		if (!particleList[i]->Alive())
+		{
+			particleList[i]->type = PART_GHOST;
+			particleList[i]->x = x;
+			particleList[i]->y = y;
+			particleList[i]->z = 0;
+			particleList[i]->dx = 0;
+			particleList[i]->dy = 0;
+			particleList[i]->dz = 0;
+			particleList[i]->life = 5;
+			particleList[i]->size = f;
+			break;
+		}
+	}
+}
+
+void AddParticle(int x, int y, int z, int dx, int dy, int dz, byte life, byte type, byte color)
+{
+	int i;
+
+	for (i = 0; i < maxParticles; i++)
+	{
+		if (!particleList[i]->Alive())
+		{
+
+			particleList[i]->x = x;
+			particleList[i]->y = y;
+			particleList[i]->z = z;
+			particleList[i]->dx = dx;
+			particleList[i]->dy = dy;
+			particleList[i]->dz = dz;
+			particleList[i]->size = 2;
+			particleList[i]->life = life;
+			particleList[i]->type = type;
+			particleList[i]->color = color;
+			break;
+		}
+	}
+}
+
+void CompassTrail(int sx, int sy, int ex, int ey)
+{
+	int i;
+	int incx, incy, n;
+
+	sx = (sx * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT;
+	ex = (ex * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT;
+	sy = (sy * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT;
+	ey = (ey * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT;
+
+	incx = (ex - sx) / 10;
+	incy = (ey - sy) / 10;
+
+	n = MGL_randoml(FIXAMT);
+	sx = sx + (incx / FIXAMT) * n;
+	sy = sy + (incy / FIXAMT) * n;
+
+	for (i = 0; i < 10; i++)
+	{
+		AddParticle(sx, sy, FIXAMT * 20, 0, 0, 0, 20, PART_COMPASS, 1);
+		sx += incx;
+		sy += incy;
+		if (incx > 0 && sx > ex)
+			sx = ex;
+		if (incx < 0 && sx < ex)
+			sx = ex;
+		if (incy > 0 && sy > ey)
+			sy = ey;
+		if (incy < 0 && sy < ey)
+			sy = ey;
+	}
+}
+
+void FloaterParticles(int x, int y, byte color, int radius, int spread, byte count)
+{
+	int i;
+	byte ang, numLeft;
+
+	ang = (byte)MGL_random(256);
+	numLeft = count;
+	for (i = 0; i < maxParticles; i++)
+	{
+		if (!particleList[i]->Alive())
+		{
+
+			particleList[i]->x = x + Cosine(ang) * radius;
+			particleList[i]->y = y + Sine(ang) * radius;
+			particleList[i]->z = 0;
+			particleList[i]->dx = radius;	// dx=radius
+			particleList[i]->dy = spread;	// dy=spread (how rapidly they move outward or inward)
+			particleList[i]->dz = 0;
+			particleList[i]->size = ang;
+			particleList[i]->life = 29;
+			particleList[i]->type = PART_FLOATER;
+			particleList[i]->color = color * 32 + 16;
+			ang += (256 / count);
+			numLeft--;
+			if (!numLeft)
+				break;
 		}
 	}
 }

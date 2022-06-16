@@ -1,6 +1,5 @@
 {
-	"title": "Dr. Lunatic Supreme With Cheese",
-	"registry_key": "LunaticSupreme",
+	"title": "Dr. Lunatic Operation SCARE",
 	"installers": [
 		{
 			"filename": "supreme8_install.exe",
@@ -9,6 +8,33 @@
 			"link": "https://hamumu.itch.io/dr-lunatic-supreme-with-cheese",
 			"file_id": 700882,
 			"description": "Base assets for Dr. Lunatic Supreme With Cheese"
+		},
+		{
+			"filename": "mystic_install.exe",
+			"kind": "inno",
+			"sha256sum": "c2d618176d23b974c01c00690b6afb0aaebd4c863dfff0bf8b1f66db1bdc2f65",
+			"link": "https://hamumu.itch.io/kid-mystic",
+			"file_id": 704052,
+			"description": "Base assets for Kid Mystic",
+			"mountpoint": "mystic"
+		},
+		{
+			"filename": "loonyland_install.EXE",
+			"kind": "inno",
+			"sha256sum": "cf3cdc555297e41f6c2da61d89815dbbc740d6fc677c83ec6c6e1acfa117de34",
+			"link": "https://hamumu.itch.io/loonyland-halloween-hill",
+			"file_id": 702760,
+			"description": "Base assets for Loonyland: Halloween Hill",
+			"mountpoint": "loonyland"
+		},
+		{
+			"filename": "hollow_betainstall.exe",
+			"kind": "nsis",
+			"sha256sum": "41660802318356fba53a21b4d368e191b3197030fb9e8eb833788f45c01c6f99",
+			"link": "https://hamumu.itch.io/sleepless-hollow",
+			"file_id": 708909,
+			"description": "Base assets for Sleepless Hollow",
+			"mountpoint": "sleepless"
 		},
 		{
 			"filename": "all_supreme_worlds.zip",

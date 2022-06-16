@@ -458,6 +458,8 @@ void PlayerGetBrain(int amt)
 			MakeNormalSound(SND_MUSHMAD);
 		else if(player.playAs==PLAY_LUNACHIK)
 			MakeNormalSound(SND_LUNABRAINS);
+		else if(player.playAs==PLAY_MYSTIC)
+			MakeNormalSound(SND_KOOLKATKM);
 
 		playerGlow=127;
 	}
@@ -593,6 +595,10 @@ void PlayerThrowHammer(Guy *me)
 	{
 		HammerLaunch(me->x,me->y,me->facing,player.hammers,player.hammerFlags);
 	}
+	if(player.playAs==PLAY_MYSTIC)
+	{
+		HammerLaunch(me->x,me->y,me->facing,player.hammers,player.hammerFlags);
+	}
 	else if(player.playAs==PLAY_LUNATIC)
 	{
 		MakeSound(SND_BALLLIGHTNING,me->x,me->y,SND_CUTOFF,600);
@@ -674,6 +680,11 @@ void DoPlayerFacing(byte c,Guy *me)
 		else if(c&CONTROL_RT)
 			me->facing=0;
 	}
+}
+
+byte FakeGetControls(void)
+{
+	return newControls;
 }
 
 void PlayerFireWeapon(Guy *me)
@@ -1293,6 +1304,13 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 				MakeSound(SND_LUNAOUCH,me->x,me->y,SND_CUTOFF|SND_ONE,2000);
 			else if(me->seq==ANIM_DIE)	// so it doesn't do this if you're drowning
 				MakeSound(SND_LUNADIE,me->x,me->y,SND_CUTOFF|SND_ONE,2000);
+		}
+		if(player.playAs==PLAY_LUNACHIK)
+		{
+			if(me->hp>0)
+				MakeSound(SND_KMOUCH,me->x,me->y,SND_CUTOFF|SND_ONE,2000);
+			else if(me->seq==ANIM_DIE)	// so it doesn't do this if you're drowning
+				MakeSound(SND_KMDIE,me->x,me->y,SND_CUTOFF|SND_ONE,2000);
 		}
 		else if(player.playAs==PLAY_LUNATIC)
 		{

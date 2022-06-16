@@ -41,6 +41,7 @@
 #define VE_MINECART 1
 #define VE_RAFT		2
 #define VE_YUGO		3
+#define VE_LOG		4
 
 typedef struct player_t
 {
@@ -141,6 +142,9 @@ void KeyChainAllCheck(void);
 void PlayerGetBrain(int amt);
 void PlayerGetCandle(int amt);
 void PlayerGetCoin(int amt);
+
+void DoPlayerFacing(byte c, Guy* me);
+byte FakeGetControls(void);
 
 void SetPlayerStart(int x,int y);
 void PutPlayerAtStart(Guy *g);

@@ -382,13 +382,25 @@ byte ZoomTileColor(int x,int y)
 
 	m=&world->map[mapNum]->map[x+y*world->map[mapNum]->width];
 
-	for(i=0;i<MAX_MAPMONS;i++)
-		if(world->map[mapNum]->badguy[i].type &&
-			world->map[mapNum]->badguy[i].x==x &&
-			world->map[mapNum]->badguy[i].y==y)
+	for (i = 0; i < MAX_MAPMONS; i++) {
+		if (world->map[mapNum]->badguy[i].type &&
+			world->map[mapNum]->badguy[i].x == x &&
+			world->map[mapNum]->badguy[i].y == y)
 		{
-			return (4*32)+20;	// red=badguy
+			return (4 * 32) + 20;	// red=badguy
 		}
+		else if (world->map[mapNum]->badguy[i].type &&
+			world->map[mapNum]->badguy[i].x == x &&
+			world->map[mapNum]->badguy[i].y == y &&
+			(world->map[mapNum]->badguy[i].type == MONS_BOUAPHA || world->map[mapNum]->badguy[i].type == MONS_BUNNY || world->map[mapNum]->badguy[i].type == MONS_FOLLOWBUNNY ||
+				world->map[mapNum]->badguy[i].type == MONS_FRIENDLY2 || world->map[mapNum]->badguy[i].type == MONS_GOODROBOT || world->map[mapNum]->badguy[i].type == MONS_GOODROBOT2 ||
+				world->map[mapNum]->badguy[i].type == MONS_WIZARD || world->map[mapNum]->badguy[i].type == MONS_PUNKBUNNY || world->map[mapNum]->badguy[i].type == MONS_MINECART ||
+				world->map[mapNum]->badguy[i].type == MONS_RAFT || world->map[mapNum]->badguy[i].type == MONS_LOG || world->map[mapNum]->badguy[i].type == MONS_YERFDOG ||
+				world->map[mapNum]->badguy[i].type == MONS_GOLEM))
+		{
+			return (1 * 32) + 16;	// bright green=goodguy
+		}
+	}
 
 	if(GetItem(m->item)->flags&IF_SOLID)
 	{

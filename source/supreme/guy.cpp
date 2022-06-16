@@ -73,7 +73,6 @@ byte Guy::AttackCheck(byte size,int xx,int yy,Guy *him)
 
 	return 0;
 }
-
 // check to see if the chosen tile intersects HIMs rectangle
 byte TileBonkCheck(int x,int y,Guy *him)
 {
@@ -533,6 +532,40 @@ void Guy::Update(Map *map,world_t *world)
 		poison--;
 	}
 
+	if (ignited > 0)
+	{
+		if (frozen)
+			frozen = 0; //can't be frozen and burning at the same time!
+
+		ignited--;
+
+		if (hp > 0 && ((ignited & 12) == 0))
+		{
+			if (aiType == MONS_BOUAPHA && !editing && !player.cheated)
+			{
+				profile.progress.damageTaken++;
+				//profile.progress.ignited += 1 / 30;
+			}
+
+			hp--;
+			if (hp == 0)
+			{
+				hp = 1;
+				GetShot(0, 0, 1, map, world);
+			}
+		}
+		if (ignited & 1)	// every other frame
+		{
+			map->DimTorch((x / TILE_WIDTH) >> FIXSHIFT, (y / TILE_HEIGHT) >> FIXSHIFT, 10);
+			if (Random(5) == 0)
+				BlowSmoke(x, y, z - FIXAMT * 20, FIXAMT);
+			if (Random(7) == 0)
+				FireBullet(x, y, 0, BLT_FLAME3, friendly * -1 + 1);
+		}
+		map->BrightTorch((x / TILE_WIDTH) >> FIXSHIFT,
+			(y / TILE_HEIGHT) >> FIXSHIFT, 8, 4);
+	}
+
 	oldx=x;
 	oldy=y;
 
@@ -551,7 +584,9 @@ void Guy::Update(Map *map,world_t *world)
 			aiType==MONS_SNOWBALL2 || aiType==MONS_ROLLER3 || aiType==MONS_ROLLER4 || aiType==MONS_DARKVAMP ||
 			aiType==MONS_FRIENDLY2 || aiType==MONS_CRAZYPANTS || aiType==MONS_AUTOZOID || aiType==MONS_YUGO ||
 			aiType==MONS_PATTY || aiType==MONS_PATROLLR || aiType==MONS_PATROLUD || aiType==MONS_DPATROLLR || aiType==MONS_DPATROLUD ||
-			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST)
+			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST || aiType==MONS_INCAGOLD || aiType == MONS_INCAGOLD2 || aiType==MONS_INCABOSS || aiType==MONS_BALL ||
+			aiType==MONS_SLUG || aiType==MONS_SNAIL || aiType==MONS_OCTOBOSS || aiType ==MONS_GOAT1 || aiType==MONS_SPARK || aiType==MONS_BIGHEAD2 ||
+			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2)
 			mind1=1;	// tell it that it hit a wall
 		b=1;
 	}
@@ -563,14 +598,16 @@ void Guy::Update(Map *map,world_t *world)
 		y-=dy;
 		if(aiType==MONS_MINECART)
 			y=(mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
-
+		
 		if(aiType==MONS_ROLLER || aiType==MONS_ROLLER2 || aiType==MONS_CENTIHEAD || aiType==MONS_DRL ||
 			aiType==MONS_BOUAPHA || aiType==MONS_VAMPIRE || aiType==MONS_PKSTEIN || aiType==MONS_TRICEROID ||
 			aiType==MONS_BUNNY || aiType==MONS_LOONYSHIP || aiType==MONS_FRIENDLY || aiType==MONS_SNOWBALL ||
 			aiType==MONS_SNOWBALL2 || aiType==MONS_ROLLER3 || aiType==MONS_ROLLER4 || aiType==MONS_DARKVAMP ||
 			aiType==MONS_FRIENDLY2 || aiType==MONS_CRAZYPANTS || aiType==MONS_AUTOZOID || aiType==MONS_YUGO ||
 			aiType==MONS_PATTY || aiType==MONS_PATROLLR || aiType==MONS_PATROLUD || aiType==MONS_DPATROLLR || aiType==MONS_DPATROLUD ||
-			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST)
+			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST || aiType==MONS_INCAGOLD || aiType == MONS_INCAGOLD2 || aiType==MONS_INCABOSS || aiType==MONS_BALL ||
+			aiType==MONS_SLUG || aiType==MONS_SNAIL || aiType==MONS_OCTOBOSS || aiType ==MONS_GOAT1 || aiType==MONS_SPARK || aiType==MONS_BIGHEAD2 ||
+			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2)
 			mind1+=2;	// tell it that it hit a wall
 		b=1;
 	}
@@ -637,6 +674,17 @@ void Guy::Update(Map *map,world_t *world)
 	mapx=(x>>FIXSHIFT)/TILE_WIDTH;
 	mapy=(y>>FIXSHIFT)/TILE_HEIGHT;
 
+	if (aiType == MONS_LOG)//for when you're riding the log!
+	{
+		int tdx, tdy;
+		if (mind != 0)
+		{
+			tdx = dx / 2;
+			tdy = dy / 2;
+			UpdateCamera(x >> FIXSHIFT, y >> FIXSHIFT, tdx, tdy, map);
+		}
+	}
+
 	if(aiType==MONS_BOUAPHA)	// special case, Bouapha is the player, follow him
 	{
 		if(player.vehicle==0 && !editing && !player.cheated)
@@ -693,11 +741,11 @@ void Guy::Update(Map *map,world_t *world)
 
 		// standing on water!!!!!!!  DROWN!!!!
 		if((hp>0) && (z==0) && (GetTerrain(world,map->GetTile(mapx,mapy)->floor)->flags&TF_WATER)
-			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.weapon==WPN_MINISUB)) &&
+			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_LOG)) && (!(player.weapon==WPN_MINISUB)) &&
 			(!(player.vehicle==VE_YUGO)) && ((MonsterFlags(goodguy->type,goodguy->aiType)&(MF_AQUATIC|MF_FLYING))==0))
 		{
 			// if there's a raft, hop on instead of dying
-			if(!RaftNearby())
+			if(!RaftNearby()&&!LogNearby())
 			{
 				if(player.weapon==WPN_PWRARMOR)
 					player.weapon=0;
@@ -713,6 +761,8 @@ void Guy::Update(Map *map,world_t *world)
 				action=ACTION_BUSY;
 				if(player.playAs==PLAY_LUNACHIK)
 					MakeSound(SND_LUNADROWN,x,y,SND_CUTOFF|SND_ONE,65536);
+				else if(player.playAs==PLAY_MYSTIC)
+					MakeSound(SND_DROWNKM,x,y,SND_CUTOFF|SND_ONE,65536);
 				else
 					MakeSound(SND_DROWN,x,y,SND_CUTOFF|SND_ONE,65536);
 				if(player.shield)
@@ -721,10 +771,10 @@ void Guy::Update(Map *map,world_t *world)
 		}
 		// standing on lava, OW!
 		if((hp>0) && (z==0) && (GetTerrain(world,map->GetTile(mapx,mapy)->floor)->flags&TF_LAVA)
-			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_YUGO)) && (!(player.weapon==WPN_PWRARMOR || player.weapon==WPN_MINISUB))
-			 && ((MonsterFlags(goodguy->type,goodguy->aiType)&(MF_AQUATIC|MF_FLYING))==0))
+			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_LOG)) && (!(player.weapon==WPN_MINISUB)) &&
+			(!(player.vehicle==VE_YUGO)) && ((MonsterFlags(goodguy->type,goodguy->aiType)&(MF_AQUATIC|MF_FLYING))==0))
 		{
-			if(!RaftNearby())
+			if(!RaftNearby() && !LogNearby())
 			{
 				if(burnFlip)
 				{
@@ -798,6 +848,8 @@ void Guy::Render(byte light)
 			t=MONS_PLAYSHROOM;
 		else if(player.playAs==PLAY_LUNACHIK)
 			t=MONS_LUNACHICK;
+		else if (player.playAs==PLAY_MYSTIC)
+			t=MONS_MYSTIC;
 		else
 			t=MONS_BOUAPHA;
 
@@ -900,6 +952,24 @@ void Guy::MonsterControl(Map *map,world_t *world)
 		GetMonsterType(aiType)->AI(this,map,world,target);
 }
 
+byte Guy::AttackCheck2(int xx, int yy, int xx2, int yy2, Guy* him)
+{
+	int x2, y2;
+
+	if (!him)
+		return 0;
+
+	x2 = him->x >> FIXSHIFT;
+	y2 = him->y >> FIXSHIFT;
+
+	//DrawDebugBox(xx,yy,xx+size*2,yy+size*2);
+	if ((x2 + him->rectx2) >= xx && (y2 + him->recty2) >= yy && (x2 + him->rectx) <= (xx2) &&
+		(y2 + him->recty) <= (yy2))
+		return 1;
+
+	return 0;
+}
+
 void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 {
 	int formerHP,newHP;
@@ -921,6 +991,31 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 
 	if(aiType==MONS_BOUAPHA && frozen)
 		frozen/=2;
+
+	if (aiType == MONS_LOOKEYLOO && !mind4)	// can only hit lookey-loo when its eye is open
+		return;
+
+	if (aiType == MONS_BOBBY) { // bobby shield attack
+		if((seq == ANIM_A1 && frm > 1 && frm < 11) || (seq == ANIM_A4))
+		{
+			if (seq == ANIM_A4)
+				return;	// just ignore it
+
+			seq = ANIM_A4;
+			frm = 0;
+			frmTimer = 0;
+			frmAdvance = 128;
+			// make clang noise
+			MakeSound(SND_BOBBYBLOCK, x, y, SND_CUTOFF, 1200);
+			return;
+		}
+	}
+
+	if (aiType == MONS_INCATONGUE && !mind3)
+		return;
+
+	if (aiType == MONS_GOAT1 && !mind3) // rammy gruff takes 1/4 damage unless dizzy
+		damage=damage/4;
 
 	if(profile.difficulty==0 && damage>0)
 	{
@@ -1002,6 +1097,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 	{
 		hp=0;
 		GoalKilledSomebody(this,type,frozen);
+		ignited=0;
 		frozen=0;
 		newHP=0;
 		seq=ANIM_DIE;
@@ -1251,10 +1347,12 @@ void UpdateGuys(Map *map,world_t *world)
 			else
 			{
 				if(!player.timeStop || guys[i]->aiType==MONS_BOUAPHA || guys[i]->hp==0 ||
-					guys[i]->aiType==MONS_MINECART || guys[i]->aiType==MONS_RAFT || guys[i]->aiType==MONS_YUGO)
+					guys[i]->aiType==MONS_MINECART || guys[i]->aiType==MONS_RAFT || guys[i]->aiType==MONS_YUGO ||
+					guys[i]->aiType==MONS_LOG)
 				{
 					if(((speedClock&3)==0) && guys[i]->aiType!=MONS_BOUAPHA && guys[i]->aiType!=MONS_RAFT &&
-						guys[i]->aiType!=MONS_MINECART && guys[i]->aiType!=MONS_RAFT && guys[i]->aiType!=MONS_YUGO)
+						guys[i]->aiType!=MONS_MINECART && guys[i]->aiType!=MONS_RAFT && guys[i]->aiType!=MONS_YUGO ||
+						guys[i]->aiType == MONS_LOG)
 					{
 						if(profile.difficulty==0)
 						{
@@ -1364,7 +1462,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 		while(type==MONS_NONE || type==MONS_NOBODY || type==MONS_BOUAPHA || type==MONS_FRIENDLY || type==MONS_GOODTURRET ||
 				type==MONS_WIZARD || type==MONS_GOODROBOT || type==MONS_GOODROBOT2 ||
 				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_MINECART || type==MONS_RAFT ||
-				type==MONS_YUGO || type==MONS_PUNKBUNNY || (GetMonsterType(type)->theme==MT_NONE))
+				type==MONS_YUGO || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM || type==MONS_LOG ||
+				(GetMonsterType(type)->theme==MT_NONE))
 			type=Random(NUM_MONSTERS);
 	}
 	else if(type==MONS_GOODGUY)
@@ -1372,7 +1471,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 		type=MONS_NOBODY;
 		while(type==MONS_NONE || type==MONS_NOBODY || !(type==MONS_FRIENDLY || type==MONS_GOODTURRET ||
 				type==MONS_WIZARD || type==MONS_GOODROBOT || type==MONS_GOODROBOT2 ||
-				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_PUNKBUNNY || (GetMonsterType(type)->theme==MT_NONE)))
+				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM || type == MONS_LOG ||
+				(GetMonsterType(type)->theme==MT_NONE)))
 			type=Random(NUM_MONSTERS);
 	}
 	else if(type==MONS_TAGGED)
@@ -1404,7 +1504,7 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			if(friendly==1 || (friendly==2 && (type==MONS_BOUAPHA || type==MONS_FRIENDLY || type==MONS_GOODTURRET ||
 				type==MONS_WIZARD || type==MONS_GOODROBOT || type==MONS_GOODROBOT2 ||
 				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_MINECART || type==MONS_RAFT ||
-				type==MONS_YUGO || type==MONS_PUNKBUNNY)))
+				type==MONS_YUGO || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM)))
 			{
 				guys[i]->friendly=1;
 				j=LockOnEvil(x>>FIXSHIFT,y>>FIXSHIFT);
@@ -1457,6 +1557,7 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->CalculateRect();
 			guys[i]->ID=i;
 			guys[i]->frozen=0;
+			guys[i]->ignited = 0;
 			guys[i]->mapx=(guys[i]->x>>FIXSHIFT)/TILE_WIDTH;
 			guys[i]->mapy=(guys[i]->y>>FIXSHIFT)/TILE_HEIGHT;
 			guys[i]->item=ITM_RANDOM;
@@ -1481,6 +1582,19 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			if(type==MONS_GENERATOR4)
 				guys[i]->mind2=30;
 
+			if (type == MONS_SPOOKLEY || type == MONS_SPOOKLEY2)
+				guys[i]->mind3 = 255;
+
+			if (type == MONS_BIGHEAD1 || type == MONS_BIGHEAD2 || type == MONS_BIGHEAD3)
+			{
+				guys[i]->z = FIXAMT * 40;
+				g = AddGuy(guys[i]->x, guys[i]->y - 1, 0, MONS_BIGBODY, 0);
+				if (g)
+				{
+					g->parent = guys[i];
+				}
+			}
+
 			if(type==MONS_MATHEAD)	// Matilda, need to add all the parts
 			{
 				guys[i]->z=32*FIXAMT;
@@ -1497,7 +1611,6 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 				if(g)
 					g->parent=guys[i];
 			}
-
 			if(type==MONS_CRABPUFF || type==MONS_BEETLE)
 			{
 				guys[i]->seq=ANIM_MOVE;
@@ -1726,6 +1839,47 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 					g->mind3=1;
 				}
 			}
+			if (type == MONS_INCABOSS)
+			{
+				g = AddGuy(x, y, 0, MONS_INCATONGUE, friendly);
+				if (g)
+					g->parent = guys[i];
+			}
+			if (type == MONS_OCTOBOSS)
+			{
+				g = AddGuy(x - FIXAMT * 140, y - FIXAMT * 100, 0, MONS_OCTOTENT, friendly);
+				if (g)
+					g->parent = guys[i];
+				g = AddGuy(x - FIXAMT * 180, y - FIXAMT * 30, 0, MONS_OCTOTENT, friendly);
+				if (g)
+					g->parent = guys[i];
+				g = AddGuy(x - FIXAMT * 180, y + FIXAMT * 30, 0, MONS_OCTOTENT, friendly);
+				if (g)
+					g->parent = guys[i];
+				g = AddGuy(x - FIXAMT * 140, y + FIXAMT * 100, 0, MONS_OCTOTENT, friendly);
+				if (g)
+					g->parent = guys[i];
+
+				g = AddGuy(x + FIXAMT * 140, y - FIXAMT * 100, 0, MONS_OCTOTENT2, friendly);
+				if (g)
+					g->parent = guys[i];
+				g = AddGuy(x + FIXAMT * 180, y - FIXAMT * 30, 0, MONS_OCTOTENT2, friendly);
+				if (g)
+					g->parent = guys[i];
+				g = AddGuy(x + FIXAMT * 180, y + FIXAMT * 30, 0, MONS_OCTOTENT2, friendly);
+				if (g)
+					g->parent = guys[i];
+				g = AddGuy(x + FIXAMT * 140, y + FIXAMT * 100, 0, MONS_OCTOTENT2, friendly);
+				if (g)
+					g->parent = guys[i];
+			}
+			if (type == MONS_ISOZOID && editing != 1)
+			{
+				guys[i]->seq = ANIM_A2;		// start hidden!
+				guys[i]->frm = 0;
+				guys[i]->frmTimer = 0;
+				guys[i]->frmAdvance = 1;
+			}
 
 			return guys[i];
 		}
@@ -1834,7 +1988,7 @@ void AddMapGuys(Map *map)
 					if(genType[i]==MONS_BOUAPHA || genType[i]==MONS_FRIENDLY || genType[i]==MONS_GOODTURRET ||
 						genType[i]==MONS_WIZARD || genType[i]==MONS_GOODROBOT || genType[i]==MONS_GOODROBOT2 ||
 						genType[i]==MONS_FRIENDLY2 || genType[i]==MONS_PUNKBUNNY || genType[i]==MONS_FOLLOWBUNNY ||
-						genType[i]==MONS_MINECART || genType[i]==MONS_RAFT || genType[i]==MONS_YUGO)
+						genType[i]==MONS_MINECART || genType[i]==MONS_RAFT || genType[i]==MONS_YUGO || genType[i]==MONS_PTERO || genType[i]==MONS_GOLEM)
 					{
 						player.totalEnemies--;
 						g->friendly=1;
@@ -2215,6 +2369,40 @@ byte RaftNearby(void)
 	return 0;
 }
 
+byte LogNearby(void)
+{
+	int i,gx,gy,mx,my;
+
+	gx=((goodguy->x-goodguy->dx)>>FIXSHIFT)/TILE_WIDTH;
+	gy=((goodguy->y-goodguy->dy)>>FIXSHIFT)/TILE_HEIGHT;
+
+	for(i=0;i<maxGuys;i++)
+		if(guys[i] && guys[i]->type && guys[i]->aiType==MONS_LOG)
+		{
+			if(RangeToTarget(guys[i],goodguy)<32*FIXAMT && player.vehicle==0)
+			{
+				MakeSound(SND_ROLYPOLYWALL, goodguy->x, goodguy->y, SND_CUTOFF, 100);
+				guys[i]->mind=1;
+				player.vehicle=VE_LOG;
+				goodguy->parent=guys[i];
+				goodguy->z=FIXAMT*8;
+				guys[i]->mind1=1;	// acceleration
+
+				mx=((guys[i]->x)>>FIXSHIFT)/TILE_WIDTH;
+				my=((guys[i]->y)>>FIXSHIFT)/TILE_HEIGHT;
+
+				if(guys[i]->hp%4==2)
+				guys[i]->facing=3;
+				else
+				guys[i]->facing=1;
+
+				return 1;
+			}
+		}
+
+	return 0;
+}
+
 void GuySwap(int sx,int sy,int width,int height,int dx,int dy)
 {
 	int i;
@@ -2474,6 +2662,11 @@ void KillMonster(int x,int y,int type,byte nofx)
 			{
 				player.vehicle=VE_NONE;	// player was riding it
 				goodguy->parent=NULL;
+			}
+			if(guys[i]->aiType==MONS_LOG && guys[i]->mind!=0)
+			{
+				player.vehicle = VE_NONE;	// player was riding it
+				goodguy->parent = NULL;
 			}
 
 			guys[i]->type=MONS_NONE;
@@ -2840,6 +3033,313 @@ void SetMonsterBright(byte fx,int x,int y,int type,int bright)
 			guys[i]->brtChange=bright;
 		}
 	}
+}
+
+byte EatHay(Guy* me, byte rad)
+{
+	int i, j;
+
+	for (i = me->mapx - rad; i <= me->mapx + rad; i++)
+		for (j = me->mapy - rad; j <= me->mapy + rad; j++)
+		{
+			if (i >= 0 && j >= 0 && i < curMap->width && j < curMap->height && curMap->map[i + j * curMap->width].item == ITM_BUSH)
+			{
+				curMap->map[i + j * curMap->width].item = 0;
+				ExplodeParticlesColor(5, (i * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT, (j * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT, FIXAMT * 5, 8, 3);
+				return 1;
+			}
+		}
+	return 0;
+}
+
+byte SmashTrees(Guy* me, byte rad)
+{
+	int i, j;
+
+	for (i = me->mapx - rad; i <= me->mapx + rad; i++)
+		for (j = me->mapy - rad; j <= me->mapy + rad; j++)
+		{
+			if (i >= 0 && j >= 0 && i < curMap->width && j < curMap->height && (curMap->map[i + j * curMap->width].item == ITM_DEADTREE || curMap->map[i + j * curMap->width].item == ITM_DEADTREE2) &&
+				i>2 && j>2 && i < curMap->width - 3 && j < curMap->height - 3 && Random(2) == 0)
+			{
+				curMap->map[i + j * curMap->width].item = 0;
+				MakeSound(SND_ROLYPOLYWALL, me->x, me->y, SND_CUTOFF, 100);
+				ExplodeParticlesColor(2, (i * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT, (j * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT, FIXAMT * 5, 8, 3);
+				return 1;
+			}
+		}
+	return 0;
+}
+
+//light s***
+void SpreadCharge(Guy* me)
+{
+	int i;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type == MONS_LIGHTSLIDE && guys[i] != me)
+		{
+			if ((guys[i]->mapx == me->mapx && (guys[i]->mapy == me->mapy - 1 || guys[i]->mapy == me->mapy + 1)) ||
+				(guys[i]->mapy == me->mapy && (guys[i]->mapx == me->mapx - 1 || guys[i]->mapx == me->mapx + 1)))
+			{
+				if (Random(10) == 0)
+					LightningBolt(guys[i]->x - 10 * FIXAMT + Random(20 * FIXAMT + 1), guys[i]->y - FIXAMT * 30 - 10 * FIXAMT + Random(20 * FIXAMT + 1), me->x, me->y - FIXAMT * 30);
+				if (guys[i]->mind1 < 105)
+					guys[i]->mind1 += 2;
+			}
+		}
+	}
+}
+
+void SuckInEvil(int x, int y, byte friendly)
+{
+	int i, suck;
+	byte a;
+
+	x /= FIXAMT;
+	y /= FIXAMT;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type && guys[i]->friendly != friendly && guys[i]->hp && !(guys[i]->type & (MF_NOHIT | MF_INVINCIBLE)))
+		{
+			suck = (guys[i]->x / FIXAMT - x) * (guys[i]->x / FIXAMT - x) + (guys[i]->y / FIXAMT - y) * (guys[i]->y / FIXAMT - y);
+			if (suck < 60000)	// 300? pixels max
+			{
+				suck = 60000 - suck;
+				suck /= 2600;	// now suck is 0-20
+				a = AngleFrom(guys[i]->x / FIXAMT, guys[i]->y / FIXAMT, x, y);
+				guys[i]->x += Cosine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->x -= Cosine(a) * suck;
+				guys[i]->y += Sine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->y -= Sine(a) * suck;
+			}
+		}
+	}
+}
+
+void SuckInGood(int x, int y, byte friendly)
+{
+	int i, suck;
+	byte a;
+
+	x /= FIXAMT;
+	y /= FIXAMT;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type && guys[i]->friendly == friendly && guys[i]->hp && !(guys[i]->type & (MF_NOHIT | MF_INVINCIBLE)))
+		{
+			suck = (guys[i]->x / FIXAMT - x) * (guys[i]->x / FIXAMT - x) + (guys[i]->y / FIXAMT - y) * (guys[i]->y / FIXAMT - y);
+			if (suck < 60000)	// 300? pixels max
+			{
+				suck = 60000 - suck;
+				suck /= 2600;	// now suck is 0-20
+				a = AngleFrom(guys[i]->x / FIXAMT, guys[i]->y / FIXAMT, x, y);
+				guys[i]->x += Cosine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->x -= Cosine(a) * suck;
+				guys[i]->y += Sine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->y -= Sine(a) * suck;
+			}
+		}
+	}
+}
+
+void PushOutEvil(int x, int y, byte friendly)
+{
+	int i, suck;
+	byte a;
+
+	x /= FIXAMT;
+	y /= FIXAMT;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type && guys[i]->friendly != friendly && guys[i]->hp && !(guys[i]->type & (MF_NOHIT | MF_INVINCIBLE)))
+		{
+			suck = (guys[i]->x / FIXAMT - x) * (guys[i]->x / FIXAMT - x) + (guys[i]->y / FIXAMT - y) * (guys[i]->y / FIXAMT - y);
+			if (suck < 60000)	// 300? pixels max
+			{
+				suck = 60000 - suck;
+				suck /= 2600;	// now suck is 0-20
+				a = AngleFrom(guys[i]->x / FIXAMT, guys[i]->y / FIXAMT, x, y);
+				guys[i]->x -= Cosine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->x += Cosine(a) * suck;
+				guys[i]->y -= Sine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->y += Sine(a) * suck;
+			}
+		}
+	}
+}
+
+void Tornado(int x, int y, byte friendly)
+{
+	int i, suck;
+	byte a;
+
+	x /= FIXAMT;
+	y /= FIXAMT;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type && guys[i]->friendly != friendly && guys[i]->hp && !(guys[i]->type & (MF_NOHIT | MF_INVINCIBLE)))
+		{
+			suck = (guys[i]->x / FIXAMT - x) * (guys[i]->x / FIXAMT - x) + (guys[i]->y / FIXAMT - y) * (guys[i]->y / FIXAMT - y);
+			if (suck < 60000)	// 300? pixels max
+			{
+				suck = 60000 - suck;
+				suck /= 15000;	// now suck is 0-20
+				a = AngleFrom(guys[i]->x / FIXAMT, guys[i]->y / FIXAMT, x, y);
+				guys[i]->x += Cosine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->x -= Cosine(a) * suck;
+				guys[i]->y += Sine(a) * suck;
+				if (!guys[i]->CanWalk(guys[i]->x, guys[i]->y, curMap, &curWorld))
+					guys[i]->y -= Sine(a) * suck;
+			}
+		}
+	}
+}
+
+void PushOthers(Guy* g, byte h, Map* map)
+{
+	int i, suck;
+	byte a;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type && !(guys[i]->type & (MF_NOHIT | MF_INVINCIBLE)) && guys[i]->hp && map->FindGuy(g->mapx, g->mapy, 1000, guys[i]))
+		{
+			if (h && abs(g->mapy - guys[i]->mapy) < 3)
+			{
+				if (g->mapx > guys[i]->mapx)
+					guys[i]->ax -= FIXAMT * 2;
+				else if (g->mapx < guys[i]->mapx)
+					guys[i]->ax += FIXAMT * 2;
+
+			}
+			else if (!h && abs(g->mapx - guys[i]->mapx) < 3)
+			{
+				if (g->mapy > guys[i]->mapy)
+					guys[i]->ay -= FIXAMT * 2;
+				else if (g->mapy < guys[i]->mapy)
+					guys[i]->ay += FIXAMT * 2;
+			}
+			Clamp(&guys[i]->ax, FIXAMT * 4);
+			Clamp(&guys[i]->ay, FIXAMT * 4);
+		}
+	}
+}
+
+Guy* holdSpook = NULL;
+
+void GetSpook(void)
+{
+	int i;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type == MONS_SPOOKLEY || guys[i]->type == MONS_SPOOKLEY2)
+		{
+			if (holdSpook == NULL)
+				holdSpook = new Guy();
+			memcpy(holdSpook, guys[i], sizeof(Guy));	// make a copy of the spook
+			return;
+		}
+	}
+}
+
+void HealOthers(int x, int y, int f, int h)
+{
+	int i, suck;
+	byte a;
+
+	x /= FIXAMT;
+	y /= FIXAMT;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type && guys[i]->friendly == 0 && guys[i]->hp && !(guys[i]->type & (MF_NOHIT | MF_INVINCIBLE)))
+		{
+			suck = (guys[i]->x / FIXAMT - x) * (guys[i]->x / FIXAMT - x) + (guys[i]->y / FIXAMT - y) * (guys[i]->y / FIXAMT - y);
+			if (suck < 60000)	// 300? pixels max
+			{
+				if (guys[i]->hp + h < guys[i]->maxHP)
+					guys[i]->hp += h;
+			}
+		}
+	}
+}
+
+void PutSpook(void)
+{
+	word ID;
+	Guy* g;
+	int i;
+
+	for (i = 0; i < maxGuys; i++)
+		if (guys[i]->type == MONS_SPOOKLEY || guys[i]->type == MONS_SPOOKLEY2)
+			guys[i]->type = MONS_NONE;
+
+	if (holdSpook != NULL)
+	{
+		g = AddGuy(0, 0, 0, MONS_SPOOKLEY, 0);
+		ID = g->ID;
+		memcpy(g, holdSpook, sizeof(Guy));
+		g->ID = ID;
+		g->target = goodguy;
+		g->parent = NULL;
+		g->type = MONS_SPOOKLEY + MONS_SPOOKLEY2 - g->type;
+		delete holdSpook;
+		holdSpook = NULL;
+	}
+}
+
+byte ArrangeBats(byte facing)
+{
+	int i, tx, ty;
+	byte ang[8];
+	byte minions, spot;
+
+	minions = CountMonsters(MONS_BATGUARD);
+
+	for (i = 0; i < minions; i++)
+	{
+		ang[i] = facing + (256 / minions) * i;
+	}
+	spot = 0;
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type == MONS_BATGUARD)
+		{
+			guys[i]->mind = TurnToward(guys[i]->mind, ang[spot], 4);
+			guys[i]->facing = guys[i]->mind / 32;
+			tx = guys[i]->parent->x + Cosine(guys[i]->mind) * 50;
+			ty = guys[i]->parent->y + Sine(guys[i]->mind) * 50;
+			if (guys[i]->x < tx)
+				guys[i]->dx += FIXAMT / 2;
+			if (guys[i]->x > tx)
+				guys[i]->dx -= FIXAMT / 2;
+			if (guys[i]->y < ty)
+				guys[i]->dy += FIXAMT / 2;
+			if (guys[i]->y > ty)
+				guys[i]->dy -= FIXAMT / 2;
+			Dampen(&guys[i]->dx, FIXAMT / 8);
+			Dampen(&guys[i]->dy, FIXAMT / 8);
+			guys[i]->x = tx;
+			guys[i]->y = ty;
+			spot++;
+		}
+	}
+
+	return minions;
 }
 
 void MonsterLifeAmt(byte fx,int x,int y,int type,int amt)
@@ -3745,6 +4245,7 @@ byte Guy::IsAwake(void)
 		case MONS_DRL:
 		case MONS_MINECART:	// not being ridden=asleep
 		case MONS_RAFT:		// same
+		case MONS_LOG:		// same
 		case MONS_GHOST:
 		case MONS_PYGMY2:
 		case MONS_PYGMY3:
@@ -3782,7 +4283,8 @@ byte Guy::IsAwake(void)
 			break;
 		case MONS_LOONYGUN:
 		case MONS_LOONYCORE:
-			return (parent && parent->mind!=0);
+		case MONS_INCATONGUE:
+			return (parent && parent->mind != 0);
 			break;
 		case MONS_LAZYBONE:
 			return (seq!=ANIM_IDLE);
@@ -3796,6 +4298,8 @@ byte Guy::IsAwake(void)
 		case MONS_PATROLUD:
 		case MONS_DPATROLLR:
 		case MONS_DPATROLUD:
+		case MONS_INCAGOLD:
+		case MONS_INCAGOLD2:
 			return (mind==2);	// awake if being driven
 			break;
 		default:
@@ -3844,4 +4348,45 @@ byte BadguyRegions(int x,int y,int x2,int y2,int tx,int ty)
 		}
 	}
 	return 1;
+}
+
+byte PeepAtKid(int x, int y, Map* map, byte face) //for peeping bomb
+{
+	int i;
+	int checkx, checky, mapx, mapy;
+
+	checkx = x;
+	checky = y;
+
+	if (goodguy == NULL)
+		return 0;
+
+	for (i = 0; i < 64; i++)
+	{
+		//AddParticle(checkx,checky,0,0,0,0,10,PART_SLIME,1);
+
+		if (abs(checkx - goodguy->x) / FIXAMT + abs(checky - goodguy->y) / FIXAMT < (16 + i))
+		{
+			mapx = x / (TILE_WIDTH * FIXAMT);
+			mapy = y / (TILE_HEIGHT * FIXAMT);
+			if (map->FindGuy(mapx, mapy, 20, goodguy))
+				return 1;
+			else
+				return 0;
+		}
+
+		checkx += Cosine(face) * 5;
+		checky += Sine(face) * 5;
+
+		mapx = checkx / (TILE_WIDTH * FIXAMT);
+		mapy = checky / (TILE_HEIGHT * FIXAMT);
+
+		if (mapx < 0 || mapy < 0 || mapx >= map->width || mapy >= map->height)
+			return 0;	// went off the map
+
+		if (map->map[mapx + mapy * map->width].wall)
+			return 0;	// hit a wall
+	}
+
+	return 0;
 }

@@ -24,6 +24,7 @@ class Guy
 		void MonsterControl(Map *map,world_t *world);
 		byte CoconutBonk(int xx,int yy,Guy *him);
 		byte AttackCheck(byte size,int xx,int yy,Guy *him);
+		byte AttackCheck2(int xx,int yy,int xx2,int yy2,Guy *him);
 		void AttackThem(void);
 		void GetShot(int dx,int dy,byte damage,Map *map,world_t *world);
 		void CalculateRect(void);
@@ -32,6 +33,7 @@ class Guy
 		int x,y,z;
 		int oldx,oldy;
 		int dx,dy,dz;
+		int ax, ay; //acceleration provided by badguys
 		byte mapx,mapy;
 		byte lastBumpX,lastBumpY;
 		byte facing;
@@ -40,6 +42,8 @@ class Guy
 		byte mind1;
 		byte mind2;
 		byte mind3;
+		byte mind4;
+		byte mind5;
 
 		byte reload;
 		byte poison;
@@ -62,6 +66,12 @@ class Guy
 		word ID;	// just a copy of the guy's number
 		byte item;	// what item you're carrying
 		byte frozen;
+
+		//NEW STUFF
+		byte ignited; //burn damage (red)
+		byte weak; //weakness affliction (dark red)
+		byte strong; //steelskin defense (dark grey)
+		byte confuse; //are they confused (light pink)
 
 		int aiType;
 		byte fromColor,toColor;
@@ -128,6 +138,29 @@ void SetMonsterColor(byte fx,int x,int y,int type,int colCode);
 void SetMonsterBright(byte fx,int x,int y,int type,int bright);
 byte CheckMonsterColor(int x,int y,int type,byte color);
 Guy *GetGuyOfAIType(int type);
+
+// Kid Mystic stuff
+byte PeepAtKid(int x,int y,Map *map,byte face);
+byte LogNearby(void);
+
+void WhackazoidUpdate(byte init);
+void WhackedAZoid(Map* map);
+void WhackazoidDisplay(void);
+
+// SH stuff
+byte ArrangeBats(byte facing);
+byte SmashTrees(Guy* me, byte rad);
+byte EatHay(Guy* me, byte rad);
+void SuckInEvil(int x, int y, byte friendly);
+void SuckInGood(int x, int y, byte friendly);
+void PushOutEvil(int x, int y, byte friendly);
+void Tornado(int x, int y, byte friendly);
+void HealOthers(int x, int y, int f, int h);
+void PushOthers(Guy* g, byte h, Map* map);
+byte Walkable(Guy *me, int x, int y, Map* map, world_t* world);
+void SpreadCharge(Guy* me);
+void GetSpook(void);
+void PutSpook(void);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

@@ -30,6 +30,7 @@
 #define WORLDS_PER_SCREEN 18
 #define CLICK_SCROLL_AMT (WORLDS_PER_SCREEN*3/4)
 
+
 #define WBTN_HEIGHT		19
 
 typedef struct worldDesc_t
@@ -60,7 +61,7 @@ static int mouseZ;
 #ifdef WTG
 static byte showFilenames = 1;
 #elif !defined(NDEBUG)
-static byte showFilenames = 0;
+static byte showFilenames = 1;
 #endif
 
 #ifdef LEVELLIST

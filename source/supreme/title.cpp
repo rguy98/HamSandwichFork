@@ -9,7 +9,7 @@
 #include "shop.h"
 #include "textgame.h"
 
-#define COPYRIGHT_YEARS "1998-2012"
+#define COPYRIGHT_YEARS "1998-2022"
 
 // special codes in the credits:
 // @ = use GirlsRWeird font

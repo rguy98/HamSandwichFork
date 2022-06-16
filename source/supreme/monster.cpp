@@ -196,6 +196,8 @@ sprite_t *GetMonsterSprite(dword type,byte seq,byte frm,byte facing)
 				type=MONS_PLAYSHROOM;
 			else if(player.playAs==PLAY_LUNACHIK)
 				type=MONS_LUNACHICK;
+			else if (player.playAs==PLAY_MYSTIC)
+				type=MONS_MYSTIC;
 		}
 	}
 
@@ -248,6 +250,8 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 				type=MONS_PLAYSHROOM;
 			else if(player.playAs==PLAY_LUNACHIK)
 				type=MONS_LUNACHICK;
+			else if(player.playAs==PLAY_MYSTIC)
+				type=MONS_MYSTIC;
 		}
 
 		isBouapha=1;
@@ -640,7 +644,11 @@ void FlailLock(Guy *me)
 // here be the AIs for each monster type
 //--------------------------------------------------------------------------------------
 
-#include "monsterai1.inc"
-#include "monsterai2.inc"
-#include "monsterai3.inc"
-#include "monsterai4.inc"
+#include "monsterai1.inc" // Dr. Lunatic - original
+#include "monsterai2.inc" // Expando Pak
+#include "monsterai3.inc" // Fun Pack
+#include "monsterai4.inc" // Supreme
+#include "monsterai5.inc" // Kid Mystic
+#include "monsterai6.inc" // Sleepless Hollow
+						  // Loonyland
+#include "monsterai8.inc" // Operation SCARE

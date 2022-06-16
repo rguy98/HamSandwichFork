@@ -2935,4 +2935,1286 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{6,7,8,9,10,11,12,13,14,15,16,255},	// attack=swipe pitchfork
 				{6,7,8,9,10,11,12,13,14,15,16,255},	// attack=swipe pitchfork
 			}},
+		{"Kid Mystic",255,255,0,NULL,
+		 11,25,128,0,"mystic/graphics/sylabulus.jsp",0,MF_WATERWALK,
+		 MT_BITS,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,10,11,11,12,12,12,255},	// attack
+				{15,16,17,18,19,20,21,22,23,24,255},		// die
+				{13,13,14,14,13,13,255},	// cast non-pointy spell
+				{7,8,9,10,11,12,12,255},	// cast pointy spell
+				{1,3,1,0,4,6,4,0,1,3,1,0,0,254,254,254,254,255},	// watery death
+				{24,23,22,21,20,19,18,17,16,15,255},		// A4=undie
+				{0,255},
+			}},
+		{"Pterodactyl",255,255,0,AI_Ptero,
+		 10,11,15,5,"mystic/graphics/ptero.jsp",0,MF_FLYING | MF_ENEMYWALK | MF_FREEWALK,
+		 MT_GOOD|MT_ANIMAL,
+			{
+				{0,1,2,6,3,4,5,4,3,6,2,1,255},	// idle
+				{0,1,2,6,3,4,5,4,3,6,2,1,255},	// move
+				{7,8,9,10,9,8,7,255},	// fire
+				{0,0,0,255},	// die
+				{7,8,9,10,9,8,7,255},	// unused
+				{7,8,9,10,9,8,7,255},	// unused
+				{7,8,9,10,9,8,7,255},	// unused
+				{7,8,9,10,9,8,7,255},	// unused
+				{7,8,9,10,9,8,7,255},	// unused
+			}},
+		{"Eye Guy",255,255,0,AI_Eyeguy,
+		 14,17,20,75,"mystic/graphics/eyeguy.jsp",0,0,
+		 MT_EVIL|MT_THINGY,
+			{
+				{0,0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,255},	// attack
+				{13,14,15,16,255},	// die
+				{7,8,9,10,11,12,255},	// a1
+				{7,8,9,10,11,12,255},	// a2
+				{7,8,9,10,11,12,255},	// a3
+				{7,8,9,10,11,12,255},	// a4
+				{7,8,9,10,11,12,255},	// a5
+			}},
+		{"Oculoid",255,255,0,AI_Peeper, //good to go!
+		 26,8,40,150,"mystic/graphics/peeper.jsp",0,MF_FLYING|MF_NOMOVE,
+		 MT_EVIL|MT_THINGY|MT_FLYING,
+			{
+				{4,4,255},	// idle
+				{4,4,255},	// move
+				{5,6,7,6,5,255},	// fire
+				{3,2,1,1,1,0,0,0,0,255},	// die
+				{3,2,1,0,1,2,3,255},	// A1 = blink
+				{0,0,1,1,2,2,3,3,255},	// A2 = wake up
+				{5,6,7,6,5,255},	// a3
+				{5,6,7,6,5,255},	// a4
+				{5,6,7,6,5,255},	// a5
+			}},
+		{"The Rook",255,255,0,AI_Tower, //good to go
+		 60,17,500,500,"mystic/graphics/tower.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_MINIBOSS,
+			{
+				{0,0,0,255},	// idle
+				{1,2,1,0,3,4,3,0,255},	// move
+				{5,5,6,6,7,7,7,8,9,9,9,9,9,10,10,10,11,11,11,255},	// attack (leap)
+				{12,13,14,15,16,16,16,16,16,255},	// die
+				{1,2,2,2,2,2,2,1,255},	// A1
+				{1,2,2,2,2,2,2,1,255},	// A2
+				{1,2,2,2,2,2,2,1,255},	// A3
+				{1,2,2,2,2,2,2,1,255},	// A4
+				{1,2,2,2,2,2,2,1,255},	// A5
+			}},
+		{"The Lookey-Loo",255,255,0,AI_Lookeyloo, //mind4
+		 64,7,1000,2000,"mystic/graphics/lookyloo.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_SPRITEBOX,
+		 MT_EVIL|MT_BOSS|MT_THINGY,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,6,6,6,6,6,6,6,6,6,5,4,3,2,1,255},	// eye-beam (frm 9 is shoot)
+				{1,3,5,6,6,6,6,255},	// die
+				{0,255}, //unused
+				{0,255}, //unused
+				{0,255}, //unused
+				{0,255}, //unused
+				{0,255}, //unused
+			}},
+		{"Pinkeye",255,255,0,AI_Pinkeye, //good to go
+		 11,13,20,1,"mystic/graphics/pinkeye.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_THINGY,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,7,8,255},	// fire
+				{9,10,11,12,12,11,10,9,9,255},	// die & resurrect (freezes on frm 3 until ready)
+				{0,255},
+				{1,2,3,4,5,6,7,8,255},	// unused
+				{1,2,3,4,5,6,7,8,255},	// unused
+				{1,2,3,4,5,6,7,8,255},	// unused
+				{1,2,3,4,5,6,7,8,255},	// unused
+			}},
+		{"Microfish",255,255,0,AI_Microfish, //good to go
+		 1,1,1,1,"mystic/graphics/micro.jsp",0,MF_AQUATIC|MF_NOSHADOW|MF_WATERWALK,
+		 MT_EVIL|MT_ANIMAL|MT_AQUATIC|MT_WACKY,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack unused
+				{0,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Grumpy Golem",255,255,0,AI_Golem, //good to go
+		 32,26,100,0,"mystic/graphics/golem.jsp",0,MF_NOMOVE|MF_FREEWALK,
+		 MT_GOOD,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// attack
+				{15,16,17,18,19,20,21,21,21,254,21,254,21,254,21,255},	// die
+				{22,23,24,25,255},	// form out of nothing (A1)
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+			}},
+		{"Bobby Khan",255,255,0,AI_BobbyKhan, //good to go
+		 48,46,1500,5000,"mystic/graphics/bobby.jsp",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_BOSS,
+			{
+				{0,0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,13,14,255},	// attack=sword slash
+				{42,42,42,43,43,43,44,44,44,44,44,44,255},	// die
+				{15,16,17,17,17,17,17,17,17,17,17,16,15,255},	//A1=block and reflect
+				{18,19,19,19,20,21,22,23,24,25,26,27,28,28,29,29,255},			//A2=spin of doom
+				{30,31,31,31,32,33,34,35,36,37,38,39,40,41,255},	// A3=stomp
+				{45,45,45,17,17,255},	// A4=blocked a shot
+				{7,8,9,10,11,12,13,14,255},	// unused attack
+			}},
+		{"Crazy Bush",255,255,0,AI_Crazybush, //good to go
+		 10,8,20,5,"mystic/graphics/crazybush.jsp",0,0,
+		 MT_EVIL|MT_WACKY|MT_VEGGIE,
+			{
+				{0,255},	// idle
+				{1,2,1,0,3,4,3,0,255},	// move
+				{0,255},	// attack
+				{5,6,7,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Octon",255,255,0,AI_Octopus, //good to go
+		 19,21,20,40,"mystic/graphics/octopus.jsp",0,MF_AQUATIC|MF_WATERWALK,
+		 MT_EVIL|MT_ZOID|MT_AQUATIC,
+			{
+				{5,6,7,6,255},	// idle
+				{5,6,6,7,6,6,255},	// move
+				{16,17,18,19,20,19,18,17,18,19,20,19,18,17,18,19,20,19,18,17,16,255},	// attack=spit from arisen postion
+				{8,9,10,11,12,13,14,15,255},	// die
+				{5,4,3,2,1,0,0,255},	// A1=arise
+				{1,2,3,4,5,5,255},	// A2=descend
+				{16,17,18,19,20,19,18,17,16,255},	// unused
+				{16,17,18,19,20,19,18,17,16,255},	// unused
+				{16,17,18,19,20,19,18,17,16,255},	// unused
+			}},
+		{"Blockhead",255,255,0,AI_Incabot, //good to go
+		 12,23,5,2,"mystic/graphics/incabot.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_HIGHTECH|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move
+				{0,255},	// attack=unused
+				{16,17,18,19,20,21,22,255},	// die
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+			}},
+		{"Blockhead Kiln",255,255,0,AI_Incagen, //good to go
+		 40,16,100,100,"mystic/graphics/incagen.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_ENEMYWALK,
+		 MT_EVIL|MT_HIGHTECH|MT_GENERATE|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move=summon
+				{0,255},	// attack=unused
+				{0,0,0,255},	// die=explode
+				{0,255},	// idle
+				{0,255},	// idle
+				{0,255},	// idle
+				{0,255},	// idle
+				{0,255},	// idle
+			}},
+		{"Megablockhead",255,255,0,AI_Incagold, //good to go
+		 11,16,2000,75,"mystic/graphics/incagold.jsp",0,MF_NOMOVE,
+		 MT_EVIL | MT_HIGHTECH | MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move
+				{0,255},	// attack=unused
+				{0,255},	// die=doesn't!
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Megablockhead",255,255,0,AI_Incagold, //good to go
+		 11,16,2000,75,"mystic/graphics/incagold.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_HIGHTECH|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move
+				{0,255},	// attack=unused
+				{0,255},	// die=doesn't!
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Log",255,255,0,AI_Raft, //good to go
+		 15,10,1,50,"mystic/graphics/log.jsp",0,MF_WATERWALK|MF_AQUATIC|MF_FREEWALK|MF_NOHIT|MF_ONEFACE|MF_FACECMD|MF_ENEMYWALK,
+		 MT_GOOD|MT_AQUATIC,
+			{
+				{0,1,2,3,4,5,6,7,8,9,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,255},	// move
+				{0,255},	// attack=unused
+				{0,1,2,255},	// die
+				{0,255},	// still
+				{0,1,2,3,4,5,6,7,8,9,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,255},	// idle
+			}},
+		{"Blocko the Great",255,255,0,AI_Incaboss, //fix lasers again
+		 65,20,1,500,"mystic/graphics/incaboss.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_ENEMYWALK|MF_INVINCIBLE,
+		 MT_EVIL|MT_MINIBOSS,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,5,5,5,5,5,5,5,5,5,5,5,4,3,2,1,255},	// attack=open mouth flames
+				{16,16,17,17,18,18,19,19,19,19,255},	// die (loop the end forever to leave the corpse)
+				{1,2,3,4,5,6,7,8,9,10,11,12,8,9,10,11,12,7,6,5,4,3,2,255}, // A1=tongue
+				{13,13,13,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,14,13,255},	// A2=eyebeam
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Blocko the Great",255,255,0,AI_Incatongue, //make invisible? - DONE!
+		 45,1,400,100,"mystic/graphics/log.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_ENEMYWALK,
+		 0,
+			{
+				{254,255},	// idle
+				{254,255},	// move
+				{254,255},	// attack=unused
+				{254,255},	// die
+				{254,255},	// unused
+				{254,255},	// unused
+				{254,255},	// unused
+				{254,255},	// unused
+				{254,255},	// unused
+			}},
+		{"Peeping Bomb",255,255,0,AI_Peepbomb, //good to go
+		 13,41,20,50,"mystic/graphics/peepbomb.jsp",0,MF_FLYING|MF_ONEFACE|MF_FACECMD,
+		 MT_EVIL|MT_THINGY|MT_TRAP,
+			{
+				{0,0,0,0,255},	// idle
+				{0,0,0,255},	// move
+				{0,255},	// attack=rotate to next facing
+				{32,33,34,35,36,37,38,39,40,255},	// die=explode
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Peeping Bomb",255,255,0,AI_Peepbomb, //good to go
+		 13,41,20,50,"mystic/graphics/peepbomb.jsp",0,MF_FLYING|MF_ONEFACE|MF_FACECMD,
+		 MT_EVIL|MT_THINGY|MT_TRAP,
+			{
+				{0,0,0,0,255},	// idle
+				{0,0,0,255},	// move
+				{0,255},	// attack=rotate to next facing
+				{32,33,34,35,36,37,38,39,40,255},	// die=explode
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Trapazoid",255,255,0,AI_Trapazoid, //good to go
+		 14,10,30,70,"mystic/graphics/trapazoid.jsp",0,MF_NOMOVE|MF_NOSHADOW,
+		 MT_EVIL|MT_ZOID|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,7,8,9,9,255},	// attack=torch in a circle
+				{6,5,4,3,2,1,0,255},	// die (turn into dud trapazoid)
+				{0,255},	// hiding time!
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+			}},
+		{"Trapazoid II",7,2,-2,AI_Trapazoid, //try something with the bullets
+		 14,10,30,70,"mystic/graphics/trapazoid.jsp",0,MF_NOMOVE|MF_NOSHADOW,
+		 MT_EVIL|MT_ZOID|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,7,8,9,9,255},	// attack=torch in a circle
+				{6,5,4,3,2,1,0,255},	// die (turn into dud trapazoid)
+				{0,255},	// hiding time!
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+				{1,2,3,4,5,6,7,8,9,9,255},	// unused
+			}},
+		{"Whackazoid",7,6,0,AI_Whackazoid, //check original
+		 14,10,1,5,"mystic/graphics/trapazoid.jsp",0,MF_NOMOVE|MF_NOSHADOW,
+		 MT_EVIL|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,7,7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,255},	// attack=torch in a circle
+				{6,5,4,3,2,1,0,255},	// die (turn into dud trapazoid)
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Slimy Slug",255,255,0,AI_Slug, //good to go
+		 12,19,30,50,"mystic/graphics/slug.jsp",0,0,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,3,2,1,255},	// move
+				{1,2,3,255},	// attack=unused
+				{5,6,7,8,9,10,11,12,13,14,15,16,17,18,255},	// die
+				{4,2,3,255},	// unused
+				{1,2,3,255},	// unused
+				{1,2,3,255},	// unused
+				{1,2,3,255},	// unused
+				{1,2,3,255},	// unused
+			}},
+		{"Sniper Snail",255,255,0,AI_Snail, //just fix the animation
+		 12,19,45,60,"mystic/graphics/snail.jsp",0,0,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,3,2,1,255},	// move
+				{4,5,6,5,4,3,2,1,255},	// attack=spit goop
+				{5,6,7,8,9,10,11,12,13,14,15,16,17,18,255},	// die
+				{5,6,7,8,9,10,11,12,13,14,14,14,255},	// A1=go into shell
+				{13,12,11,10,9,8,7,6,5,5,255},	// A2=get out of shell
+				{14,255},	// hiding in shell
+				{4,5,6,5,4,3,2,1,255},	// unused
+				{4,5,6,5,4,3,2,1,255},	// unused
+			}},
+		{"Smashball",255,255,0,AI_Ball, //good to go
+		 14,1,40,500,"mystic/graphics/ball.jsp",0,MF_INVINCIBLE|MF_ENEMYWALK|MF_NOMOVE|MF_ONEFACE|MF_WATERWALK|MF_FREEWALK,
+		 MT_GOOD|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,0,0,0,0,0,0,0,0,0,255},	// attack
+				{0,255},	// die
+				{0,0,0,0,0,0,0,0,0,0,255},	// attack
+				{0,0,0,0,0,0,0,0,0,0,255},	// attack
+				{0,0,0,0,0,0,0,0,0,0,255},	// attack
+				{0,0,0,0,0,0,0,0,0,0,255},	// attack
+				{0,0,0,0,0,0,0,0,0,0,255},	// attack
+			}},
+		{"Optimum Octon",255,255,0,AI_Octoboss, //good to go
+		 90,15,450,300,"mystic/graphics/octoboss.jsp",0,MF_ONEFACE|MF_NOMOVE|MF_AQUATIC|MF_WATERWALK|MF_ENEMYWALK,
+		 MT_EVIL|MT_ZOID|MT_BOSS|MT_AQUATIC,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{10,11,12,13,14,14,14,14,14,14,14,14,14,13,12,11,10,255},	// attack=spit
+				{1,2,3,4,5,6,7,8,9,255},	// die
+				{10,11,12,13,14,14,14,14,14,14,14,14,14,13,12,11,10,255},	// unused
+				{10,11,12,13,14,14,14,14,14,14,14,14,14,13,12,11,10,255},	// unused
+				{10,11,12,13,14,14,14,14,14,14,14,14,14,13,12,11,10,255},	// unused
+				{10,11,12,13,14,14,14,14,14,14,14,14,14,13,12,11,10,255},	// unused
+				{10,11,12,13,14,14,14,14,14,14,14,14,14,13,12,11,10,255},	// unused
+			}},
+		{"Octentacle",255,255,0,AI_Octotentacle, //good to go
+		 20,11,80,50,"mystic/graphics/octotent.jsp",0,MF_NOMOVE|MF_AQUATIC|MF_WATERWALK|MF_ENEMYWALK,
+		 MT_BITS,
+			{
+				{1,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// attack=slap
+				{6,5,4,3,2,1,0,255},	// die
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+			}},
+		{"Octentacle",255,255,0,AI_Octotentacle, //good to go
+		 20,11,80,50,"mystic/graphics/octotent.jsp",0,MF_NOMOVE|MF_AQUATIC|MF_WATERWALK|MF_ENEMYWALK,
+		 MT_BITS,
+			{
+				{1,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// attack=slap
+				{6,5,4,3,2,1,0,255},	// die
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+				{1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,255},	// unused
+			}},
+		{"Rammy Gruff",255,255,0,AI_Rammy, //check ramming?
+		 20,52,275,300,"mystic/graphics/goat.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_BOSS|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,6,7,8,9,10,11,12,255},	// move=charge
+				{1,2,3,2,1,255},	// attack=shoot
+				{32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,255},	// die
+				{13,14,15,16,17,18,19,20,21,22,23,15,16,17,18,19,20,21,22,23,15,14,13,255},	// stunned
+				{24,25,26,26,255},	//begin hop
+				{27,28,29,29,29,29,29,29,29,30,31,32,255},	//squish onto the ground after a hop
+				{0,255},	// none
+				{0,255},	// unused
+			}},
+		{"Hoppy Gruff",255,255,-3,AI_Hoppy, //good to go
+		 20,52,325,300,"mystic/graphics/goat.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_BOSS|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,6,7,8,9,10,11,12,255},	// move=charge
+				{1,2,3,2,1,255},	// attack=shoot
+				{32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,255},	// die
+				{13,14,15,16,17,18,19,20,21,22,23,15,16,17,18,19,20,21,22,23,15,14,13,255},	// stunned
+				{24,25,26,26,255},	//begin hop
+				{27,28,29,29,29,29,29,29,29,30,31,32,255},	//squish onto the ground after a hop
+				{0,255},	// none
+				{0,255},	// unused
+			}},
+		{"Gruffy Gruff",255,255,3,AI_Gruffy, //good to go
+		 20,52,400,300,"mystic/graphics/goat.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_BOSS|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,6,7,8,9,10,11,12,255},	// move=charge
+				{1,2,3,2,1,255},	// attack=shoot
+				{32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,255},	// die
+				{13,14,15,16,17,18,19,20,21,22,23,15,16,17,18,19,20,21,22,23,15,14,13,255},	// stunned
+				{24,25,26,26,255},	//begin hop
+				{27,28,29,29,29,29,29,29,29,30,31,32,255},	//squish onto the ground after a hop
+				{0,255},	// none
+				{0,255},	// unused
+			}},
+		{"Happy Stick Shroom",255,255,0,AI_Stickshroom, //good to go
+		 9,6,15,50,"mystic/graphics/stkshr.jsp",0,MF_ONEFACE,
+		 MT_EVIL|MT_WACKY|MT_VEGGIE,
+			{
+				{0,1,255},	// idle
+				{0,1,255},	// move=walk
+				{2,2,2,2,2,2,255},	// attack=shoot
+				{3,3,4,4,5,5,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Happy Stick Spider",255,255,0,AI_Stickspider, //good to go
+		 9,6,25,70,"mystic/graphics/stkspd.jsp",0,MF_ONEFACE,
+		 MT_EVIL|MT_WACKY|MT_SPIDER|MT_ANIMAL,
+			{
+				{0,1,255},	// idle
+				{0,1,255},	// move=walk
+				{2,2,2,2,2,2,255},	// attack=shoot
+				{3,4,3,4,3,4,254,3,254,4,254,3,254,254,4,254,254,3,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Happy Stick Corpse",255,255,0,AI_Stickcorpse, //good to go
+		 11,10,40,100,"mystic/graphics/stkskl.jsp",0,MF_ONEFACE,
+		 MT_EVIL|MT_WACKY|MT_SPOOKY,
+			{
+				{0,255},	// idle
+				{0,1,0,2,255},	// move=walk
+				{3,3,3,3,3,3,255},	// attack=shoot
+				{4,5,6,7,8,9,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Happy Stick Bat",255,255,0,AI_Stickbat, //good to go
+		 11,6,20,60,"mystic/graphics/stkbat.jsp",0,MF_ONEFACE|MF_FLYING,
+		 MT_EVIL|MT_WACKY|MT_FLYING|MT_SPOOKY|MT_ANIMAL,
+			{
+				{0,1,255},	// idle
+				{0,1,255},	// move=walk
+				{2,2,2,2,2,2,255},	// attack=shoot
+				{3,3,4,4,5,5,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Happy Stick Dancer",7,6,8,AI_Dancer, //good to go
+		 11,10,400,5000,"mystic/graphics/stkskl.jsp",0,MF_ONEFACE|MF_FREEWALK|MF_ENEMYWALK|MF_NOMOVE,
+		 MT_EVIL|MT_WACKY|MT_MINIBOSS,
+			{
+				{0,255},	// idle
+				{0,1,0,2,0,1,0,2,255},	// move=walk
+				{3,3,3,3,255},	// attack=shoot
+				{4,5,6,7,8,9,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Creepy Crawly",1,0,-3,AI_BigSpider,
+		 8,21,10,50,"graphics/bigspdr.jsp",0,0,
+		 MT_EVIL|MT_SPIDER,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{14,15,16,17,18,17,18,17,18,19,19,20,20,255},	// die
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{0,255},
+				{0,255},
+			}},
+		{"Froggy",255,255,0,AI_Frog,
+		 6,22,4,100,"sleepless/graphics/frog.jsp",0,0,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,6,7,8,0,255},	// move
+				{9,10,11,12,13,14,15,16,255},	// attack
+				{17,18,19,20,21,255},		// die
+			}},
+		{"Flying Pumpkin",2,4,0,AI_PumpkinFly,
+		 11,6,5,500,"!19",0,MF_FLYING,
+		 MT_EVIL|MT_PUMPKIN|MT_FLYING,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{0,0,255},	// die (just long enough to spew shrapnel)
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+			}},
+		{"Dumble",1,6,0,AI_BabyThing,
+		 12,44,20,50,"graphics/babything.jsp",0,0,
+		 MT_EVIL|MT_THINGY,
+			{
+				{12,255},	// idle
+				{1,2,3,4,5,6,7,8,9,10,11,255},	// move
+				{20,21,22,23,24,25,26,27,255},	// attack
+				{34,35,36,37,38,39,40,41,42,43,255},	// die
+				{13,14,15,16,17,16,15,16,17,16,15,16,17,16,15,255},	// fall asleep (A1)
+				{18,19,18,255},	// blink (A2)
+				{28,29,30,29,28,255}, // look right (A3)
+				{31,32,33,32,31,255}, // look left (A4)
+				{0,255},
+			}},
+		{"Glass Jaw",0,7,0,AI_Bonehead,
+		 8,32,10,50,"!2",0,0,
+		 MT_EVIL|MT_SPOOKY,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{12,13,14,15,16,17,18,19,255},	// attack
+				{7,8,9,10,11,11,11,11,254,11,254,11,254,11,254,11,254,11,254,11,254,11,255},		// die
+				{20,21,22,23,24,25,255},	// chomp/spit projectile
+				{26,27,27,27,26,255},	// point at bouapha
+				{11,10,9,8,7,255},	// resurrect=A3
+				{28,29,30,31,30,29,28,255},	// leap skyward
+			}},
+		{"Toadie",1,2,0,AI_Frog,
+		 6,22,8,100,"!9",0,0,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,6,7,8,0,255},	// move
+				{9,10,11,12,13,14,15,16,255},	// attack
+				{17,18,19,20,21,255},		// die
+			}},
+		{"Firebug",1,4,0,AI_BigSpider,
+		 8,21,10,50,"!5",0,0,
+		 MT_EVIL|MT_SPIDER,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{14,15,16,17,18,17,18,17,18,19,19,20,20,255},	// die
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{7,8,9,10,11,12,12,13,13,255},	// attack
+				{0,255},
+				{0,255},
+			}},
+		{"Firebat",2,4,0,AI_Bat,
+		 8,27,12,25,"!3",0,MF_FLYING,
+		 MT_FLYING|MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,8,7,255},	// attack
+				{17,18,19,20,21,22,23,24,25,26,255},		// die
+				{10,11,12,12,12,12,12,11,10,255},	// diving attack
+				{13,14,15,15,16,255},	// bounce off during dive
+				{7,8,9,8,7,255},	// attack
+				{0,255},
+				{0,255},
+			}},
+		{"Happy Stick Tree",255,255,0,AI_Tree,
+		 20,5,100,5000,"sleepless/graphics/tree.jsp",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_WACKY|MT_MINIBOSS,
+			{
+				{0,255},	// idle
+				{0,0,0,0,255},	// move
+				{0,0,0,0,255},	// attack=snowball
+				{1,2,3,4,254,4,254,4,254,4,255},	// die
+				{1,1,255},	// A1=sad
+			}},
+		{"Funnybone",4,1,6,AI_Goodbone,
+		 8,32,6,50,"sleepless/graphics/skeleton.jsp",0,0,
+		 MT_GOOD|MT_SPOOKY,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{12,13,14,15,16,17,18,19,255},	// attack
+				{7,8,9,10,11,11,11,11,254,11,254,11,254,11,254,11,254,11,254,11,254,11,255},		// die
+				{20,21,22,23,24,25,255},	// chomp/spit projectile
+				{26,27,27,27,26,255},	// point at bouapha
+				{7,8,9,10,11,11,11,11,254,11,254,11,254,11,254,11,254,11,254,11,254,11,255},		// drown=A3
+				{11,10,9,8,7,255},	// resurrect=A4
+		}},
+		{"Royal Guard",2,6,-4,AI_BatGuard,
+		 8,27,50,25,"!3",0,MF_FLYING|MF_NOMOVE|MF_ENEMYWALK|MF_FREEWALK|MF_WALLWALK,
+		 MT_ANIMAL|MT_BITS,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,8,7,255},	// attack
+				{17,18,19,20,21,22,23,24,25,26,255},		// die
+				{10,11,12,12,12,12,12,11,10,255},	// diving attack
+				{13,14,15,15,16,255},	// bounce off during dive
+				{7,8,9,8,7,255},	// attack
+				{0,255},
+				{0,255},
+			}},
+		{"Headless Horseradish",255,255,0,AI_Horseradish,
+		 11,10,25000,100,"sleepless/graphics/radish.jsp",0,MF_NOMOVE|MF_ENEMYWALK|MF_FREEWALK,
+		 MT_EVIL|MT_VEGGIE|MT_BOSS,
+			{
+				{0,255},	// idle
+				{1,2,1,0,3,4,3,0,255},	// move
+				{5,6,7,8,9,255},	// attack=shoot spines
+				{0,0,0,0,255},	// die
+			}},
+		{"Rolling Stone",2,3,0,AI_Roller,
+		 35,11,100,1000,"graphics/roller.jsp",0,MF_ONEFACE,
+		 MT_EVIL|MT_TRAP,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,0,255},	// move (roll down the screen)
+				{5,4,3,2,1,0,255},	// attack=roll up the screen
+				{0,0,255},	// die
+				{6,7,8,9,10,0,255},	// A1=roll to the right
+				{10,9,8,7,6,0,255},	// A2=roll to the left
+				{5,4,3,2,1,0,255},	// attack=roll up the screen
+				{0,255},
+				{0,255},
+			}},
+		{"Big Head Todd",4,5,0,AI_BigHead,
+		 50,8,300,1500,"graphics/lich.jsp",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_SPOOKY|MT_MINIBOSS|MT_WACKY,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,5,6,7,8,255},	// die
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+			}},
+		{"Sir Spookley Hauntmore",255,255,0,AI_Spook,
+		 30,9,300,1,"sleepless/graphics/bigghost.jsp",0,MF_ONEFACE|MF_FLYING|MF_FREEWALK|MF_ENEMYWALK,
+		 MT_EVIL|MT_BOSS|MT_SPOOKY,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,2,1,255},	// attack
+				{4,4,5,5,6,6,7,7,8,8,255},	// die
+				{1,2,3,3,3,2,1,2,3,2,1,0,0,0,0,1,2,3,2,1,255},	// A1=sneeze
+			}},
+		{"Spookley",255,255,0,AI_Spook,
+		 30,9,300,1,"!51",0,MF_ONEFACE|MF_FLYING|MF_GHOST|MF_FREEWALK|MF_ENEMYWALK|MF_NOSHADOW|MF_NOHIT,
+		 MT_EVIL|MT_BOSS|MT_SPOOKY|MT_BITS,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,2,1,255},	// attack
+				{4,4,5,5,6,6,7,7,8,8,255},	// die
+				{1,2,3,3,3,2,1,2,3,2,1,0,0,0,0,1,2,3,2,1,255},	// A1=sneeze
+			}},
+		{"Big Head Bod",255,255,0,AI_BigHeadBod,
+		 8,32,6,50,"sleepless/graphics/bonehead.jsp",0,MF_NOHIT|MF_ENEMYWALK|MF_FREEWALK|MF_NOMOVE,
+		 MT_BITS,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{12,13,14,15,16,17,18,19,255},	// attack
+				{7,8,9,10,11,11,11,11,254,11,254,11,254,11,254,11,254,11,254,11,254,11,255},		// die
+				{20,21,22,23,24,25,255},	// chomp/spit projectile
+				{26,27,27,27,26,255},	// point at bouapha
+				{11,10,9,8,7,255},	// resurrect=A3
+				{28,29,30,31,30,29,28,255},	// leap skyward
+			}},
+		{"Spark",0,7,7,AI_Spark,
+		 11,2,6,300,"!66",0,MF_GHOST|MF_ONEFACE|MF_NOHIT|MF_FREEWALK|MF_ENEMYWALK|MF_INVINCIBLE|MF_NOMOVE|MF_WALLWALK|MF_FLYING|MF_WATERWALK,
+		 MT_EVIL|MT_TRAP|MT_FLYING,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,255},	// die
+			}},
+		{"Sparky",3,7,2,AI_Sparky,
+		 12,55,100,100,"!137",0,MF_FREEWALK|MF_ENEMYWALK|MF_NOMOVE,
+		 MT_EVIL|MT_MINIBOSS|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{30,31,32,32,32,33,34,35,36,37,38,39,40,41,42,43,255},	// attack (pounce)
+				{44,45,46,47,48,49,50,51,51,51,52,53,54,254,54,254,54,254,54,255},		// die
+				{7,8,9,9,8,7,255},	// spit projectile = A1
+				{10,11,12,12,12,13,14,15,16,17,17,18,19,255},	// charging slash = A2
+				{20,21,22,23,24,25,26,26,26,26,26,26,26,26,27,28,29,255},		// howl = A3
+				{30,31,32,32,32,33,34,35,36,37,38,39,40,41,42,43,255},	// attack (pounce)
+				{30,31,32,32,32,33,34,35,36,37,38,39,40,41,42,43,255},	// attack (pounce)
+			}},
+		{"Megaburner",255,255,0,AI_Burner,
+		 18,2,30,300,"!66",0,MF_NOSHADOW|MF_ONEFACE|MF_NOMOVE|MF_INVINCIBLE,
+		 MT_EVIL|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,255},		// die
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+			}},
+		{"Iron Skull",4,0,-8,AI_IronSkull,
+		 50,8,20000,1500,"!44",0,MF_NOMOVE|MF_ONEFACE|MF_FLYING|MF_ENEMYWALK,
+		 MT_EVIL|MT_SPOOKY|MT_BOSS|MT_FLYING,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,5,6,7,8,255},	// die
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+			}},
+		{"Lightswitch",255,255,0,AI_LightSwitch,
+		 10,8,3000,1,"sleepless/graphics/lghtball.jsp",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_TRAP,
+			{
+				{7,255},	// idle
+				{7,255},	// move
+				{7,6,5,4,3,2,1,0,0,0,0,255},	// attack (shove)
+				{0,255},	// die
+			}},
+		{"Unbreakable Glass",255,255,0,AI_Knight,
+		 50,47,1000,1000,"graphics/knight.jsp",0,MF_GLOW|MF_ONEFACE|MF_NOMOVE,
+		 MT_EVIL|MT_MINIBOSS,
+			{
+				{14,255},	// idle
+				{15,16,17,18,19,20,21,22,14,255},	// move
+				{26,27,28,29,30,31,32,33,255},	// attack
+				{34,35,36,37,38,39,40,41,42,43,44,45,46,255},	// die
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,255}, // A1 = arrive
+				{23,24,25,25,25,25,25,25,25,24,23,255}, // A2 = block
+				{26,27,28,29,30,31,32,33,255},	// attack
+				{26,27,28,29,30,31,32,33,255},	// attack
+				{26,27,28,29,30,31,32,33,255},	// attack
+			}},
+		{"Mad Cow",255,255,0,AI_MadCow,
+		 22,15,20,250,"graphics/cow.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,1,0,3,4,3,255},	// move
+				{5,5,6,6,6,5,5,255},	// attack
+				{7,8,9,10,11,12,13,14,255},	// die
+				{5,5,6,6,6,5,5,255},	// attack
+			}},
+		{"Lady Von Spatula",255,255,0,AI_Spatula,
+		 25,28,300,1000,"graphics/countess.jsp",0,MF_ONEFACE|MF_NOMOVE,
+		 MT_EVIL|MT_BOSS|MT_SPOOKY,
+			{
+				{0,1,2,3,4,5,6,7,8,9,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,255},	// move
+				{13,14,15,16,17,18,18,18,18,18,19,255},	// attack
+				{20,21,22,22,22,22,23,24,25,26,27,255},	// die
+				{10,11,12,12,12,12,11,10,255},	// A1=summon boneheads
+				{3,3,3,255},	// A2=charge up to rush
+				{13,14,15,16,17,18,18,18,18,18,19,255},	// attack
+				{13,14,15,16,17,18,18,18,18,18,19,255},	// attack
+				{13,14,15,16,17,18,18,18,18,18,19,255},	// attack
+			}},
+		{"Extremely Mad Cow",2,4,0,AI_MadCow2,
+		 32,15,1000,250,"!72",0,MF_NOMOVE,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,1,0,3,4,3,255},	// move
+				{5,5,6,6,6,5,5,255},	// attack
+				{7,8,9,10,11,12,13,14,255},	// die
+				{5,5,6,6,6,5,5,255},	// attack
+			}},
+		{"Rafe Lector",255,255,0,AI_Rafe,
+		 50,47,200,1000,"!71",0,MF_ONEFACE|MF_NOMOVE|MF_ENEMYWALK,
+		 MT_EVIL|MT_BOSS,
+			{
+				{14,255},	// idle
+				{15,16,17,18,19,20,21,22,14,255},	// move
+				{26,27,28,29,30,31,32,33,255},	// attack
+				{34,35,36,37,38,39,40,41,42,43,44,45,46,255},	// die
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,255}, // A1 = arrive
+				{23,24,25,25,25,25,25,25,25,24,23,255}, // A2 = block
+				{26,27,28,29,30,31,32,33,255},	// attack
+				{26,27,28,29,30,31,32,33,255},	// attack
+				{26,27,28,29,30,31,32,33,255},	// attack
+			}},
+		{"Laser",4,7,0,AI_Turret,
+		 10,1,80,200,"graphics/turret.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,0,0,255},	// die
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+			}},
+		{"Laser",4,7,0,AI_Turret,
+		 10,1,80,200,"!79",0,MF_NOMOVE,
+		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,0,0,255},	// die
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+			}},
+		{"Laser",4,7,0,AI_Turret,
+		 10,1,80,200,"!79",0,MF_NOMOVE,
+		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,0,0,255},	// die
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+			}},
+		{"Laser",4,7,0,AI_Turret,
+		 10,1,80,200,"!79",0,MF_NOMOVE,
+		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,0,0,255},	// die
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+			}},
+		{"Bobber",0,4,10,AI_Bobber,
+		 18,2,30,300,"!66",0,MF_ONEFACE|MF_NOMOVE|MF_NOHIT|MF_WALLWALK|MF_ENEMYWALK|MF_FREEWALK,
+		 MT_GOOD|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{0,255},	// attack
+				{0,255},		// die
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+				{0,255},	// attack
+			}},
+		{"Rock n' Roll",2,6,0,AI_Roller,
+		 35,11,100,1000,"!43",0,MF_ONEFACE,
+		 MT_EVIL|MT_TRAP,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,0,255},	// move (roll down the screen)
+				{5,4,3,2,1,0,255},	// attack=roll up the screen
+				{0,0,255},	// die
+				{6,7,8,9,10,0,255},	// A1=roll to the right
+				{10,9,8,7,6,0,255},	// A2=roll to the left
+				{5,4,3,2,1,0,255},	// attack=roll up the screen
+				{5,4,3,2,1,0,255},	// attack=roll up the screen
+				{5,4,3,2,1,0,255},	// attack=roll up the screen
+			}},
+		{"Reflection",255,255,0,AI_Reflection,
+		 4,29,128,0,"!1",0,MF_NOMOVE|MF_INVINCIBLE|MF_WATERWALK,
+		 MT_GOOD|MT_HUMAN,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,13,14,15,16,255},	// attack
+				{0,0,0,0,0,0,0,26,27,28,255},		// die
+				{23,24,25,24,23,255},	// use item
+				{17,18,19,20,21,22,21,20,21,22,21,20,19,18,17,255},	// bored
+				{1,3,1,0,4,6,4,0,1,3,1,0,0,0,26,27,28,255},	// watery death
+				{7,8,9,10,11,12,13,14,15,16,255},	// attack
+				{7,8,9,10,11,12,13,14,15,16,255},	// attack
+			}},
+		{"Your Bad Side",1,3,0,AI_EvilClone,
+		 11,29,128,0,"!1",0,0,
+		 MT_EVIL|MT_HUMAN|MT_WACKY,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,13,14,15,16,255},	// attack
+				{0,0,0,0,0,0,0,26,27,28,255},		// die
+				{23,24,25,24,23,255},	// use item
+				{17,18,19,20,21,22,21,20,21,22,21,20,19,18,17,255},	// bored
+				{1,3,1,0,4,6,4,0,1,3,1,0,0,0,26,27,28,255},	// watery death
+				{7,8,9,10,11,12,13,14,15,16,255},	// attack
+				{7,8,9,10,11,12,13,14,15,16,255},	// attack
+			}},
+		{"The Darkness",255,255,-7,AI_Darkness,
+		 11,29,6,300,"!1",0,MF_WATERWALK|MF_FREEWALK,
+		 MT_EVIL|MT_TRAP|MT_WACKY,
+			{
+				{254,255},	// idle
+				{254,255},	// move
+				{254,255},	// attack
+				{254,255},	// die
+			}},
+		{"Scaredy Bat",2,5,0,AI_ScaredyBat,
+		 8,27,20,25,"graphics/bat.jsp",0,MF_FLYING,
+		 MT_FLYING|MT_ANIMAL|MT_GOOD,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,8,7,255},	// attack
+				{17,18,19,20,21,22,23,24,25,26,255},		// die
+				{10,11,12,12,12,12,12,11,10,255},	// diving attack
+				{13,14,15,15,16,255},	// bounce off during dive
+				{7,8,9,8,7,255},	// attack
+				{0,255},
+				{0,255},
+			}},
+		{"Blaster",5,4,0,AI_LightBlaster,
+		 10,8,60,1,"!70",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_TRAP,
+			{
+				{7,255},	// idle
+				{7,255},	// move
+				{7,6,5,4,3,2,1,0,255},	// attack
+				{0,255},	// die
+			}},
+		{"Deadhead",0,6,-16,AI_CrazyBone,
+		 8,32,10,100,"!2",0,0,
+		 MT_EVIL|MT_SPOOKY,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{20,21,22,23,24,255},	// attack
+				{7,8,9,10,11,12,13,14,15,16,255},		// die
+				{25,26,27,28,29,30,255},	// chomp/spit projectile
+				{31,32,32,32,31,255},	// point at bouapha
+				{16,15,14,13,12,11,10,9,8,7,255},	// resurrect=A3
+				{7,8,9,9,8,8,7,255},	// skyward leap
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
+			}},
+		{"Speedy Hernandez",3,5,0,AI_Speedy,
+		 12,55,250,100,"graphics/wolfman.jsp",0,MF_FREEWALK|MF_ENEMYWALK|MF_NOMOVE,
+		 MT_EVIL|MT_BOSS|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{30,31,32,32,32,33,34,35,36,37,38,39,40,41,42,43,255},	// attack (pounce)
+				{44,45,46,47,48,49,50,51,51,51,52,53,54,254,54,254,54,254,54,255},		// die
+				{7,8,9,9,8,7,255},	// spit projectile = A1
+				{10,11,12,12,12,13,14,15,16,17,17,18,19,255},	// charging slash = A2
+				{20,21,22,23,24,25,26,26,26,26,26,26,26,26,27,28,29,255},		// howl = A3
+				{30,31,32,32,32,33,34,35,36,37,38,39,40,41,42,43,255},	// attack (pounce)
+				{30,31,32,32,32,33,34,35,36,37,38,39,40,41,42,43,255},	// attack (pounce)
+			}},
+		{"The Grue",6,0,-13,AI_Grue,
+		 30,30,500,1500,"graphics/mamaspdr.jsp",0,MF_NOMOVE|MF_ENEMYWALK,
+		 MT_EVIL|MT_BOSS|MT_SPIDER,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,12,13,13,255},	// spit (attack)
+				{19,20,21,22,23,24,25,25,25,26,27,28,29,255},	// die
+				{14,15,16,17,18,255},	// bite (A1)
+				{7,8,9,10,11,12,12,13,13,255},	// spit (attack)
+				{7,8,9,10,11,12,12,13,13,255},	// spit (attack)
+				{0,255},
+				{0,255},
+			}},
+		{"Big Head Rod",255,255,0,AI_BigHead2,
+		 50,8,300,1500,"!44",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_SPOOKY|MT_MINIBOSS,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,5,6,7,8,255},	// die
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+			}},
+		{"Big Head Maude",4,1,0,AI_BigHead,
+		 50,8,300,1500,"!44",0,MF_NOMOVE|MF_ONEFACE,
+		 MT_EVIL|MT_SPOOKY|MT_MINIBOSS,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,5,6,7,8,255},	// die
+				{1,2,3,4,4,3,2,1,255},	// attack=open mouth
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+			}},
+		{"Charge Coil",5,6,3,AI_LightSlide,
+		 10,8,3000,1,"!70",0,MF_NOMOVE|MF_ONEFACE|MF_INVINCIBLE,
+		 MT_TRAP|MT_GOOD,
+			{
+				{5,255},	// idle
+				{5,255},	// move
+				{5,4,3,2,1,0,0,0,0,0,0,0,255},	// attack (charge up)
+				{0,255},	// die
+			}},
+		{"Marsh Marrow",0,1,-4,AI_Bonehead,
+		 8,32,40,50,"!2",0,0,
+		 MT_SPOOKY|MT_EVIL,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{20,21,22,23,24,255},	// attack
+				{7,8,9,10,11,12,13,14,15,16,255},		// die
+				{25,26,27,28,29,30,255},	// chomp/spit projectile
+				{31,32,32,32,31,255},	// point at bouapha
+				{16,15,14,13,12,11,10,9,8,7,255},	// resurrect=A3
+				{7,8,9,9,8,8,7,255},	// skyward leap
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
+			}},
+		{"Beetle Nest",1,5,6,AI_Patch,
+		 16,17,100,1000,"graphics/patch.jsp",0,MF_NOMOVE|MF_ENEMYWALK|MF_ONEFACE|MF_NOSHADOW,
+		 MT_EVIL|MT_TRAP|MT_GENERATE,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{11,12,13,14,15,16,255},	// die
+				{3,4,5,6,7,8,9,10,255},	// A1=summon
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+			}},
+		{"Simulated Head",255,255,0,AI_PumpkinFly,
+		 11,6,25,500,"!19",0,MF_FLYING,
+		 MT_EVIL|MT_PUMPKIN|MT_BITS,
+			{
+				{0,255},	// idle
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{0,0,255},	// die (just long enough to spew shrapnel)
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+				{1,2,3,4,5,0,255},	// move
+			}},
+		{"Toad Hole",1,2,6,AI_Patch,
+		 16,17,50,1000,"!162",0,MF_NOMOVE|MF_ENEMYWALK|MF_ONEFACE|MF_NOSHADOW,
+		 MT_EVIL|MT_TRAP|MT_GENERATE,
+			{
+				{0,255},	// idle
+				{0,255},	// move
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{11,12,13,14,15,16,255},	// die
+				{3,4,5,6,7,8,9,10,255},	// A1=summon
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+				{1,2,0,2,0,1,2,1,0,1,0,2,1,2,1,0,2,1,2,255},	// attack
+			}},
+		// Sleepless hollow ends here
+		{"Third Eye",5,6,-3,AI_Eyeguy,
+		 14,17,20,75,"mystic/graphics/eyeguy.jsp",0,0,
+		 MT_EVIL|MT_THINGY,
+			{
+				{0,0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,255},	// attack
+				{13,14,15,16,255},	// die
+				{7,8,9,10,11,12,255},	// a1
+				{7,8,9,10,11,12,255},	// a2
+				{7,8,9,10,11,12,255},	// a3
+				{7,8,9,10,11,12,255},	// a4
+				{7,8,9,10,11,12,255},	// a5
+			}},
+		{"Burning Bush",1,4,4,AI_Crazybush, //good to go
+		 10,8,15,5,"mystic/graphics/crazybush.jsp",0,0,
+		 MT_EVIL|MT_WACKY|MT_VEGGIE,
+			{
+				{0,255},	// idle
+				{1,2,1,0,3,4,3,0,255},	// move
+				{0,255},	// attack
+				{5,6,7,255},	// die
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Calamari",6,4,2,AI_Octopus, //good to go
+		 19,21,15,40,"!222",0,MF_AQUATIC|MF_WATERWALK,
+		 MT_EVIL|MT_ZOID|MT_AQUATIC,
+			{
+				{5,6,7,6,255},	// idle
+				{5,6,6,7,6,6,255},	// move
+				{16,17,18,19,20,19,18,17,18,19,20,19,18,17,18,19,20,19,18,17,16,255},	// attack=spit from arisen postion
+				{8,9,10,11,12,13,14,15,255},	// die
+				{5,4,3,2,1,0,0,255},	// A1=arise
+				{1,2,3,4,5,5,255},	// A2=descend
+				{16,17,18,19,20,19,18,17,16,255},	// unused
+				{16,17,18,19,20,19,18,17,16,255},	// unused
+				{16,17,18,19,20,19,18,17,16,255},	// unused
+			}},
+		{"Banana Slug",7,5,0,AI_Slug, //good to go
+		 12,19,60,50,"!235",0,0,
+		 MT_EVIL|MT_ANIMAL,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,3,2,1,255},	// move
+				{1,2,3,255},	// attack=unused
+				{5,6,7,8,9,10,11,12,13,14,15,16,17,18,255},	// die
+				{4,2,3,255},	// unused
+				{1,2,3,255},	// unused
+				{1,2,3,255},	// unused
+				{1,2,3,255},	// unused
+				{1,2,3,255},	// unused
+			}},
+		{"Mad Golem",255,255,-4,AI_Golem, //good to go
+		 32,26,100,0,"!219",0,MF_NOMOVE|MF_FREEWALK,
+		 MT_EVIL,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// attack
+				{15,16,17,18,19,20,21,21,21,254,21,254,21,254,21,255},	// die
+				{22,23,24,25,255},	// form out of nothing (A1)
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+				{7,8,9,10,11,12,12,12,13,13,14,14,255},	// unused
+			}},
+		{"Danger Bunny",0,4,-4,AI_PunkBunny2,
+		 8,16,40,100,"!204",0,0,
+		 MT_ANIMAL|MT_URBAN|MT_EVIL,
+			{
+				{0,255},	// idle
+				{1,2,1,0,3,4,3,0,255},	// walk
+				{5,6,7,8,9,7,8,9,7,8,9,10,7,6,5,255},	// attack (machine gun)
+				{0,0,254,254,255},	// die
+				{11,12,13,14,15,255},	// A1 = bomb throw
+				{5,6,7,8,9,7,8,9,7,8,9,10,7,6,5,255},	// attack (machine gun)
+				{5,6,7,8,9,7,8,9,7,8,9,10,7,6,5,255},	// attack (machine gun)
+				{5,6,7,8,9,7,8,9,7,8,9,10,7,6,5,255},	// attack (machine gun)
+				{5,6,7,8,9,7,8,9,7,8,9,10,7,6,5,255},	// attack (machine gun)
+			}},
+		{"Evil Clone",1,5,-4,AI_EvilClone2,
+		 11,14,128,0,"!192",0,0,
+		 MT_EVIL|MT_VEGGIE,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,7,8,8,9,10,11,12,12,13,255},	// attack
+				{0,0,0,0,0,0,0,0,0,0,255},	// die
+				{7,8,10,11,13,255},	// use item
+				{7,8,9,9,9,9,9,9,8,7,0,0,0,0,0,255},	// bored
+				{1,3,1,0,4,6,4,0,1,3,1,0,0,0,0,0,0,255},	// watery death
+				{7,7,8,8,9,10,11,12,12,13,255},	// attack
+				{7,7,8,8,9,10,11,12,12,13,255},	// attack
+			}},
+		{"Evil Clone",6,4,-4,AI_EvilClone2,
+		 40,21,128,0,"!57",0,0,
+		 MT_EVIL|MT_HUMAN,
+			{
+				{0,255},	// idle
+				{7,8,9,8,7,0,10,11,12,11,10,0,255},	// move
+				{1,2,3,4,5,6,5,4,5,6,5,6,5,4,3,4,3,4,5,4,3,2,1,255},	// attack=laugh
+				{13,14,15,16,17,17,17,17,17,17,17,18,19,20,20,20,20,255},	// die
+				// these following are only used when you play as Dr. L
+				{1,2,3,2,1,255},	// use item
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255},	// bored
+				{7,9,7,0,10,12,10,0,7,9,7,0,0,0,0,0,0,255},	// watery death
+				{1,2,3,4,5,6,5,4,5,6,5,6,5,4,3,4,3,4,5,4,3,2,1,255},	// attack=laugh
+			}},
+		{"Evil Clone",1,255,-4,AI_EvilClone2,	// playable char
+		 11,27,128,0,"!205",0,0,
+		 MT_EVIL|MT_HUMAN,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,11,12,13,13,0,0,255},	// attack=fire gun
+				{14,15,16,17,18,19,20,21,22,23,24,25,26,255},	// die
+				{7,9,10,12,13,255},	// A1=use weapon
+				{14,15,16,17,18,17,16,15,14,15,17,15,14,0,0,255},	// A2=bored
+				{1,3,1,0,4,6,4,0,1,3,1,0,0,0,24,25,26,255},	// A3=watery death
+				{7,8,9,10,11,12,13,13,0,0,255},	// attack=fire gun
+				{7,8,9,10,11,12,13,13,0,0,255},	// attack=fire gun
+			}},
+		{"Evil Clone",3,4,0,AI_EvilClone2,
+		 11,25,128,0,"!211",0,0,
+		 MT_EVIL|MT_HUMAN,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
+				{7,8,9,10,10,11,11,12,12,255},	// attack
+				{15,16,17,18,19,20,21,22,23,24,255},		// die
+				{13,13,14,14,13,13,255},	// cast non-pointy spell
+				{7,8,9,10,11,12,12,255},	// cast pointy spell
+				{1,3,1,0,4,6,4,0,1,3,1,0,0,254,254,254,254,255},	// watery death
+				{24,23,22,21,20,19,18,17,16,15,255},		// A4=undie
+				{0,255},
+			}},
 	};

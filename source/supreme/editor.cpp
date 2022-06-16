@@ -77,12 +77,20 @@ byte InitEditor(void)
 	strcpy(MonsterName(MONS_PATCH2),"Pumpkin Patch Fast");
 	strcpy(MonsterName(MONS_UNDERMAGMA),"Magmazoid Underwater");
 	strcpy(MonsterName(MONS_PARKED2),"Parked Car2");
-	strcpy(MonsterName(MONS_TRAFFIC),"Traffic: Clockwise");
-	strcpy(MonsterName(MONS_TRAFFIC2),"Traffic: Counterclockwise");
+	strcpy(MonsterName(MONS_TRAFFIC),"Traffic: CW");
+	strcpy(MonsterName(MONS_TRAFFIC2),"Traffic: CCW");
 	strcpy(MonsterName(MONS_PATROLLR),"Patrol Mumble Horiz.");
 	strcpy(MonsterName(MONS_PATROLUD),"Patrol Mumble Vert.");
 	strcpy(MonsterName(MONS_DPATROLLR),"Death Patrol Horiz.");
 	strcpy(MonsterName(MONS_DPATROLUD),"Death Patrol Vert.");
+	strcpy(MonsterName(MONS_INCAGOLD), "Megablockhead:H");
+	strcpy(MonsterName(MONS_INCAGOLD2), "Megablockhead:V");
+	strcpy(MonsterName(MONS_PEEPBOMB), "Peeping Bomb:CW");
+	strcpy(MonsterName(MONS_PEEPBOMB2), "Peeping Bomb:CCW");
+	strcpy(MonsterName(MONS_CLONESHRM), "Evil Clone:Shroom");
+	strcpy(MonsterName(MONS_CLONEDRL), "Evil Clone:Lunatic");
+	strcpy(MonsterName(MONS_CLONELUNA), "Evil Clone:Chick");
+	strcpy(MonsterName(MONS_CLONEKM), "Evil Clone:Mystic");
 
 	for(i=MONS_SUCKER1;i<=MONS_BLOWER4;i++)
 	{
@@ -143,6 +151,14 @@ void ExitEditor(void)
 	strcpy(MonsterName(MONS_PATROLUD),"Patrol Mumble");
 	strcpy(MonsterName(MONS_DPATROLLR),"Death Patrol");
 	strcpy(MonsterName(MONS_DPATROLUD),"Death Patrol");
+	strcpy(MonsterName(MONS_INCAGOLD), "Megablockhead");
+	strcpy(MonsterName(MONS_INCAGOLD2), "Megablockhead");
+	strcpy(MonsterName(MONS_PEEPBOMB), "Peeping Bomb");
+	strcpy(MonsterName(MONS_PEEPBOMB2), "Peeping Bomb");
+	strcpy(MonsterName(MONS_CLONESHRM), "Evil Clone");
+	strcpy(MonsterName(MONS_CLONEDRL), "Evil Clone");
+	strcpy(MonsterName(MONS_CLONELUNA), "Evil Clone");
+	strcpy(MonsterName(MONS_CLONEKM), "Evil Clone");
 
 	for(i=MONS_SUCKER1;i<=MONS_BLOWER4;i++)
 	{
