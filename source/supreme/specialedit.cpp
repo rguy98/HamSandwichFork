@@ -272,14 +272,20 @@ static char bulletName[][20]={
 	"Slug Slime",
 	"Comet",
 	"Comet Explosion",
+	// Sleepless Hollow
 	"Sitting Flame",
 	"Floaty Flame",
+	"Ignition Shot",
 	"Black Hole Shot",
 	"Black Hole",
 	"Evil Green Bullet",
-	"Evil Sitting Flame"
+	"Evil Sitting Flame",
+	"Laser Beam",
+	"Evil Lunachick Ray",
+	"Evil Fireball",
+	"Evil Lightning Ball",
 };
-#define MAX_BULLETS (BLT_BADSITFLAME + 1)
+#define MAX_BULLETS (BLT_BADLIGHTNING + 1)
 
 static void SetupTriggerButtons(int t,int y);
 static void SetupEffectButtons(int t,int y);

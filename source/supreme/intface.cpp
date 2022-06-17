@@ -937,8 +937,8 @@ void RenderInterface(MGLDraw *mgl)
 	sprintf(combo,"Combo x%d",curCombo);
 	PrintGlow(240,comboY,combo,0,2);
 
-	sprintf(debuggy, "DEBUG - x%d", player.vehicle);
-	PrintGlow(240, 80, debuggy, 0, 2);
+	//sprintf(debuggy, "DEBUG - x%d", player.vehicle);
+	//PrintGlow(240, 80, debuggy, 0, 2);
 }
 
 void RenderCollectedStuff(int x,int y,MGLDraw *mgl)

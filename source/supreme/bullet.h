@@ -96,11 +96,12 @@
 #define BLT_BLACKHOLE	80	// black hole shot existing
 #define BLT_BADGREEN	81
 #define BLT_BADSITFLAME	82
+#define BLT_LASERBEAM	83
 
 // Operation SCARE
-#define BLT_BADLUNA			83
-#define BLT_BADFBALL		84
-#define BLT_BADLIGHTNING	85
+#define BLT_BADLUNA			84
+#define BLT_BADFBALL		85
+#define BLT_BADLIGHTNING	86
 
 // the special hammer flags for different powerups
 #define HMR_REVERSE 1
@@ -160,6 +161,8 @@ int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets
 void ChangeBullet(byte fx,int x,int y,int type,int newtype); // for specials to change bullets
 byte BulletFacingType(byte type); // To check if a type of bullet uses none, 0-7, or 0-255 facings
+void RenderMysticalHammerItem(byte col, int x, int y);
+void EraseLasers(int mapx, int mapy);
 
 void GetBulletDeltas(int *bdx,int *bdy);
 

@@ -85,6 +85,12 @@ byte InitEditor(void)
 	strcpy(MonsterName(MONS_DPATROLUD),"Death Patrol Vert.");
 	strcpy(MonsterName(MONS_INCAGOLD), "Megablockhead:H");
 	strcpy(MonsterName(MONS_INCAGOLD2), "Megablockhead:V");
+	strcpy(MonsterName(MONS_INCADARK), "Hyperblockhead:H");
+	strcpy(MonsterName(MONS_INCADARK2), "Hyperblockhead:V");
+	strcpy(MonsterName(MONS_TURRETR),"Laser:Right");
+	strcpy(MonsterName(MONS_TURRETD),"Laser:Down");
+	strcpy(MonsterName(MONS_TURRETL),"Laser:Left");
+	strcpy(MonsterName(MONS_TURRETU),"Laser:Up");
 	strcpy(MonsterName(MONS_PEEPBOMB), "Peeping Bomb:CW");
 	strcpy(MonsterName(MONS_PEEPBOMB2), "Peeping Bomb:CCW");
 	strcpy(MonsterName(MONS_CLONESHRM), "Evil Clone:Shroom");
@@ -153,6 +159,12 @@ void ExitEditor(void)
 	strcpy(MonsterName(MONS_DPATROLUD),"Death Patrol");
 	strcpy(MonsterName(MONS_INCAGOLD), "Megablockhead");
 	strcpy(MonsterName(MONS_INCAGOLD2), "Megablockhead");
+	strcpy(MonsterName(MONS_INCADARK), "Hyperblockhead");
+	strcpy(MonsterName(MONS_INCADARK2), "Hyperblockhead");
+	strcpy(MonsterName(MONS_TURRETR),"Laser");
+	strcpy(MonsterName(MONS_TURRETD),"Laser");
+	strcpy(MonsterName(MONS_TURRETL),"Laser");
+	strcpy(MonsterName(MONS_TURRETU),"Laser");
 	strcpy(MonsterName(MONS_PEEPBOMB), "Peeping Bomb");
 	strcpy(MonsterName(MONS_PEEPBOMB2), "Peeping Bomb");
 	strcpy(MonsterName(MONS_CLONESHRM), "Evil Clone");

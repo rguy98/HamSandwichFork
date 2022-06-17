@@ -39,9 +39,6 @@ soundDesc_t soundInfo[MAX_SOUNDS] = {
 	{SND_GOTOMAP,"Goto Map",ST_INTFACE},
 	{SND_WINLEVEL,"Win Level",ST_INTFACE | ST_VOCAL},
 	{SND_WALLDOWN,"Zap Wall",ST_EFFECT},
-	{SND_WALLDOWNKM,"Zap Wall (KM)",ST_EFFECT},
-	{SND_WALLUP,"Make Wall",ST_EFFECT},
-	{SND_WALLUPKM,"Make Wall (KM)",ST_EFFECT},
 	{SND_LIGHTSON,"Lights On",ST_EFFECT},
 	{SND_TELEPORT,"Teleport",ST_EFFECT},
 	{SND_MESSAGE,"Message Appears",ST_INTFACE},
@@ -79,6 +76,7 @@ soundDesc_t soundInfo[MAX_SOUNDS] = {
 	{SND_SERPENTDIE,"Zoid Die",ST_MONSTER},
 	{SND_SERPENTSPIT,"Zoid Spit",ST_MONSTER},
 	{SND_MATTIEOUCH,"Matilda Ouch",ST_MONSTER},
+	{SND_MATTIETRUEDIE,"???",ST_MONSTER},
 	{SND_MATTIEDIE,"Matilda Die",ST_MONSTER},
 	{SND_MATTIECLAW,"Matilda Claw",ST_MONSTER},
 	{SND_MATTIESHOOT,"Matilda Shoot",ST_MONSTER},
@@ -412,6 +410,9 @@ soundDesc_t soundInfo[MAX_SOUNDS] = {
 	{SND_BESERK,"Beserk!",ST_EFFECT | ST_VOCAL | ST_PLAYER},
 	{SND_STONESKIN,"Stoneskin",ST_EFFECT | ST_PLAYER},
 	{SND_INFERNAL,"Infernal Spell",ST_EFFECT | ST_PLAYER},
+	{SND_WALLDOWNKM,"Zap Wall (KM)",ST_EFFECT},
+	{SND_WALLUP,"Make Wall",ST_EFFECT},
+	{SND_WALLUPKM,"Make Wall (KM)",ST_EFFECT},
 };
 
 byte soundAvailable = 0;

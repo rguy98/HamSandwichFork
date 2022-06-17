@@ -319,3 +319,203 @@ void AI_EvilClone2(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		}
 	}
 }
+
+void AI_LiveBomb(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{;
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_DIE)
+		{
+			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,16);
+			FireBullet(me->x,me->y,0,BLT_BOOM,me->friendly);
+		}
+		return;
+	}
+
+	if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,32,0,0,0,map,world,me->friendly))
+	{
+		me->hp=1;
+		me->GetShot(0,0,1,map,world);
+		return;
+	}
+	FaceGoodguy(me,goodguy);
+	me->dx+=Cosine(me->facing*32)/2;
+	me->dy+=Sine(me->facing*32)/2;
+
+	// circling the player
+	if(me->mind==0)
+	{
+		if(me->x<goodguy->x)
+		{
+			// on left side
+			if(me->y<goodguy->y)
+			{
+				// upper left
+				me->dy+=FIXAMT;
+			}
+			else
+				// lower left
+				me->dx+=FIXAMT;
+		}
+		else
+		{
+			// on right side
+			if(me->y<goodguy->y)
+			{
+				// upper left
+				me->dx-=FIXAMT;
+			}
+			else
+				// lower left
+				me->dy-=FIXAMT;
+		}
+		Dampen(&me->dx,FIXAMT/4);
+		Dampen(&me->dy,FIXAMT/4);
+		Clamp(&me->dx,FIXAMT*8);
+		Clamp(&me->dy,FIXAMT*8);
+	}
+
+	if(me->mind1&1)
+		me->dx=-me->dx;
+	if(me->mind1&2)
+		me->dy=-me->dy;
+	me->mind1=0;
+
+	if(me->seq!=ANIM_MOVE)
+	{
+		me->seq=ANIM_MOVE;
+		me->frm=0;
+		me->frmTimer=0;
+		me->frmAdvance=180;
+	}
+}
+
+void AI_Incadark(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y;
+	byte a;
+
+	if(me->reload)
+		me->reload--;
+
+	if(me->ouch==4)
+	{
+		if(me->hp>0)
+			MakeSound(SND_ZOMBIEOUCH,me->x,me->y,SND_CUTOFF,1200);
+		else
+			MakeSound(SND_ZOMBIEDIE,me->x,me->y,SND_CUTOFF,1200);
+	}
+
+	if(me->action==ACTION_BUSY)
+	{
+		return;	// can't do nothin' right now
+	}
+
+	if(abs(me->mind2-me->facing)==4)	// max distance
+	{
+		if(Random(2))
+			me->facing+=2;
+		else
+			me->facing-=2;
+		me->facing&=7;
+	}
+	else if(me->mind2==me->facing)
+	{
+	}
+	else	// rotate towards true facing
+	{
+		int dir,diff;
+
+		if(me->mind2>me->facing)
+		{
+			diff=me->mind2-me->facing;
+			if(diff>4)
+			{
+				dir=-2;
+				diff=8-diff;
+			}
+			else
+				dir=2;
+		}
+		else
+		{
+			diff=me->facing-me->mind2;
+			if(diff>4)
+			{
+				dir=2;
+				diff=8-diff;
+			}
+			else
+				dir=-2;
+		}
+		me->facing=(me->facing+dir)&7;
+	}
+	if(me->mind==0)	// newborn
+	{
+		me->facing=Random(8);
+		if(me->aiType==MONS_INCADARK)
+			me->mind2=0;	// desired facing/also direction of movement
+		else
+			me->mind2=2;	// desired facing/also direction of movement
+
+		me->mind=1;
+	}
+	else if(me->mind==1)	// pacing
+	{
+		if(me->mind1)	// bonked a wall
+		{
+			me->mind1=0;
+			if(me->mind2<4)
+				me->mind2+=4;
+			else
+				me->mind2-=4;
+		}
+		if(me->mind2!=me->facing)
+		{
+			me->dx=0;
+			me->dy=0;
+		}
+		else
+		{
+			me->dx=Cosine(me->mind2*32)*3/2;
+			me->dy=Sine(me->mind2*32)*3/2;
+		}
+
+		if(me->mind2==me->facing && TargetInSight(me,map,goodguy))
+		{
+			me->frmAdvance=256;
+			me->reload=0;
+			me->mind=2;	// start clapping!
+		}
+
+		if(me->seq!=ANIM_MOVE)
+		{
+			me->seq=ANIM_MOVE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=64;
+		}
+	}
+	else	// staring at goodguy
+	{
+		me->dx=Cosine(me->mind2*32)*12;
+		me->dy=Sine(me->mind2*32)*12;
+		x=me->x+Cosine(me->facing*32)*16;
+		y=me->y+Sine(me->facing*32)*16;
+		if(me->AttackCheck(16,x>>FIXSHIFT,y>>FIXSHIFT,goodguy)){
+			goodguy->GetShot(Cosine(me->facing*32)*4,Sine(me->facing*32)*4,128,map,world);
+			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
+		}
+		if(!TargetInSight(me,map,goodguy)){
+			me->mind=0;
+		}
+		if(me->seq!=ANIM_MOVE)
+		{
+			me->seq=ANIM_MOVE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=180;
+		}
+	}
+}

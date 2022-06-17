@@ -31,6 +31,8 @@
 #define PART_GHOST		24
 #define PART_COMPASS	25
 #define PART_FLOATER	26
+#define PART_RLHAMMER	27	// used by hammer, not always red
+#define PART_SUCK		28	// particles that get sucked in by black hole
 
 class Particle
 {
@@ -97,6 +99,7 @@ void FloaterParticles(int x, int y, byte color, int radius, int spread, byte cou
 
 void SmokeTile(int x,int y);
 void JackFrostWeather(int x,int y);
+void SuckParticle(int x, int y, int z);
 
 int CountParticles();
 

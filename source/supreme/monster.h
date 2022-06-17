@@ -346,8 +346,11 @@
 #define MONS_CLONEDRL	304		// Evil Clone (Dr. Lunatic)
 #define MONS_CLONELUNA	305		// Evil Clone (LunaChick)
 #define MONS_CLONEKM	306		// Evil Clone (Kid Mystic)
+#define MONS_BOMB		307		// Live bomb
+#define MONS_INCADARK	308		// horiz
+#define MONS_INCADARK2	309		// vert
 
-#define NUM_MONSTERS  307    // Can grow as needed
+#define NUM_MONSTERS  310    // Can grow as needed
 #define NUM_PROFILE_MONSTERS 248 // Do not change without redoing the profile format
 
 // fake monster codes
@@ -710,5 +713,9 @@ void AI_Bobber(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 void AI_PunkBunny2(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_EvilClone2(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_LiveBomb(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Incadark(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Laser(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Deadhead(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 #endif

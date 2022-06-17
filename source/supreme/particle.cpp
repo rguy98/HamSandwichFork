@@ -1524,6 +1524,35 @@ void TrackParticle(byte color,int x,int y,int tx,int ty)
 	}
 }
 
+void SuckParticle(int x, int y, int z)
+{
+	int i;
+	byte ang;
+
+	for (i = 0; i < maxParticles; i++)
+	{
+		if (!particleList[i]->Alive())
+		{
+			ang = Random(256);
+			particleList[i]->x = x + Cosine(ang) * 64;
+			particleList[i]->y = y + Sine(ang) * 64;
+			particleList[i]->tx = x;
+			particleList[i]->ty = y;
+			particleList[i]->z = z;
+			//particleList[i]->dx=(Cosine(ang)*48)/-10;
+			//particleList[i]->dy=(Sine(ang)*48)/-10;
+			particleList[i]->dx = 0;
+			particleList[i]->dy = 0;
+			particleList[i]->dz = 0;
+			particleList[i]->size = 8;
+			particleList[i]->life = 20;
+			particleList[i]->type = PART_SUCK;
+			particleList[i]->color = 16;
+			break;
+		}
+	}
+}
+
 int CountParticles()
 {
 	int i, n = 0;

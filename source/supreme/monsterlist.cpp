@@ -3519,17 +3519,18 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},
 			}},
 		{"Glass Jaw",0,7,0,AI_Bonehead,
-		 8,32,10,50,"!2",0,0,
+		 8,38,10,50,"!2",0,0,
 		 MT_EVIL|MT_SPOOKY,
 			{
 				{0,255},	// idle
 				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
-				{12,13,14,15,16,17,18,19,255},	// attack
-				{7,8,9,10,11,11,11,11,254,11,254,11,254,11,254,11,254,11,254,11,254,11,255},		// die
-				{20,21,22,23,24,25,255},	// chomp/spit projectile
-				{26,27,27,27,26,255},	// point at bouapha
-				{11,10,9,8,7,255},	// resurrect=A3
-				{28,29,30,31,30,29,28,255},	// leap skyward
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
+				{7,8,9,10,11,12,13,14,15,16,255},		// die
+				{25,26,27,28,29,30,255},	// chomp/spit projectile
+				{31,32,32,32,31,255},	// point at bouapha
+				{16,15,14,13,12,11,10,9,8,7,255},	// resurrect=A3
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 			}},
 		{"Toadie",1,2,0,AI_Frog,
 		 6,22,8,100,"!9",0,0,
@@ -3579,7 +3580,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{1,1,255},	// A1=sad
 			}},
 		{"Funnybone",4,1,6,AI_Goodbone,
-		 8,32,6,50,"sleepless/graphics/skeleton.jsp",0,0,
+		 8,32,6,50,"sleepless/graphics/bonehead.jsp",0,0,
 		 MT_GOOD|MT_SPOOKY,
 			{
 				{0,255},	// idle
@@ -3759,7 +3760,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{7,8,9,10,11,12,13,14,255},	// die
 				{5,5,6,6,6,5,5,255},	// attack
 			}},
-		{"Lady Von Spatula",255,255,0,AI_Spatula,
+		{"Lady Von Spatula",6,3,0,AI_Spatula,
 		 25,28,300,1000,"graphics/countess.jsp",0,MF_ONEFACE|MF_NOMOVE,
 		 MT_EVIL|MT_BOSS|MT_SPOOKY,
 			{
@@ -3783,8 +3784,8 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{7,8,9,10,11,12,13,14,255},	// die
 				{5,5,6,6,6,5,5,255},	// attack
 			}},
-		{"Rafe Lector",255,255,0,AI_Rafe,
-		 50,47,200,1000,"!71",0,MF_ONEFACE|MF_NOMOVE|MF_ENEMYWALK,
+		{"Rafe Lector",6,7,0,AI_Rafe, // edited
+		 50,47,400,1000,"!71",0,MF_ONEFACE|MF_NOMOVE|MF_ENEMYWALK,
 		 MT_EVIL|MT_BOSS,
 			{
 				{14,255},	// idle
@@ -3797,7 +3798,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{26,27,28,29,30,31,32,33,255},	// attack
 				{26,27,28,29,30,31,32,33,255},	// attack
 			}},
-		{"Laser",4,7,0,AI_Turret,
+		{"Laser",4,7,0,AI_Laser,
 		 10,1,80,200,"graphics/turret.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
 			{
@@ -3811,8 +3812,8 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},	// attack
 				{0,255},	// attack
 			}},
-		{"Laser",4,7,0,AI_Turret,
-		 10,1,80,200,"!79",0,MF_NOMOVE,
+		{"Laser",4,7,0,AI_Laser,
+		 10,1,80,200,"graphics/turret.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
 			{
 				{0,255},	// idle
@@ -3825,8 +3826,8 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},	// attack
 				{0,255},	// attack
 			}},
-		{"Laser",4,7,0,AI_Turret,
-		 10,1,80,200,"!79",0,MF_NOMOVE,
+		{"Laser",4,7,0,AI_Laser,
+		 10,1,80,200,"graphics/turret.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
 			{
 				{0,255},	// idle
@@ -3839,8 +3840,8 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},	// attack
 				{0,255},	// attack
 			}},
-		{"Laser",4,7,0,AI_Turret,
-		 10,1,80,200,"!79",0,MF_NOMOVE,
+		{"Laser",4,7,0,AI_Laser,
+		 10,1,80,200,"graphics/turret.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_TRAP|MT_HIGHTECH,
 			{
 				{0,255},	// idle
@@ -3933,7 +3934,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},
 			}},
 		{"Blaster",5,4,0,AI_LightBlaster,
-		 10,8,60,1,"!70",0,MF_NOMOVE|MF_ONEFACE,
+		 10,8,60,1,"sleepless/graphics/lghtball.jsp",0,MF_NOMOVE|MF_ONEFACE,
 		 MT_EVIL|MT_TRAP,
 			{
 				{7,255},	// idle
@@ -3941,18 +3942,18 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{7,6,5,4,3,2,1,0,255},	// attack
 				{0,255},	// die
 			}},
-		{"Deadhead",0,6,-16,AI_CrazyBone,
-		 8,32,10,100,"!2",0,0,
+		{"Deadhead",0,6,-16,AI_Deadhead,
+		 8,38,10,100,"!2",0,0,
 		 MT_EVIL|MT_SPOOKY,
 			{
 				{0,255},	// idle
 				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
-				{20,21,22,23,24,255},	// attack
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 				{7,8,9,10,11,12,13,14,15,16,255},		// die
 				{25,26,27,28,29,30,255},	// chomp/spit projectile
 				{31,32,32,32,31,255},	// point at bouapha
 				{16,15,14,13,12,11,10,9,8,7,255},	// resurrect=A3
-				{7,8,9,9,8,8,7,255},	// skyward leap
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 			}},
 		{"Speedy Hernandez",3,5,0,AI_Speedy,
@@ -4021,17 +4022,17 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},	// die
 			}},
 		{"Marsh Marrow",0,1,-4,AI_Bonehead,
-		 8,32,40,50,"!2",0,0,
+		 8,38,40,50,"!2",0,0,
 		 MT_SPOOKY|MT_EVIL,
 			{
 				{0,255},	// idle
 				{1,2,3,2,1,0,4,5,6,5,4,0,255},	// move
-				{20,21,22,23,24,255},	// attack
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 				{7,8,9,10,11,12,13,14,15,16,255},		// die
 				{25,26,27,28,29,30,255},	// chomp/spit projectile
 				{31,32,32,32,31,255},	// point at bouapha
 				{16,15,14,13,12,11,10,9,8,7,255},	// resurrect=A3
-				{7,8,9,9,8,8,7,255},	// skyward leap
+				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 				{7,8,9,9,9,9,9,9,9,8,8,8,7,255},	// attack
 			}},
 		{"Beetle Nest",1,5,6,AI_Patch,
@@ -4216,5 +4217,47 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{1,3,1,0,4,6,4,0,1,3,1,0,0,254,254,254,254,255},	// watery death
 				{24,23,22,21,20,19,18,17,16,15,255},		// A4=undie
 				{0,255},
+			}},
+		{"Sentient Bomb",255,255,0,AI_LiveBomb,
+		 10,16,12,1000,"graphics/livebomb.jsp",0,MF_ONEFACE|MF_FLYING,
+		 MT_WEIRD,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+				{0,255},
+			}},
+		{"Hyperblockhead",2,0,-8,AI_Incadark, //good to go
+		 11,16,2000,75,"mystic/graphics/incagold.jsp",0,MF_NOMOVE,
+		 MT_EVIL | MT_HIGHTECH | MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move
+				{0,255},	// attack=unused
+				{0,255},	// die=doesn't!
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+			}},
+		{"Hyperblockhead",2,0,-8,AI_Incadark, //good to go
+		 11,16,2000,75,"mystic/graphics/incagold.jsp",0,MF_NOMOVE,
+		 MT_EVIL|MT_HIGHTECH|MT_TRAP,
+			{
+				{0,255},	// idle
+				{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,255},	// move
+				{0,255},	// attack=unused
+				{0,255},	// die=doesn't!
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
+				{0,255},	// unused
 			}},
 	};

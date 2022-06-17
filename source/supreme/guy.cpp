@@ -191,6 +191,7 @@ byte TryToPushItem(int x,int y,int destx,int desty,Map *map,world_t *world)
 		// the floor is pushonable, let's do it
 		tile->item=map->GetTile(x,y)->item;
 		map->GetTile(x,y)->item=0;
+		EraseLasers(x, y);
 		return 1;
 	}
 	else
@@ -586,7 +587,8 @@ void Guy::Update(Map *map,world_t *world)
 			aiType==MONS_PATTY || aiType==MONS_PATROLLR || aiType==MONS_PATROLUD || aiType==MONS_DPATROLLR || aiType==MONS_DPATROLUD ||
 			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST || aiType==MONS_INCAGOLD || aiType == MONS_INCAGOLD2 || aiType==MONS_INCABOSS || aiType==MONS_BALL ||
 			aiType==MONS_SLUG || aiType==MONS_SNAIL || aiType==MONS_OCTOBOSS || aiType ==MONS_GOAT1 || aiType==MONS_SPARK || aiType==MONS_BIGHEAD2 ||
-			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2)
+			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2||aiType==MONS_BOMB||
+			aiType == MONS_INCADARK || aiType == MONS_INCADARK2)
 			mind1=1;	// tell it that it hit a wall
 		b=1;
 	}
@@ -607,7 +609,8 @@ void Guy::Update(Map *map,world_t *world)
 			aiType==MONS_PATTY || aiType==MONS_PATROLLR || aiType==MONS_PATROLUD || aiType==MONS_DPATROLLR || aiType==MONS_DPATROLUD ||
 			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST || aiType==MONS_INCAGOLD || aiType == MONS_INCAGOLD2 || aiType==MONS_INCABOSS || aiType==MONS_BALL ||
 			aiType==MONS_SLUG || aiType==MONS_SNAIL || aiType==MONS_OCTOBOSS || aiType ==MONS_GOAT1 || aiType==MONS_SPARK || aiType==MONS_BIGHEAD2 ||
-			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2)
+			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2||aiType==MONS_BOMB||
+			aiType == MONS_INCADARK || aiType == MONS_INCADARK2)
 			mind1+=2;	// tell it that it hit a wall
 		b=1;
 	}
@@ -1351,8 +1354,8 @@ void UpdateGuys(Map *map,world_t *world)
 					guys[i]->aiType==MONS_LOG)
 				{
 					if(((speedClock&3)==0) && guys[i]->aiType!=MONS_BOUAPHA && guys[i]->aiType!=MONS_RAFT &&
-						guys[i]->aiType!=MONS_MINECART && guys[i]->aiType!=MONS_RAFT && guys[i]->aiType!=MONS_YUGO ||
-						guys[i]->aiType == MONS_LOG)
+						guys[i]->aiType!=MONS_MINECART && guys[i]->aiType!=MONS_RAFT && guys[i]->aiType!=MONS_YUGO &&
+						guys[i]->aiType!=MONS_LOG)
 					{
 						if(profile.difficulty==0)
 						{
@@ -2381,7 +2384,6 @@ byte LogNearby(void)
 		{
 			if(RangeToTarget(guys[i],goodguy)<32*FIXAMT && player.vehicle==0)
 			{
-				MakeSound(SND_ROLYPOLYWALL, goodguy->x, goodguy->y, SND_CUTOFF, 100);
 				guys[i]->mind=1;
 				player.vehicle=VE_LOG;
 				goodguy->parent=guys[i];

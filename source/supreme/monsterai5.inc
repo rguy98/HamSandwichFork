@@ -987,6 +987,8 @@ void AI_BobbyKhan(Guy *me,Map *map,world_t *world,Guy *goodguy)
 
 void AI_Crazybush(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
+	int i;
+
 	if(me->reload)
 		me->reload--;
 
@@ -1000,6 +1002,11 @@ void AI_Crazybush(Guy *me,Map *map,world_t *world,Guy *goodguy)
 
 	if(me->action==ACTION_BUSY)
 	{
+		if(me->aiType==MONS_CRAZYBUSH2 && me->seq==ANIM_DIE && me->frm==3)
+		{
+			for(i=0;i<8;i++)
+				FireExactBullet(me->x,me->y,0,Cosine(i*32)*12,Sine(i*32)*12,FIXAMT*4,0,120,0,BLT_FLAME2,me->friendly);
+		}
 		return;	// can't do nothin' right now
 	}
 
@@ -1012,8 +1019,19 @@ void AI_Crazybush(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		}
 		FaceGoodguy2(me,goodguy);
 
-		me->dx=Cosine(me->facing*32)*5;
-		me->dy=Sine(me->facing*32)*5;
+		if(me->aiType==MONS_CRAZYBUSH2){
+			me->dx=Cosine(me->facing*32)*6;
+			me->dy=Sine(me->facing*32)*6;
+			if(me->mind1>Random(80)){
+				FireBullet(me->x,me->y,0,BLT_BADSITFLAME,me->friendly);
+				me->mind1=0;
+			}
+			me->mind1++;
+		}
+		else{
+			me->dx=Cosine(me->facing*32)*4;
+			me->dy=Sine(me->facing*32)*4;
+		}
 		if(me->seq!=ANIM_MOVE)
 		{
 			me->seq=ANIM_MOVE;
@@ -1357,7 +1375,23 @@ void AI_Log(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	goodguy=GetGuyOfAIType(MONS_BOUAPHA);
 	if(!goodguy)
 		return;
-
+	
+	if(me->hp%2==0)
+		me->facing=11;
+	else
+		me->facing=0;
+	
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_DIE)
+		{
+			x=me->x/FIXAMT;
+			y=me->y/FIXAMT;
+			BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
+		}
+		return;
+	}
+	
 	if(me->mind==0)	// waiting to be ridden
 	{
 		// chill
@@ -1368,105 +1402,29 @@ void AI_Log(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			me->frmTimer=0;
 		}
 		me->frmAdvance=32;
+		me->mind2=0;
 	}
 	else	// being ridden
 	{
+		if (me->mind2==0)
+		me->mind2 = 30;
+		else if (me->mind2>1)
+		me->mind2--;
+	
 		if(!editing && !player.cheated)
 			profile.progress.raftDistance+=abs(me->dx/FIXAMT)+abs(me->dy/FIXAMT);
-
-		// if you've reached the center of a tile, time to decide where to go
-		x=(me->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
-		y=(me->mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
-		if((me->x<=x && me->oldx>x) || (me->x>=x && me->oldx<x) ||
-		   (me->y<=y && me->oldy>y) || (me->y>=y && me->oldy<y) || me->mind1==0)
-		{
-			tries=0;
-			do
-			{
-				x=me->mapx;
-				y=me->mapy;
-				switch(me->facing)
-				{
-					case 0:
-						x++;
-						break;
-					case 1:
-						y++;
-						break;
-					case 2:
-						x--;
-						break;
-					case 3:
-						y--;
-						break;
-				}
-				if(x<0 || x>=map->width || y<0 || y>=map->height ||
-					map->map[x+y*map->width].wall>0 ||
-					(GetItem(map->map[x+y*map->width].item)->flags&IF_SOLID))
-				{
-					me->x-=me->dx;
-					me->y-=me->dy;
-					me->facing=(me->facing+2)&3;
-					tries++;
-				}
-				else
-					tries=10;	// we're okay!
-			}
-			while(tries<3);
-			if(tries<10)	// it failed and would've been in an infinite loop
-			{
-				for(tries=0;tries<4;tries++)
-				{
-					x=me->mapx;
-					y=me->mapy;
-					switch(tries)
-					{
-						case 0:
-							x++;
-							break;
-						case 1:
-							y++;
-							break;
-						case 2:
-							x--;
-							break;
-						case 3:
-							y--;
-							break;
-					}
-					if(x>=0 && x<map->width && y>=0 && y<map->height &&
+		
+		goodguy->x=me->x;
+		me->dx=goodguy->dx*0.75;
+		goodguy->y=(me->y)+12*FIXAMT;
+		
+		x=me->mapx;
+		y=me->mapy;
+		y++;
+		if(x>=0 && x<map->width && y>=0 && y<map->height &&
 						map->map[x+y*map->width].wall==0 &&
 						!(GetItem(map->map[x+y*map->width].item)->flags&IF_SOLID) &&
 						!(GetTerrain(world,map->map[x+y*map->width].floor)->flags&(TF_SOLID|TF_WATER|TF_LAVA)))
-					{
-						me->facing=tries;
-						me->x=(me->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
-						me->y=(me->mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
-						me->mind1=0;
-						me->mind=0;
-						goodguy->dx=0;
-						goodguy->dy=0;
-						me->dx=0;
-						me->dy=0;
-						goodguy->x=me->x+Cosine(me->facing*64)*TILE_WIDTH;
-						goodguy->y=me->y+Sine(me->facing*64)*TILE_HEIGHT;
-						MakeSound(SND_TURNGOOD,me->x,me->y,SND_CUTOFF,10);
-						player.vehicle=0;
-						return;
-
-					}
-				}
-				if(tries==4)	// there was no spot to put the player
-				{
-					NewMessage("Your raft broke!",60,0);
-					me->type=MONS_NONE;
-					player.vehicle=0;
-					return;
-				}
-
-			}
-			// otherwise if it's not water, we're done
-			if(!(GetTerrain(world,map->map[x+y*map->width].floor)->flags&(TF_WATER)))
 			{
 				me->x=(me->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
 				me->y=(me->mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
@@ -1476,36 +1434,23 @@ void AI_Log(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				goodguy->dy=0;
 				me->dx=0;
 				me->dy=0;
-				goodguy->x=me->x+Cosine(me->facing*64)*TILE_WIDTH;
-				goodguy->y=me->y+Sine(me->facing*64)*TILE_HEIGHT;
-				MakeSound(SND_ROLYPOLYWALL,me->x,me->y,SND_CUTOFF,100);
+				goodguy->y=me->y+(TILE_HEIGHT)*FIXAMT;
 				player.vehicle=0;
 				return;
+
 			}
-		}
-		// move forward at the right speed otherwise
-		me->dx=Cosine(me->facing*64)*(me->mind1/4);
-		me->dy=Sine(me->facing*64)*(me->mind1/4);
-
-		// confine the player to the raft
-		goodguy->x=me->x+me->dx;
-		goodguy->y=me->y+me->dy+1;
-		goodguy->z=FIXAMT*8;
-		goodguy->dx=0;
-		goodguy->dy=0;
-		goodguy->dz=0;
-
-		if(me->mind1<16)
-			me->mind1++;
-
-		if(me->seq!=ANIM_MOVE)
-		{
-			me->seq=ANIM_MOVE;
-			me->frm=0;
-			me->frmTimer=0;
-		}
-		me->frmAdvance=32;
+		me->dy=(goodguy->dy+(((-0.1*me->mind2)+5.1)*FIXAMT));
+		if (me->dy<0)
+		me->dy=0;
+		if(me->mind2==1)
+		me->dx=goodguy->dx/2;
+		if(me->mind1&2)
+		if(me->mind1)
+			me->dx=0;
+		me->mind1=0;
 	}
+	//WaterRipple(me->x/FIXAMT,me->y/FIXAMT,Random(32*20));
+	me->frmAdvance=64;
 }
 
 void AI_Incaboss(Guy *me,Map *map,world_t *world,Guy *goodguy)

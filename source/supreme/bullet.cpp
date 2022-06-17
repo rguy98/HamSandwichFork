@@ -145,6 +145,126 @@ byte BulletCanGo(byte type,int xx,int yy,Map *map,byte size,byte friendly)
 	return result;
 }
 
+void LaserMirrorHit(bullet_t* me, Map* map, world_t* world)
+{
+	short mapx, mapy;
+	char n[2];
+
+	mapx = me->x / (TILE_WIDTH * FIXAMT);
+	mapy = me->y / (TILE_HEIGHT * FIXAMT);
+
+	if (mapx == (me->target % 256) && mapy == (me->target / 256))	// you've already hit/not hit this space
+		return;
+
+	if (mapx < 0 || mapy < 0 || mapx >= map->width || mapy >= map->height)
+	{
+		me->type = BLT_NONE;
+		return;
+	}
+
+	if (me->dx < 0)
+	{
+		me->dx = me->dx;
+	}
+	n[0] = GetItem(map->map[mapx + mapy * map->width].item)->name[0];
+	n[1] = GetItem(map->map[mapx + mapy * map->width].item)->name[1];
+	if (n[0] == '@')	// mirror items start with @
+	{
+		if (me->dx > 0)	// heading right
+		{
+			if (n[1] == '1' || n[1] == '3')
+			{
+				me->type = BLT_NONE;
+				ExplodeParticlesColor(5, me->x, me->y, me->z, 1, 2);
+				return;	// blocked
+			}
+			else if (n[1] == '0')
+			{
+				me->dx = 0;
+				me->dy = -FIXAMT * 24;
+				me->facing = 6 * 32;
+			}
+			else if (n[1] == '2')
+			{
+				me->dx = 0;
+				me->dy = FIXAMT * 24;
+				me->facing = 2 * 32;
+			}
+		}
+		else if (me->dx < 0)	// heading left
+		{
+			if (n[1] == '0' || n[1] == '2')
+			{
+				me->type = BLT_NONE;
+				ExplodeParticlesColor(4, me->x, me->y, me->z, 1, 2);
+				return;	// blocked
+			}
+			else if (n[1] == '1')
+			{
+				me->dx = 0;
+				me->dy = -FIXAMT * 24;
+				me->facing = 6 * 32;
+			}
+			else if (n[1] == '3')
+			{
+				me->dx = 0;
+				me->dy = FIXAMT * 24;
+				me->facing = 2 * 32;
+			}
+		}
+		else if (me->dy < 0)	// heading up
+		{
+			if (n[1] == '0' || n[1] == '1')
+			{
+				me->type = BLT_NONE;
+				ExplodeParticlesColor(4, me->x, me->y, me->z, 1, 2);
+				return;	// blocked
+			}
+			else if (n[1] == '2')
+			{
+				me->dx = -FIXAMT * 32;
+				me->dy = 0;
+				me->facing = 4 * 32;
+			}
+			else if (n[1] == '3')
+			{
+				me->dx = FIXAMT * 32;
+				me->dy = 0;
+				me->facing = 0 * 32;
+			}
+		}
+		else if (me->dy > 0)	// heading down
+		{
+			if (n[1] == '2' || n[1] == '3')
+			{
+				me->type = BLT_NONE;
+				ExplodeParticlesColor(4, me->x, me->y, me->z, 1, 2);
+				return;	// blocked
+			}
+			else if (n[1] == '0')
+			{
+				me->dx = -FIXAMT * 32;
+				me->dy = 0;
+				me->facing = 4 * 32;
+			}
+			else if (n[1] == '1')
+			{
+				me->dx = FIXAMT * 32;
+				me->dy = 0;
+				me->facing = 0 * 32;
+			}
+		}
+		me->target = (mapx + mapy * 256);
+		me->x = (mapx * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT;
+		me->y = (mapy * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT;
+	}
+	else
+	{
+		ExplodeParticlesColor(4, me->x, me->y, me->z, 1, 2);
+		me->type = BLT_NONE;
+	}
+}
+
 void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 {
 	switch(me->type)
@@ -249,6 +369,13 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 			me->dy+=-FIXAMT/4+Random(FIXAMT/2);
 			me->facing=((byte)(8-me->facing))&15;
 			break;
+		case BLT_HOLESHOT:
+		case BLT_BLACKHOLE:
+			me->x -= me->dx;
+			break;
+		case BLT_LASERBEAM:	// reflects off mirrors
+			LaserMirrorHit(me, map, world);
+			break;
 		case BLT_BOMB:
 			MakeSound(SND_BOMBREFLECT,me->x,me->y,SND_CUTOFF,600);
 			me->x-=me->dx;
@@ -345,7 +472,7 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 			if (Random(3) == 0)
 				me->type = BLT_DEATHBEAM2;
 			else
-				me->type = BLT_NONE;
+				LaserMirrorHit(me,map,world);
 			break;
 	}
 }
@@ -455,6 +582,13 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 			me->dx+=-FIXAMT/4+Random(FIXAMT/2);
 			me->facing=(16-me->facing)&15;
 			break;
+		case BLT_HOLESHOT:
+		case BLT_BLACKHOLE:
+			me->y -= me->dy;
+			break;
+		case BLT_LASERBEAM:	// reflects off mirrors
+			LaserMirrorHit(me, map, world);
+			break;
 		case BLT_BOMB:
 			MakeSound(SND_BOMBREFLECT,me->x,me->y,SND_CUTOFF,600);
 			me->y-=me->dy;
@@ -551,7 +685,7 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 			if (Random(3) == 0)
 				me->type = BLT_DEATHBEAM2;
 			else
-				me->type = BLT_NONE;
+				LaserMirrorHit(me, map, world);
 			break;
 	}
 }
@@ -648,6 +782,7 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_FLAME2:
 		case BLT_FLAME3:
 		case BLT_LASER:
+		case BLT_LASERBEAM:
 		case BLT_MEGABEAM:
 		case BLT_MEGABEAM1:
 		case BLT_MEGABEAM2:
@@ -674,6 +809,9 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_TORPEDO:
 		case BLT_PAPER:
 		case BLT_FREEZE:
+		case BLT_IGNITE:
+		case BLT_HOLESHOT:
+		case BLT_BLACKHOLE:
 			me->z=0;
 			break;
 		case BLT_SPEAR:
@@ -743,6 +881,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_LILBOOM:
 		case BLT_LILBOOM2:
 		case BLT_LASER:
+		case BLT_LASERBEAM:
 		case BLT_BOOM:
 		case BLT_ENERGY:
 		case BLT_MEGABEAM:
@@ -765,8 +904,16 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_BUBBLEPOP:
 		case BLT_SCANLOCK:
 		case BLT_BADLUNA:
+		case BLT_BLACKHOLE:
 		default:
 			me->type=0;
+			break;
+		case BLT_HOLESHOT:
+			me->type = BLT_BLACKHOLE;
+			me->dx = 0;
+			me->dy = 0;
+			me->timer = 30 * 2 + 50;
+			me->anim = 0;
 			break;
 		case BLT_MINIFBALL:
 		case BLT_YELWAVE:
@@ -809,6 +956,10 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_BIGAXE:
 			me->type=0;
 			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,10,8);
+			break;
+		case BLT_IGNITE:
+			me->type = 0;
+			ExplodeParticles2(PART_SNOW2, me->x, me->y, me->z, 10, 8);
 			break;
 		case BLT_MISSILE:
 		case BLT_MAGICMISSILE:
@@ -913,6 +1064,12 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
+		case BLT_BLACKHOLE:
+			if (FindVictims2(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, 0, 0, 1, map, world, me->friendly))
+			{
+
+			}
+			break;
 		case BLT_SCANNER:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,0,0,0,map,world,me->friendly))
 			{
@@ -941,6 +1098,18 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				me->type=BLT_NONE;
 				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
 				MakeSound(SND_BULLETHIT,me->x,me->y,SND_CUTOFF,900);
+			}
+			break;
+		case BLT_LASERBEAM:
+			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 8, 0, 0, 80, map, world, me->friendly))
+			{
+				ExplodeParticlesColor(7, me->x, me->y, me->z, 2, 5);
+				MakeSound(SND_LIGHTNING, me->x, me->y, SND_CUTOFF, 900);
+			}
+			if (me->timer < 30 * 10 - 2 && FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 8, 0, 0, 80, map, world, 1 - me->friendly))
+			{
+				ExplodeParticlesColor(7, me->x, me->y, me->z, 2, 5);
+				MakeSound(SND_LIGHTNING, me->x, me->y, SND_CUTOFF, 900);
 			}
 			break;
 		case BLT_ICECLOUD:
@@ -1068,6 +1237,25 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				me->type=BLT_NONE;
 				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
 				MakeSound(SND_HAMMERBONK,me->x,me->y,SND_CUTOFF,900);
+			}
+			break;
+		case BLT_IGNITE:
+			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 16, 0, 0, 0, map, world, me->friendly))
+			{
+				if (!reflect)
+				{
+					GetLastGuyHit()->ignited = 330;
+					me->type = BLT_NONE;
+					ExplodeParticles(PART_HAMMER, me->x, me->y, me->z, 8);
+					MakeSound(SND_FLAMEGO, me->x, me->y, SND_CUTOFF, 900);
+				}
+				else
+				{
+					me->friendly = 1 - me->friendly;
+					me->target = 65535;
+					me->dx = -me->dx;
+					me->dy = -me->dy;
+				}
 			}
 			break;
 		case BLT_MINIFBALL:
@@ -1428,31 +1616,43 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	activeBulDY=me->dy;
 	b=0;
 
-	if(map->flags&MAP_UNDERWATER)
+
+	if (me->type == BLT_LASERBEAM)
 	{
-		me->x+=me->dx*3/4;
-		if(!BulletCanGo(me->type,me->x,me->y,map,8,me->friendly))
-			BulletHitWallX(me,map,world);
-		else
-		{
-			me->y+=me->dy*3/4;
-			if(!BulletCanGo(me->type,me->x,me->y,map,8,me->friendly))
-				BulletHitWallY(me,map,world);
-		}
-		me->z+=me->dz*3/4;
+		me->x += me->dx;
+		me->y += me->dy;
+		me->z = FIXAMT * 5;
+		if (!BulletCanGo(me->type, me->x, me->y, map, 1, me->friendly))
+			LaserMirrorHit(me, map, world);
 	}
 	else
 	{
-		me->x+=me->dx;
-		if(!BulletCanGo(me->type,me->x,me->y,map,8,me->friendly))
-			BulletHitWallX(me,map,world);
+		if (map->flags & MAP_UNDERWATER)
+		{
+			me->x += me->dx * 3 / 4;
+			if (!BulletCanGo(me->type, me->x, me->y, map, 8, me->friendly))
+				BulletHitWallX(me, map, world);
+			else
+			{
+				me->y += me->dy * 3 / 4;
+				if (!BulletCanGo(me->type, me->x, me->y, map, 8, me->friendly))
+					BulletHitWallY(me, map, world);
+			}
+			me->z += me->dz * 3 / 4;
+		}
 		else
 		{
-			me->y+=me->dy;
-			if(!BulletCanGo(me->type,me->x,me->y,map,8,me->friendly))
-				BulletHitWallY(me,map,world);
+			me->x += me->dx;
+			if (!BulletCanGo(me->type, me->x, me->y, map, 8, me->friendly))
+				BulletHitWallX(me, map, world);
+			else
+			{
+				me->y += me->dy;
+				if (!BulletCanGo(me->type, me->x, me->y, map, 8, me->friendly))
+					BulletHitWallY(me, map, world);
+			}
+			me->z += me->dz;
 		}
-		me->z+=me->dz;
 	}
 
 	if(me->z<0)
@@ -1461,7 +1661,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	// all gravity-affected bullets, get gravitized
 	if(me->type==BLT_HAMMER || me->type==BLT_HAMMER2 || me->type==BLT_BOMB || me->type==BLT_GRENADE
 		|| me->type==BLT_ROCK || me->type==BLT_EVILHAMMER || me->type==BLT_SPEAR || me->type==BLT_BADSPEAR
-		|| me->type==BLT_BUBBLE || me->type==BLT_COIN || me->type==BLT_BIGCOIN)
+		|| me->type==BLT_BUBBLE || me->type==BLT_COIN || me->type==BLT_BIGCOIN || me->type==BLT_SITFLAME
+		|| me->type==BLT_BADSITFLAME || me->type==BLT_FLAME3)
 		me->dz-=FIXAMT;
 
 	me->timer--;
@@ -1483,10 +1684,23 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			me->anim++;
 			HitBadguys(me,map,world);
 			break;
+		case BLT_HOLESHOT:
+			me->anim = 1 - me->anim;
+			me->dx = (me->dx * 19) / 20;
+			me->dy = (me->dy * 19) / 20;
+			break;
+		case BLT_BLACKHOLE:
+			SuckParticle(me->x, me->y, FIXAMT * 20);
+			map->BrightTorch(mapx, mapy, -10, 2);
+			SuckInEvil(me->x, me->y, me->friendly);
+			if (Random(2) == 0)
+				HitBadguys(me, map, world);
+			break;
 		case BLT_SLIME:	// frame 259-270
 			me->anim++;
 			if(me->anim&1)
 				HitBadguys(me,map,world);
+			break;
 		case BLT_LUNA:
 		case BLT_LUNA2:
 			me->dz=0;
@@ -1635,7 +1849,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 							 (me->y/TILE_HEIGHT)>>FIXSHIFT,32,4);
 			HitBadguys(me,map,world);
 			if(me->timer==4)
-				FireBulletAfter(me->x+Cosine(me->facing)*16*FIXAMT,me->y+Sine(me->facing)*16*FIXAMT,me->facing,BLT_DEATHBEAM,me,me->friendly);
+				FireBulletAfter(me->x+Cosine(me->facing)*16,me->y+Sine(me->facing)*16,me->facing,BLT_DEATHBEAM,me,me->friendly);
 			me->anim=1-me->anim;
 			break;
 		case BLT_ICEBEAM:
@@ -1819,6 +2033,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			BlowSmoke(me->x, me->y, me->z, FIXAMT);
 			break;
 		case BLT_LASER:
+		case BLT_LASERBEAM:
 			HitBadguys(me,map,world);
 			break;
 		case BLT_BOMB:
@@ -2154,9 +2369,27 @@ void RenderStinky(int x,int y,int z,char bright,byte frm)
 	SprDraw(x,y,z,255,bright-64,bulletSpr->GetSprite(SPR_STINKY+frm),DISPLAY_DRAWME|DISPLAY_GHOST);
 }
 
-void RenderBullet(bullet_t *me)
+void RenderMysticalHammerItem(byte col, int x, int y)
 {
 	int v;
+	sprite_t* curSpr;
+	byte f;
+
+	f = ((player.clock / 2) % 8);
+	x -= Cosine(f * 32) * 8;
+	y -= Sine(f * 32) * 6;
+
+	v = f * 16 + 12 + SPR_HAMMER;
+	curSpr = bulletSpr->GetSprite(v);
+	SprDraw(x >> FIXSHIFT, y >> FIXSHIFT, 0, 255, 0, curSpr,
+		DISPLAY_DRAWME | DISPLAY_SHADOW);
+	SprDrawOff(x >> FIXSHIFT, y >> FIXSHIFT, 10, 4, col, 0, curSpr,
+		DISPLAY_DRAWME | DISPLAY_OFFCOLOR);
+}
+
+void RenderBullet(bullet_t *me)
+{
+	int v,x,y,z;
 	sprite_t *curSpr;
 
 	switch(me->type)
@@ -2323,6 +2556,18 @@ void RenderBullet(bullet_t *me)
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
 					DISPLAY_DRAWME|DISPLAY_SHADOW);
 			break;
+		case BLT_LASERBEAM:
+			curSpr = bulletSpr->GetSprite(((me->facing + 8) / 16) + SPR_LASER);
+			for (v = 0; v < 3; v++)
+			{
+				z = me->z;//+Random(FIXAMT*8);
+				x = me->x - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
+				y = me->y - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
+
+				SprDraw(x >> FIXSHIFT, y >> FIXSHIFT, z >> FIXSHIFT, 255, me->bright, curSpr,
+					DISPLAY_DRAWME | DISPLAY_GLOW);
+			}
+			break;
 		case BLT_PAPER:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_PAPER);
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
@@ -2395,6 +2640,13 @@ void RenderBullet(bullet_t *me)
 			curSpr=bulletSpr->GetSprite(me->anim+SPR_GRENADE);
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
 					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
+					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			break;
+		case BLT_HOLESHOT:
+			curSpr=bulletSpr->GetSprite(me->anim+SPR_GRENADE);
+			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,5,0,2,me->bright-12,curSpr,
+					DISPLAY_DRAWME|DISPLAY_OFFCOLOR);
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
 					DISPLAY_DRAWME|DISPLAY_SHADOW);
 			break;
@@ -2614,6 +2866,14 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 
 	switch(me->type)
 	{
+		case BLT_HOLESHOT:
+			me->z=FIXAMT*20;
+			me->dx=Cosine(facing)*8;
+			me->dy=Sine(facing)*8;
+			me->dz=0;
+			me->anim=0;
+			me->timer=60;
+			break;
 		case BLT_COMET:
 			me->anim=(byte)Random(8);
 			me->timer=255;
@@ -2793,6 +3053,14 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->dy=Sine(me->facing)*8;
 			me->dz=FIXAMT*5;
 			break;
+		case BLT_IGNITE:
+			me->anim = 0;
+			me->timer = 60;
+			me->z = FIXAMT * 20;
+			me->dx = Cosine(me->facing) * 12;
+			me->dy = Sine(me->facing) * 12;
+			me->dz = 0;
+			break;
 		case BLT_MISSILE:
 		case BLT_MAGICMISSILE:
 		case BLT_SKULL:
@@ -2901,6 +3169,17 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->facing/=16;
 			me->dz=0;
 			MakeSound(SND_BULLETFIRE,me->x,me->y,SND_CUTOFF,1050);
+			break;
+		case BLT_LASERBEAM:
+			me->anim = 0;
+			me->timer = 30 * 10;
+			me->facing = me->facing * 32;
+			me->dx = Cosine(me->facing) * 32;
+			me->dy = Sine(me->facing) * 24;
+			me->x += Cosine(me->facing) * (Random(10));
+			me->y += Sine(me->facing) * (Random(8));
+			me->dz = 0;
+			me->target = 255 + 255 * 256;
 			break;
 		case BLT_ENERGY:
 			me->anim=0;
@@ -3342,6 +3621,7 @@ void HammerLaunch(int x,int y,byte facing,byte count,byte flags)
 	}
 	if(player.playAs==PLAY_LUNACHIK)
 	{
+		dz=0;
 		if(type==BLT_HAMMER)
 			type=BLT_LUNA;
 		else if(type==BLT_HAMMER2)
@@ -3350,6 +3630,7 @@ void HammerLaunch(int x,int y,byte facing,byte count,byte flags)
 	}
 	else if (player.playAs == PLAY_MYSTIC)
 	{
+		dz=0;
 		if (type == BLT_HAMMER)
 			type = BLT_FIREBALL;
 		else if (type == BLT_HAMMER2)
@@ -3621,6 +3902,20 @@ void MakeRadar(int rx,int ry,byte w)
 	ry+=(camY-240)+TILE_HEIGHT/2;
 	FireExactBullet(rx*FIXAMT,ry*FIXAMT,FIXAMT,0,0,0,0,20,0,BLT_SCANLOCK,0);
 	*/
+}
+
+void EraseLasers(int mapx, int mapy)
+{
+	int i;
+
+	mapx = (mapx * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT;
+	mapy = (mapy * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT;
+
+	for (i = 0; i < config.numBullets; i++)
+	{
+		if (bullet[i].type == BLT_LASER && abs(bullet[i].x - mapx) < FIXAMT * 64 && abs(bullet[i].y - mapy) < FIXAMT * 48)
+			bullet[i].type = BLT_NONE;
+	}
 }
 
 int CountBullets(byte type)

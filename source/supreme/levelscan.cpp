@@ -103,7 +103,39 @@ static char bulletName[][20]={
 	"Cheese Hammer",
 	"Evil Freeze",
 	"Lunachick Ray",
-	"Bouncy Lunachick"
+	"Bouncy Lunachick",
+	//KM
+	"Mystic Fireball",
+	"Bouncy Fireball",
+	"Magic Missile",
+	"Yellow Wave",
+	"Big Yellow Bullet",
+	"Coin",
+	"Ice Cloud",
+	"Mini Fireball",
+	"BIG Coin",
+	"Liquify Spell",
+	"Good Shockwave",
+	"Armaggedon Skull",
+	"Ice Beam",
+	"Ice Beam End",
+	"Death Beam",
+	"Death Beam End",
+	"Slug Slime",
+	"Comet",
+	"Comet Explosion",
+	// Sleepless Hollow
+	"Sitting Flame",
+	"Floaty Flame",
+	"Ignition Shot",
+	"Black Hole Shot",
+	"Black Hole",
+	"Evil Green Bullet",
+	"Evil Sitting Flame",
+	"Laser Beam",
+	"Evil Lunachick Ray",
+	"Evil Fireball",
+	"Evil Lightning Ball"
 };
 
 void PrintFX(word flags)
