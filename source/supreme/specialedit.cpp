@@ -192,7 +192,21 @@ static char wpnName[][16]={
 	"Scanner",
 	"Mini-Sub",
 	"Freeze Ray",
-	"Stopwatch"};
+	"Stopwatch",
+	"Flamebringer",
+	"Lightreaver",
+	"Planetsmasher",
+	"Sparkthrower",
+	"Earsplitter",
+	"Bonecrusher",
+	"Rocket Launcher",
+	"Snowblower",
+	"Confuse Ray",
+	"Death Ray",
+	"B.F.G.",
+	"Torpedos",
+	"Super Soaker",
+	"Cucurbinator"};
 
 static char bulletName[][20]={
 	"Anything",

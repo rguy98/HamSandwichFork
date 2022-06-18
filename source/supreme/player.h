@@ -12,29 +12,45 @@
 #include "progress.h"
 
 // secondary weapon defines
-#define WPN_NONE	 0
-#define WPN_MISSILES 1
-#define WPN_AK8087	 2
-#define WPN_BOMBS	 3
-#define WPN_FLAME	 4
-#define WPN_PWRARMOR 5
-#define WPN_BIGAXE	 6
-#define WPN_LIGHTNING 7
-#define WPN_SPEAR	 8
-#define WPN_MACHETE  9
-#define WPN_MINES	 10
-#define WPN_TURRET	 11
+#define WPN_NONE		0
+#define WPN_MISSILES	1
+#define WPN_AK8087		2
+#define WPN_BOMBS		3
+#define WPN_FLAME		4
+#define WPN_PWRARMOR	5
+#define WPN_BIGAXE		6
+#define WPN_LIGHTNING	7
+#define WPN_SPEAR		8
+#define WPN_MACHETE		9
+#define WPN_MINES		10
+#define WPN_TURRET		11
 #define WPN_MINDCONTROL 12
-#define WPN_REFLECTOR 13
-#define WPN_JETPACK	  14
-#define WPN_SWAPGUN	  15
-#define WPN_TORCH	  16
-#define WPN_SCANNER	  17
-#define WPN_MINISUB	  18
-#define WPN_FREEZE	  19
-#define WPN_STOPWATCH 20
+#define WPN_REFLECTOR	13
+#define WPN_JETPACK		14
+#define WPN_SWAPGUN		15
+#define WPN_TORCH		16
+#define WPN_SCANNER		17
+#define WPN_MINISUB		18
+#define WPN_FREEZE		19
+#define WPN_STOPWATCH	20
+// sleepless hollow "hammers"
+#define WPN_IGNITE		21
+#define WPN_REFLECT		22
+#define WPN_PORTAL		23
+#define WPN_SPARKS		24
+#define WPN_SONIC		25
+#define WPN_BONEHEAD	26
+// new custom things!
+#define WPN_ROCKETS		27
+#define WPN_SNOWBLOWER	28
+#define WPN_CONFUSERAY	29
+#define WPN_DEATHRAY	30
+#define WPN_BFG			31
+#define WPN_TORPEDOS	32
+#define WPN_WATERGUN	33
+#define WPN_PUMPKINS	34
 
-#define MAX_WEAPONS	  21
+#define MAX_WEAPONS	  35
 
 // vehicles you could be on
 #define VE_NONE		0

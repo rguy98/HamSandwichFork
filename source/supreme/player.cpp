@@ -690,6 +690,7 @@ byte FakeGetControls(void)
 void PlayerFireWeapon(Guy *me)
 {
 	byte c;
+	int i;
 
 	if(player.life==0)
 		return;	// no shooting when you're dead
@@ -971,6 +972,97 @@ void PlayerFireWeapon(Guy *me)
 				player.wpnReload=20;
 				player.timeStop=30*3;
 			}
+			break;
+		case WPN_IGNITE:
+			FireBullet(me->x,me->y,me->facing*32,BLT_IGNITE,1);
+			player.wpnReload=5;
+			break;
+		case WPN_PORTAL:
+			FireBullet(me->x,me->y,me->facing*32,BLT_HOLESHOT,1);
+			player.wpnReload=15;
+			break;
+		case WPN_REFLECT:
+			MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
+			FireBullet(me->x,me->y,me->facing,BLT_REFLECT,1);
+			if(Random(20)<5 && goodguy->hp<goodguy->maxHP)
+			{
+				HealGoodguy(1);
+			}
+
+			c=FakeGetControls();
+			player.shield=4;
+			if(c&CONTROL_B2)	// fire is held
+			{
+				player.wpnReload=0;
+			}
+			else
+			{
+				player.wpnReload=10;
+			}
+			break;
+		case WPN_SPARKS:
+			MakeSound(SND_CACTONSHOOT,me->x,me->y,SND_CUTOFF,200);
+			for(i=0;i<(5/2)+1;i++)
+				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*24,me->facing*32,BLT_SCANSHOT,1);
+
+			me->z+=FIXAMT*Random(4);
+			me->dx+=FIXAMT/2-Random(FIXAMT);
+			me->dy+=FIXAMT/2-Random(FIXAMT);
+			c=FakeGetControls();
+			if(c&CONTROL_B2)	// fire is held
+			{
+				player.wpnReload=2;
+				me->frmTimer=0;
+				me->frm--;
+			}
+			else
+			{
+				player.wpnReload=5;
+			}
+			DoPlayerFacing(c,me);
+			break;
+		case WPN_SONIC:
+			FireBullet(me->x+Cosine(me->facing*32)*10,me->y+Sine(me->facing*32)*10,me->facing*32,BLT_BIGAXE,1);
+			MakeSound(SND_SDZLSPIT,me->x,me->y,SND_CUTOFF,1200);
+			player.wpnReload=30;
+			break;
+		case WPN_BONEHEAD:
+			Guy* g;
+			g=GetGuyOfType(MONS_GOODBONE);
+			if(g)
+			{
+				byte a;
+
+				a=Random(256);
+				g->type=MONS_NONE;
+				MakeSound(SND_BOMBBOOM,g->x,g->y,SND_CUTOFF,400);
+				for(i=0;i<8;i++)
+					FireBullet(g->x,g->y,(a+(256*i)/8)&255,BLT_GREEN,g->friendly);
+			}
+			g=AddGuy(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
+				FIXAMT*10,MONS_GOODBONE,1);
+			if(g==NULL || !g->CanWalk(g->x,g->y,curMap,&curWorld))
+			{
+				MakeSound(SND_TURRETBZZT,me->x,me->y,SND_CUTOFF,1200);
+				if(g)
+				{
+					g->type=MONS_NONE;
+					player.ammo+=1;
+				}
+			}
+			else
+			{
+				MakeSound(SND_SKELALIVE,me->x,me->y,SND_CUTOFF,1200);
+				g->seq=ANIM_A4;
+				g->frm=0;
+				g->frmTimer=0;
+				g->frmAdvance=128;
+				g->facing=me->facing;
+				g->action=ACTION_BUSY;
+				g->dx=Cosine(g->facing*32)*8;
+				g->dy=Sine(g->facing*32)*8;
+			}
+			player.wpnReload=30;
 			break;
 	}
 	if(player.ammoCrate)

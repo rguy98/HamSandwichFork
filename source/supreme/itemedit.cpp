@@ -147,6 +147,20 @@ static char wpnName[MAX_WEAPONS][32]={
 	"Mini-Sub",
 	"Freeze Ray",
 	"Stopwatch",
+	"Flamebringer",
+	"Lightreaver",
+	"Planetsmasher",
+	"Sparkthrower",
+	"Earsplitter",
+	"Bonecrusher",
+	"Rocket Launcher",
+	"Snowblower",
+	"Confuse Ray",
+	"Death Ray",
+	"B.F.G.",
+	"Torpedos",
+	"Super Soaker",
+	"Cucurbinator",
 };
 
 static char colorName[8][16]={

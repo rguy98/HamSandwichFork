@@ -97,6 +97,9 @@ void StartRaging(void)
 		case WPN_FREEZE:
 			player.rageClock=16;
 			break;
+		default:
+			player.rageClock=16;
+			break;
 	}
 }
 
@@ -243,6 +246,8 @@ void DoRage(Guy *me)
 			if(player.rageClock&1)
 				for(i=0;i<8;i++)
 					FireBullet(me->x,me->y,i,BLT_SCANNER,1);
+			break;
+		default:
 			break;
 	}
 }
