@@ -21,6 +21,8 @@
 #define PROF_NORMAL	0
 #define PROF_DELETE	1
 #define PROF_KEYCONFIG 2
+#define PROF_MODECONFIG 3 // Toggles modes straight from the profile!
+#define PROF_MODECONFIRM 4
 
 #define BTN_PLAYLIST	1
 #define BTN_DEL_PROF	2
@@ -32,6 +34,7 @@
 #define BTN_DIFFICULTY	8
 #define BTN_CHARACTER	9
 #define BTN_RECORDS		10
+#define BTN_MODECONFIG	11
 
 #define MAX_PROFS	20
 #define PRFNAME_LEN	32
@@ -41,6 +44,10 @@
 #define BTN_K2		20
 #define BTN_DEFAULT	30
 #define BTN_EXITKEYS 31
+
+// modeconfig buttons (1-8)
+#define BTN_M1		32
+#define BTN_EXITMODES (BTN_M1 + NUM_MODES)
 
 typedef struct profButton_t
 {
@@ -57,12 +64,25 @@ static profButton_t btn[]={
 	{20,150,122,"Candle Radar",BTN_CANDLERADAR},
 	{20,180,122,"Move N' Shoot",BTN_MOVENSHOOT},
 	{20,210,122,"Record Book",BTN_RECORDS},
+	{20,352,200,"Configure Modes",BTN_MODECONFIG},
 	{20,374,200,"Configure Keys",BTN_KEYCONFIG},
 	{20,396,200,"Edit Song Playlists",BTN_PLAYLIST},
 	{20,418,200,"Delete This Profile",BTN_DEL_PROF},
 	{20,440,200,"Save & Exit",BTN_EXIT},
 };
 #define NUM_PROF_BTNS	10
+
+static profButton_t mBtn[] = {
+	{20,60,122,"",BTN_M1},
+	{20,90,122,"",BTN_M1+1},
+	{20,120,122,"",BTN_M1+2},
+	{20,150,122,"",BTN_M1+3},
+	{20,180,122,"",BTN_M1+4},
+	{20,210,122,"",BTN_M1+5},
+	{20,240,122,"",BTN_M1+6},
+	{20,440,200,"Exit",BTN_EXITMODES},
+};
+#define NUM_M_BTNS	8
 
 static profButton_t kcBtn[]={
 	{90,90,102,"",BTN_K1+0},
@@ -94,9 +114,30 @@ static char msBright,msDBright;
 static char fileList[PRFNAME_LEN*MAX_PROFS];
 static int numFiles;
 static byte profChoice;
+static byte hoverId = -1;
 
 static char diffName[][16]={"Normal","Hard","Lunatic"};
 static char charName[][16]={"Bouapha","Happy Stick Man","Dr. Lunatic","Shtupid Shroom","LunaChick","MechaBouapha"};
+static char modeName[][16] = {
+	"Disco",
+	"TV",
+	"Ludicrous",
+	"Subliminal",
+	"Splatter",
+	"Manic",
+	"Handheld"
+};
+char modeDesc[][64] = {
+	"All tiles are given FLASHY disco colors!",
+	"Applies Atari-esque lines to the screen.",
+	"The player dies in one hit, no matter what.",
+	"All sounds are played backwards.",
+	"Particle effects are amplified for laughs.",
+	"Everything runs at 2x speed - sound included.",
+	"Shrinks the screen to handheld size."
+};
+
+static char modeAvailable[][10] = { "Active","Inactive","???" };
 
 static byte recordBook,candleRadar,brainRadar,moveNShoot;
 
@@ -204,6 +245,21 @@ void InitKeyConfig(void)
 	ApplyControlSettings();
 }
 
+#define NUM_MODES 7
+
+void InitModeConfig(void)
+{
+	//SIF_BOUGHT
+	int i;
+	for (i = 0; i < NUM_MODES; i++)
+	{
+		if(profile.progress.purchase[modeShopNum[i]] & SIF_BOUGHT)
+			strcpy(mBtn[i].txt, (modeName[i]));
+		else
+			strcpy(mBtn[i].txt, ("???"));
+	}
+}
+
 byte UpdateProfMenu(int *lastTime,MGLDraw *mgl)
 {
 	int i,j;
@@ -282,6 +338,10 @@ byte UpdateProfMenu(int *lastTime,MGLDraw *mgl)
 								InitKeyConfig();
 								mode=PROF_KEYCONFIG;
 								kcMode=0;
+								break;
+							case BTN_MODECONFIG:
+								InitModeConfig();
+								mode=PROF_MODECONFIG;
 								break;
 							case BTN_DEL_PROF:
 								mode=PROF_DELETE;
@@ -460,6 +520,91 @@ byte UpdateProfMenu(int *lastTime,MGLDraw *mgl)
 				}
 			}
 			break;
+		case PROF_MODECONFIG:
+			if (mgl->MouseTap())
+			{
+				for (i=0; i< NUM_M_BTNS; i++)
+				{
+					if (PointInRect(msx, msy, mBtn[i].x, mBtn[i].y, mBtn[i].x + mBtn[i].wid, mBtn[i].y + PBTN_HEIGHT))
+					{
+						switch (mBtn[i].id)
+						{
+							default:
+								if (i < NUM_MODES) {
+									if(profile.progress.purchase[modeShopNum[i]] & SIF_ACTIVE) {
+										profile.progress.purchase[modeShopNum[i]] ^= SIF_ACTIVE;
+										MakeNormalSound(SND_MENUSELECT);
+									}
+									else if (profile.progress.purchase[modeShopNum[i]] & SIF_BOUGHT) {
+										switch(i){
+											case MODE_DISCO:
+												mode = PROF_MODECONFIRM;
+												InitYesNoDialog("This mode contains flashing lights and is not reccomended "
+																"for suffering from epilepsy. Are you sure?","Sure!","Nope");
+												break;
+											case MODE_LUDICROUS:
+												mode = PROF_MODECONFIRM;
+												InitYesNoDialog("Are you sure? This mode isn't remotely fair.","Okay","EEK!");
+												break;
+											default:
+												profile.progress.purchase[modeShopNum[i]] ^= SIF_ACTIVE;
+												MakeNormalSound(SND_MENUSELECT);
+												break;
+										}
+									}
+									else
+										MakeNormalSound(SND_KMNOBUY);
+								}
+								break;
+							case BTN_EXITMODES:
+								MakeNormalSound(SND_MENUSELECT);
+								mode = PROF_NORMAL;
+								hoverId = -1;
+								SaveProfile();
+								break;
+						}
+					}
+				}
+			}
+			else if (k == 27)
+			{
+				mode = PROF_NORMAL;
+				hoverId = -1;
+				SaveProfile();
+			}
+			else {
+				
+				
+				for (i = 0; i < NUM_M_BTNS; i++)
+				{
+					if (i < NUM_MODES && PointInRect(msx, msy, mBtn[i].x, mBtn[i].y, mBtn[i].x + mBtn[i].wid, mBtn[i].y + PBTN_HEIGHT)) {
+						hoverId = i;
+					}
+				}
+			}
+			break;
+		case PROF_MODECONFIRM:
+			if(mgl->MouseTap())
+			{
+				YesNoDialogClick(msx,msy);
+			}
+			if(k!=0)
+				YesNoDialogKey(k);
+			if(YesNoDialogCommand()==YNM_YES)
+			{
+				if(hoverId < 0){hoverId = 0;}
+				profile.progress.purchase[modeShopNum[hoverId]] ^= SIF_ACTIVE;
+				MakeNormalSound(SND_MENUSELECT);
+				mode = PROF_MODECONFIG;
+				ExitYesNoDialog();
+			}
+			else if(YesNoDialogCommand()==YNM_NO)
+			{
+				MakeNormalSound(SND_MENUSELECT);
+				mode = PROF_MODECONFIG;
+				ExitYesNoDialog();
+			}
+			break;
 	}
 
 	return 0;
@@ -467,7 +612,7 @@ byte UpdateProfMenu(int *lastTime,MGLDraw *mgl)
 
 void RenderProfButton(int x,int y,int wid,const char *txt,MGLDraw *mgl)
 {
-	if((mode==PROF_NORMAL || mode==PROF_KEYCONFIG) && PointInRect(msx,msy,x,y,x+wid,y+PBTN_HEIGHT))
+	if((mode==PROF_NORMAL || mode==PROF_KEYCONFIG || mode==PROF_MODECONFIG) && PointInRect(msx,msy,x,y,x+wid,y+PBTN_HEIGHT))
 	{
 		mgl->Box(x,y,x+wid,y+PBTN_HEIGHT,32+31);
 		mgl->FillBox(x+1,y+1,x+wid-1,y+PBTN_HEIGHT-1,32+8);
@@ -605,6 +750,60 @@ void RenderKeyConfigMenu(MGLDraw *mgl)
 	SetSpriteConstraints(0,0,639,479);
 }
 
+
+
+void RenderModeConfigMenu(MGLDraw* mgl)
+{
+	int i;
+	int msx2, msy2;
+
+	for (i = 0; i < 480; i++)
+		memcpy(&mgl->GetScreen()[i * mgl->GetWidth()], &backgd[i * 640], 640);
+
+	for (i = 0; i < NUM_M_BTNS; i++) {
+		RenderProfButton(mBtn[i].x, mBtn[i].y, mBtn[i].wid, mBtn[i].txt, mgl);
+		if (i < NUM_MODES) {
+			int t;
+			if (profile.progress.purchase[modeShopNum[i]] & SIF_ACTIVE)
+				t = 0;
+			else if (profile.progress.purchase[modeShopNum[i]] & SIF_BOUGHT)
+				t = 1;
+			else
+				t = 2;
+			PrintGlow(mBtn[i].x + mBtn[i].wid + 32, mBtn[i].y, modeAvailable[t], 0, 2);
+		}
+	}
+	if (hoverId > -1) {
+		if (profile.progress.purchase[modeShopNum[hoverId]] & SIF_BOUGHT) {
+			PrintGlow(mBtn[0].x + mBtn[i].wid + 128, mBtn[hoverId].y, modeDesc[hoverId], 0, 2);
+		}
+	}
+	
+	if(mode==PROF_MODECONFIRM)
+	{
+		RenderYesNoDialog3(msx,msy,mgl);
+	}
+
+	PrintGlow(20, 20, "Configure Modes", 0, 2);
+
+	//PrintGlow(20, 90, "Up", 0, 2);
+
+	// mouse cursor
+	SetSpriteConstraints(13, 13, 627, 467);
+	msx2 = msx;
+	msy2 = msy;
+	if (msx2 < 13)
+		msx2 = 13;
+	if (msy2 < 13)
+		msy2 = 13;
+	if (msx2 > 622)
+		msx2 = 622;
+	if (msy2 > 462)
+		msy2 = 462;
+	plSpr->GetSprite(0)->DrawBright(msx2, msy2, mgl, msBright / 2);
+	SetSpriteConstraints(0, 0, 639, 479);
+}
+
 //----------------
 
 TASK(void) ProfMenu(MGLDraw *mgl)
@@ -620,10 +819,13 @@ TASK(void) ProfMenu(MGLDraw *mgl)
 		lastTime+=TimeLength();
 		StartClock();
 		done=UpdateProfMenu(&lastTime,mgl);
-		if(mode!=PROF_KEYCONFIG)
+
+		if(mode<PROF_KEYCONFIG)
 			RenderProfMenu(mgl);
-		else
+		else if(mode==PROF_KEYCONFIG)
 			RenderKeyConfigMenu(mgl);
+		else
+			RenderModeConfigMenu(mgl);
 
 		AWAIT mgl->Flip();
 

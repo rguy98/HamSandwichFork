@@ -25,6 +25,7 @@
 #define CHEAT_RAGE		15
 
 #define NUM_CHEATS		16
+#define IGF				1
 
 void InitCheater(void);
 void CheatKey(char c);

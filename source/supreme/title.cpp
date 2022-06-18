@@ -266,6 +266,10 @@ void MainMenuDisplay(MGLDraw *mgl)
 	CenterPrint(igfX-1,igfY-1,"IGF Judge Edition!  Do Not Distribute",-32,2);
 	CenterPrint(igfX+1,igfY+1,"IGF Judge Edition!  Do Not Distribute",-32,2);
 	CenterPrint(igfX,igfY,"IGF Judge Edition!  Do Not Distribute",0,2);
+#else
+	CenterPrint(igfX-1,igfY-1,"Under Construction!",-32,2);
+	CenterPrint(igfX+1,igfY+1,"Under Construction!",-32,2);
+	CenterPrint(igfX,igfY,"Under Construction!",0,2);
 #endif
 }
 
@@ -480,7 +484,12 @@ TASK(byte) MainMenu(MGLDraw *mgl)
 	oldc=CONTROL_B1|CONTROL_B2;
 	planetSpr=new sprite_set_t("graphics/pizza.jsp");
 
-	PlaySongForce("002title.ogg");
+	if(profile.progress.purchase[modeShopNum[MODE_REVERSE]] & SIF_ACTIVE){
+		PlaySongForce("zrev_002.ogg");
+	}
+	else{
+		PlaySongForce("002title.ogg");
+	}
 
 	igfX=Random(500)+100;
 	igfY=Random(300)+100;

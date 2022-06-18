@@ -7,6 +7,7 @@
 // level progress flags
 #define LF_PASSED		2	// have passed it
 #define LF_CANDLES		4	// have collected all candles
+#define LF_BONUS		8	// special-activated bonus goal?
 
 // keychain bitflags
 #define KC_KEYCH1		1
@@ -73,14 +74,14 @@ typedef struct progress_t
 	dword totalCoins,coinsSpent;
 	dword totalWorlds;
 	dword loonyKeys,loonyKeysUsed;
-	float totalPercent;	// percentage of ALL worlds/levels/etc you have completed
+	float totalPercent;					// percentage of ALL worlds/levels/etc you have completed
 
 	dword hammersThrown;
 	dword damageDone,damageTaken;
 	dword shotsFired;
 	dword rages;
 	dword runOver;
-	word finishedWorlds;	// worlds you've 100%ed
+	word  finishedWorlds;				// worlds you've 100%ed
 	dword footDistance,raftDistance,cartDistance,driveDistance;
 	dword underwaterTime;
 	dword grassChopped;
@@ -92,12 +93,12 @@ typedef struct progress_t
 	worldData_t *world;
 	word kills[NUM_PROFILE_MONSTERS];	// how many times you've killed each type
 	byte scanned[NUM_PROFILE_MONSTERS];	// has each type been scanned?
-	byte purchase[256];			// which things you have purchased
-	byte movie[20];				// which movies you've seen for theater purposes
-	byte goal[100];				// whether you've done each of the 100 goals
+	byte purchase[256];					// which things you have purchased
+	byte movie[20];						// which movies you've seen for theater purposes
+	byte goal[100];						// whether you've done each of the 100 goals
 
-	dword cheats;				// how often you've cheated
-	byte wpnLock;				// weapon lock
+	dword cheats;						// how often you've cheated
+	byte wpnLock;						// weapon lock
 	byte expansion[EXPANSION_SIZE];		// unused space for possible future expansion
 } progress_t;
 

@@ -40,8 +40,9 @@
 #define MAP_STEALTH		(1<<9)
 #define MAP_WAVY		(1<<10)
 #define MAP_OXYGEN		(1<<11)
+#define MAP_BONUS		(1<<12)
 
-#define NUM_LVL_FLAGS	12
+#define NUM_LVL_FLAGS	13
 
 // map updating modes
 #define UPDATE_GAME		0

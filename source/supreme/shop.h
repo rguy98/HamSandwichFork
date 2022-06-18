@@ -69,6 +69,7 @@
 #define MODE_SPLATTER	4
 #define MODE_MANIC		5
 #define MODE_TEENY		6
+#define NUM_MODES		7
 
 typedef struct shopItem_t
 {

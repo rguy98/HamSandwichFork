@@ -467,22 +467,27 @@ void StoreWorldResults(worldData_t *me,world_t *world)
 	float newpct;
 	int i,maxPts,pts;
 
-
 	newpct=0.0f;
 	pts=0;
 	maxPts=0;
 	for(i=0;i<world->numMaps;i++)
+	{
 		if(!(world->map[i]->flags&MAP_HUB))
 			maxPts+=1000;
-
+		if(world->map[i]->flags&MAP_BONUS)
+			maxPts+=100; // Hubs can have bonus goals too - 1 per level!
+	}
+		
 	for(i=0;i<me->levels;i++)
 	{
 		if(me->level[i].flags&LF_PASSED)
 		{
-			pts+=800;
+			pts+=750;
 			if(me->level[i].flags&LF_CANDLES)
-				pts+=200;
+				pts+=250; // You must pass to get the points
 		}
+		if(me->level[i].flags&LF_BONUS)
+			pts+=100; // You get the points regardless of passing
 	}
 
 	newpct=(float)pts*100.0f/(float)maxPts;
