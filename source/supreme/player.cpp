@@ -20,7 +20,7 @@ byte tportclock;
 int pStartX=-1,pStartY=-1;
 static byte oldControls,newControls,checkTheControls;
 
-int maxAmmo[MAX_WEAPONS]={1000,20,99,5,50,1000,15,40,20,30,8,3,1,40,10,3,50,5,1000,5,1};
+int maxAmmo[MAX_WEAPONS]={1000,20,99,5,50,1000,15,40,20,30,8,3,1,40,10,3,50,5,1000,5,10,2,25,2,15,20,5,50,1,1,5,40,20,5};
 
 void ShouldCheckControls(byte n)
 {

@@ -13,20 +13,26 @@
 #define SPR_POWERUP		7
 #define SPR_OXYGAUGE	8
 #define SPR_ENEMYLIFE	11
-#define SPR_COINBOX		62
 #define SPR_WPNNAME		22
-#define SPR_LOONYKEY	50
-#define SPR_CANDLE		51
-#define SPR_KEYCH		52
-#define SPR_BRAIN		56
-#define SPR_VARBAR		64
+
+#define SPR_KEYS		56
+#define SPR_HAMMER		60
+#define SPR_PANTS		(SPR_HAMMER+1)
+#define SPR_SPRING		(SPR_HAMMER+2)
+#define SPR_REVERSE		(SPR_HAMMER+3)
+#define SPR_LOONYKEY	(SPR_HAMMER+4)
+#define SPR_CANDLE		(SPR_HAMMER+5)
+#define SPR_KEYCH		(SPR_HAMMER+7)
+#define SPR_BRAIN		(SPR_HAMMER+10)
+#define SPR_RAGE		71
+#define SPR_COINBOX		76
+#define SPR_VARBAR		78
 
 #define SPR_IFHAMMER	1
 #define SPR_MINIGAUGE	2
 #define SPR_NUMBERS		12
 #define SPR_WEAPONS		13
 #define SPR_KEYRING		29
-#define SPR_RAGE		57
 
 #define KEYRINGX		40
 #define KEYRINGY		38
@@ -579,14 +585,14 @@ void DrawKeys(int x,int y,MGLDraw *mgl)
 	int i;
 
 	for(i=0;i<player.keys[0];i++)
-		intfaceSpr->GetSprite(42)->Draw(x+i*10,y,mgl);
+		intfaceSpr->GetSprite(SPR_KEYS)->Draw(x+i*10,y,mgl);
 
 	if(player.keys[1])
-		intfaceSpr->GetSprite(43)->Draw(x,y+6,mgl);
+		intfaceSpr->GetSprite(SPR_KEYS+1)->Draw(x,y+6,mgl);
 	if(player.keys[2])
-		intfaceSpr->GetSprite(45)->Draw(x+10,y+6,mgl);
+		intfaceSpr->GetSprite(SPR_KEYS+3)->Draw(x+10,y+6,mgl);
 	if(player.keys[3])
-		intfaceSpr->GetSprite(44)->Draw(x+20,y+6,mgl);
+		intfaceSpr->GetSprite(SPR_KEYS+2)->Draw(x+20,y+6,mgl);
 }
 
 void DrawHammers(int x,int y,MGLDraw *mgl)
@@ -594,16 +600,16 @@ void DrawHammers(int x,int y,MGLDraw *mgl)
 	int i,p;
 
 	for(i=0;i<player.hammers;i++)
-		intfaceSpr->GetSprite(46)->Draw(x,y+i*6,mgl);
+		intfaceSpr->GetSprite(SPR_HAMMER)->Draw(x,y+i*6,mgl);
 
 	p=(16-player.hamSpeed)/4;
 	for(i=0;i<p;i++)
-		intfaceSpr->GetSprite(47)->Draw(x,y+i*8,mgl);
+		intfaceSpr->GetSprite(SPR_PANTS)->Draw(x,y+i*8,mgl);
 
 	if(player.hammerFlags&HMR_REFLECT)
-		intfaceSpr->GetSprite(48)->Draw(x,y,mgl);
+		intfaceSpr->GetSprite(SPR_SPRING)->Draw(x,y,mgl);
 	if(player.hammerFlags&HMR_REVERSE)
-		intfaceSpr->GetSprite(49)->Draw(x,y,mgl);
+		intfaceSpr->GetSprite(SPR_REVERSE)->Draw(x,y,mgl);
 }
 
 void UpdateInterface(Map *map)
