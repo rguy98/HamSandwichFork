@@ -279,7 +279,7 @@ void InitItems(void);
 void ExitItems(void);
 void RenderItem(int x,int y,byte type,char bright,byte flags);
 void InstaRenderItem(int x,int y,byte type,char bright,MGLDraw *mgl);
-void DrawRedX(int x,int y,byte candle,MGLDraw *mgl);
+void DrawRedX(int x,int y,byte candle,byte bonus,MGLDraw *mgl);
 item_t *GetItem(int type);
 item_t *GetBaseItem(int type);
 word NumItems(void);

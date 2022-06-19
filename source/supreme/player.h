@@ -158,6 +158,7 @@ void KeyChainAllCheck(void);
 void PlayerGetBrain(int amt);
 void PlayerGetCandle(int amt);
 void PlayerGetCoin(int amt);
+void PlayerGetBonusGoal(char *text);
 
 void DoPlayerFacing(byte c, Guy* me);
 byte FakeGetControls(void);

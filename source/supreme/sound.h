@@ -389,6 +389,12 @@
 #define SND_JACKATTACK	329
 #define SND_JACKDIE		330
 
+#define SND_MAILBOXHIT	331
+#define SND_MAILBOXDIE	332
+#define SND_STOPSIGNHEY	333
+#define SND_STOPSIGNHIT	334
+#define SND_STOPSIGNDIE	335
+
 // Import sounds from other games using synthetic sound numbers in the following ranges:
 #define SND_MYSTIC_START    1024
 #define SND_MYSTIC_END      (SND_MYSTIC_START + 511)

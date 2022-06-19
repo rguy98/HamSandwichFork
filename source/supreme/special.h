@@ -41,7 +41,8 @@
 #define TRG_EQUATION	30	// true if N is EQUATION or less/more/exactly (equation is stored in corresponding effect slot!)
 #define TRG_EQUVAR		31	// true if var V1 is EQUATION or less/more/exactly (equation is stored in corresponding effect slot!)
 #define TRG_BULLETRECT  32  // true if there are any of bullet X in rect
-#define MAX_TRIGGER		33
+#define TRG_BONUSGOAL	33  // true if there are any of bullet X in rect
+#define MAX_TRIGGER		34
 
 // effects
 #define EFF_NONE		0
@@ -82,7 +83,8 @@
 #define EFF_VARBAR		35	// edit the varbar below the rage bar
 #define EFF_MAKEBULLET	36	// summon a bullet at a location
 #define EFF_CHANGEBULLET	37	// change bullet of type N at X,Y (or any X,Y) to type Z, N can be any or specific, Z must be specific
-#define EFF_MAX			38
+#define EFF_BONUSGOAL	38	// give bonus goal
+#define EFF_MAX			39
 
 // trigger flags
 #define TF_NOT		1	// NOT this one

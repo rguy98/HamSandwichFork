@@ -432,6 +432,25 @@ void InitShowGoal(MGLDraw *mgl,byte num)
 	mgl->LastKeyPressed();
 }
 
+void InitShowBonusGoal(MGLDraw *mgl, char *title, char *text)
+{
+	char txt[64];
+
+	noKeyTime=60;
+
+	GetDisplayMGL()->LoadBMP("graphics/galgoal.bmp");
+
+	CenterPrint(320,110,"Bonus Goal Complete!",0,0);
+	sprintf(txt,"\"%s\"",title);
+	CenterPrint(320,220,txt,0,0);
+	sprintf(txt, "Earned for %s.", text);
+	CenterPrint(320,340,txt,-32,1);
+
+	GetTaps();
+	GetArrowTaps();
+	mgl->LastKeyPressed();
+}
+
 void ExitShowGoal(void)
 {
 	GetDisplayMGL()->ClearScreen();
@@ -487,6 +506,30 @@ TASK(void) ShowGoalEarned(byte num)
 	int lastTime=1;
 
 	InitShowGoal(GetDisplayMGL(),num);
+
+	while(!done)
+	{
+		lastTime+=TimeLength();
+		StartClock();
+		done=UpdateShowGoal(&lastTime,GetDisplayMGL());
+		RenderShowGoal(GetDisplayMGL());
+
+		AWAIT GetDisplayMGL()->Flip();
+
+		if(!GetDisplayMGL()->Process())
+			done=1;
+		EndClock();
+	}
+
+	ExitShowGoal();
+}
+
+TASK(void) ShowBonusGoalEarned(char *title, char *text)
+{
+	byte done=0;
+	int lastTime=1;
+
+	InitShowBonusGoal(GetDisplayMGL(),title,text);
 
 	while(!done)
 	{

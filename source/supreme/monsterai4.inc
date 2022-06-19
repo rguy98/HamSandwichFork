@@ -1745,9 +1745,9 @@ void AI_Mailboxer(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	if(me->ouch==4)
 	{
 		if(me->hp>0)
-			MakeSound(SND_ZOMBIEOUCH,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_MAILBOXHIT,me->x,me->y,SND_CUTOFF,1200);
 		else
-			MakeSound(SND_ZOMBIEDIE,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_MAILBOXDIE,me->x,me->y,SND_CUTOFF,1200);
 	}
 
 	if(me->action==ACTION_BUSY)

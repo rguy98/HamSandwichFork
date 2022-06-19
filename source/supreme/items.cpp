@@ -988,9 +988,12 @@ void InstaRenderItem(int x,int y,byte type,char bright,MGLDraw *mgl)
 
 }
 
-void DrawRedX(int x,int y,byte candle,MGLDraw *mgl)
+void DrawRedX(int x,int y,byte candle,byte bonus,MGLDraw *mgl)
 {
-	itmSpr->GetSprite(140+candle)->Draw(x+61,y+71,mgl);
+	if(!bonus)
+		itmSpr->GetSprite(140+candle)->Draw(x+61,y+71,mgl);
+	else
+		itmSpr->GetSprite(140+candle)->DrawColored(x+61,y+71,mgl,7,0);
 }
 
 item_t *GetItem(int type)

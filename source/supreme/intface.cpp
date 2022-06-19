@@ -955,6 +955,8 @@ void RenderCollectedStuff(int x,int y,MGLDraw *mgl)
 		intfaceSpr->GetSprite(SPR_LOONYKEY)->Draw(x+183,y+57,mgl);
 	if((player.levelProg->flags&LF_CANDLES))
 		intfaceSpr->GetSprite(SPR_CANDLE)->Draw(x+181,y+20,mgl);
+	if((player.levelProg->flags&LF_BONUS))
+		intfaceSpr->GetSprite(SPR_CANDLE)->Draw(x+181,y+40,mgl);
 
 	if(PlayerBrains()>=curMap->numBrains)
 		intfaceSpr->GetSprite(SPR_BRAIN)->Draw(x+144,y+1,mgl);

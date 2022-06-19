@@ -1353,6 +1353,9 @@ byte TriggerYes(special_t *me,trigger_t *t,Map *map)
 			else
 				answer=0;
 			break;
+		case TRG_BONUSGOAL:
+			answer = (curMap->flags & LF_BONUS) ? 1 : 0;
+			break;
 	}
 
 	if(t->flags&TF_NOT)
@@ -1753,6 +1756,16 @@ void SpecialEffect(special_t *me,Map *map)
 			case EFF_CHANGEBULLET:
 				ChangeBullet(!(me->effect[i].flags&EF_NOFX),me->effect[i].x,me->effect[i].y,me->effect[i].value,me->effect[i].value2);
 				break;
+			case EFF_BONUSGOAL:
+				if(map->flags&MAP_BONUS){
+					if(!(me->effect[i].flags & EF_NOFX))
+						MakeNormalSound(SND_FAIRYGET);
+					PlayerGetBonusGoal(me->effect[i].text);
+				}
+				else{
+					MakeNormalSound(SND_TURRETBZZT);
+				}
+				break;
 		}
 	}
 	if(me->uses>0)
@@ -1809,7 +1822,7 @@ void RenderSpecialXes(Map *map)
 {
 	int i,j,k;
 	int camx,camy;
-	byte c;
+	byte c,b;
 
 	GetCamera(&camx,&camy);
 	camx-=320;
@@ -1826,10 +1839,12 @@ void RenderSpecialXes(Map *map)
 					if(LevelIsPassed(player.worldProg,spcl[i].effect[j].value))
 					{
 						c=0;
+						b=0;
 						for(k=0;k<player.worldProg->levels;k++)
 							if(player.worldProg->level[k].levelNum==spcl[i].effect[j].value)
 							{
 								c=((player.worldProg->level[k].flags&LF_CANDLES)!=0);
+								b=((player.worldProg->level[k].flags&LF_BONUS)!=0);
 								break;
 							}
 
@@ -1840,10 +1855,10 @@ void RenderSpecialXes(Map *map)
 
 						if(k&15)
 							DrawRedX(spcl[i].x*TILE_WIDTH-camx+TILE_WIDTH/2-4+Random(9),
-								 spcl[i].y*TILE_HEIGHT-camy+TILE_HEIGHT/2-4+Random(9),c,GetDisplayMGL());
+								 spcl[i].y*TILE_HEIGHT-camy+TILE_HEIGHT/2-4+Random(9),c,b,GetDisplayMGL());
 						else
 							DrawRedX(spcl[i].x*TILE_WIDTH-camx+TILE_WIDTH/2,
-									 spcl[i].y*TILE_HEIGHT-camy+TILE_HEIGHT/2,c,GetDisplayMGL());
+									 spcl[i].y*TILE_HEIGHT-camy+TILE_HEIGHT/2,c,b,GetDisplayMGL());
 
 						j=NUM_EFFECTS;
 					}

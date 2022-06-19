@@ -112,7 +112,8 @@ static char trigName[][16]={
 	"Monster Color",
 	"Equation",
 	"Var Equation",
-	"Bullet In Rect"
+	"Bullet In Rect",
+	"Got Bonus Goal"
 };
 
 static char effName[][16]={
@@ -153,7 +154,8 @@ static char effName[][16]={
 	"Item Sprites",
 	"Variable Bar",
 	"Summon Bullet",
-	"Change Bullet"
+	"Change Bullet",
+	"Get Bonus Goal"
 };
 
 static char lvlFlagName[][16]={
@@ -169,6 +171,7 @@ static char lvlFlagName[][16]={
 	"Stealth",
 	"Wavy",
 	"Oxygen Meter",
+	"Bonus Goal",
 };
 
 static char wpnName[][16]={
@@ -1812,6 +1815,9 @@ static void SetupTriggerButtons(int t,int y)
 			sprintf(s,"(%d,%d)-(%d,%d)",trigger.x,trigger.y,((word)trigger.value2)%256,((word)trigger.value2)/256);
 			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+3+100*t,0,370,y+17,150,14,s,RectClick);
 			break;
+		case TRG_BONUSGOAL:
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If the bonus goal is achieved", NULL);
+			break;
 	}
 }
 
@@ -2410,6 +2416,19 @@ static void SetupEffectButtons(int t,int y)
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+6+100*t,0,520,y+17,65,14,"No FX",NoFXClick);
 			else
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+6+100*t,0,520,y+17,65,14,"Play FX",NoFXClick);
+			break;
+		case EFF_BONUSGOAL:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Give a bonus goal for ",NULL);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,210,y+17,200,14,effect.text,MessageClick);
+			if(effect.flags&EF_NOFX)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+2+100*t,0,520,y+17,65,14,"No Snd",NoFXClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+2+100*t,0,520,y+17,65,14,"Play Snd",NoFXClick);
+			if(effect.flags&EF_TOGGLE)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,455,y+17,60,14,"Large",ToggleClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,455,y+17,60,14,"Normal",ToggleClick);
+			break;
 			break;
 	}
 }

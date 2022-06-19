@@ -168,8 +168,6 @@ void PlayerWinLevel(byte isSecret)
 	
 	if(curMap->numCandles==0)
 		player.levelProg->flags|=LF_CANDLES;	// get candle credit if there aren't any
-	if(curMap->flags&MAP_BONUS)
-		player.levelProg->flags|=LF_BONUS;	// get bonus level credit if any
 
 	PrintToLog("StoreWorldResults",0);
 	StoreWorldResults(player.worldProg,&curWorld);
@@ -501,6 +499,21 @@ void PlayerGetCandle(int amt)
 		StoreWorldResults(player.worldProg,&curWorld);
 		SaveProfile();
 		playerGlow=127;
+	}
+}
+
+void PlayerGetBonusGoal(char *text)
+{
+	/**/
+	if (!(player.levelProg->flags & LF_BONUS)) {
+		ShowBonusGoalEarned(curMap->name, text);
+		player.levelProg->flags |= LF_BONUS;
+		StoreWorldResults(player.worldProg, &curWorld);
+		SaveProfile();
+	}
+	else {
+		HealRing(3, goodguy->x, goodguy->y, FIXAMT * 20, 64, 5);
+		MakeNormalSound(SND_FAIRYGET);
 	}
 }
 
