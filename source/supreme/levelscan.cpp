@@ -21,6 +21,8 @@ static char lvlFlagName[][16]={
 	"Underwater",
 	"Underlava",
 	"Stealth",
+	"Dynamic Water",
+	"Dynamic Lava",
 };
 
 static char wpnName[][16]={

@@ -15,6 +15,7 @@
 #include "log.h"
 #include "palettes.h"
 #include "appdata.h"
+#include "water.h"
 
 byte showStats=0;
 dword gameStartTime,visFrameCount,updFrameCount;
@@ -24,6 +25,7 @@ float frmRate;
 word numRunsToMakeUp;
 
 char lastKey=0;
+byte waterFlip = 0;
 static char lastLevelName[32];
 byte shopping,tutorial,verified;
 byte doShop;
@@ -328,6 +330,10 @@ TASK(byte) LunaticRun(int *lastTime)
 			}
 			UpdateParticles(curMap);
 			UpdateMessage();
+
+			waterFlip = 1 - waterFlip;
+			if (waterFlip)
+				UpdateWater();
 
 			if(curMap->flags&MAP_SNOWING)
 				MakeItSnow(curMap);

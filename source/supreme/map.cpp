@@ -1237,12 +1237,18 @@ void Map::Render(world_t *world,int camX,int camY,byte flags)
 						// point in rendering this floor (unless it is transparent
 						if((!map[i+(j+1)*width].wall) ||
 							(GetTerrain(world,map[i+(j+1)*width].floor)->flags&TF_TRANS))
-							RenderFloorTileFancy(scrX,scrY,m->floor,shdw,lites);
+							{
+								RenderFloorTileFancy(scrX,scrY,m->floor,shdw,lites);
+								if((curMap->flags& MAP_DYWATR || curMap->flags&MAP_DYLAVA) && (GetTerrain(world,map[i+j*width].floor)->flags&TF_TRANS))
+									RenderFloorTileFancyWater(scrX,scrY,m->floor,0,shdw,lites);
+							}
 					}
 					else
 					{
 						// if there's a wall to the right, draw a shadow on this tile
 						RenderFloorTileFancy(scrX,scrY,m->floor,shdw,lites);
+						if((curMap->flags&MAP_DYWATR  || curMap->flags&MAP_DYLAVA) && (GetTerrain(world,map[i+j*width].floor)->flags&TF_TRANS))
+							RenderFloorTileFancyWater(scrX,scrY,m->floor,0,shdw,lites);
 					}
 				}
 			}

@@ -102,6 +102,10 @@ void InitPlayer(byte level,const char *fname)
 	player.cheated=0;
 	player.bestCombo=0;
 	player.cheesePower=0;
+	
+	//For the dynamic water/lava colors
+	player.waterDyn = 3;
+	player.lavaDyn = 4;
 
 	for(i=1;i<6;i++)
 	{

@@ -4,7 +4,10 @@
 #include "progress.h"
 #include "shop.h"
 #include "config.h"
+#include "water.h"
 #include "ioext.h"
+#include "game.h"
+#include "player.h"
 
 tile_t tiles[NUMTILES];
 MGLDraw *tileMGL;
@@ -13,11 +16,12 @@ int numTiles;
 void InitTiles(MGLDraw *mgl)
 {
 	tileMGL=mgl;
+	InitWater();
 }
 
 void ExitTiles(void)
 {
-	// nothing to do
+	ExitWater();
 }
 
 byte *GetTileData(int t)
@@ -655,6 +659,67 @@ inline void GouraudBox(int x,int y,byte *src,char light0,char light1,char light2
 	}
 }
 
+inline void GouraudBoxWater(int x, int y, byte* src, char light0, char light1, char light2, char light3, byte water)
+{
+	int i, j, tmp;
+	byte* dst, b;
+	int curLight, dlx, dly1, dly2, firstLight, lastLight;
+
+	dst = tileMGL->GetScreen() + x + y * 640;
+
+	curLight = light0 * FIXAMT;
+
+	firstLight = light0 * FIXAMT;
+	lastLight = light1 * FIXAMT;
+	dly1 = (light2 - light0) * FIXAMT / GB_HEI;
+	dly2 = (light3 - light1) * FIXAMT / GB_HEI;
+
+	for (j = 0; j < GB_HEI; j++)
+	{
+		dlx = (lastLight - firstLight) / GB_WID;
+		curLight = firstLight;
+		if (y + j > 479)
+			return;	// all done!
+		if (y + j >= 0)
+		{
+			for (i = 0; i < GB_WID; i++)
+			{
+				if (x + i >= 0 && x + i < 640)
+				{
+					b = *src;
+
+					if (curMap->flags & MAP_DYWATR && (b & (~31)) == player.waterDyn * 32)
+						b = WaterPixel(x + i, y + j, player.waterDyn);
+					if (curMap->flags & MAP_DYLAVA && (b & (~31)) == player.lavaDyn * 32)
+						b = WaterPixel(x + i, y + j, player.lavaDyn);
+
+
+					tmp = (b & 31) + (curLight / FIXAMT);
+					if (tmp < 0)
+						tmp = 0;
+					if (tmp > 31)
+						tmp = 31;
+					(*dst) = (b & (~31)) + tmp;
+				}
+				dst++;
+				src++;
+
+				curLight += dlx;
+			}
+		}
+		else
+		{
+			dst += GB_WID;
+			src += GB_WID;
+		}
+		dst += (640 - GB_WID);
+		src += GB_WID;
+
+		firstLight += dly1;
+		lastLight += dly2;
+	}
+}
+
 inline void GouraudBoxTrans(int x,int y,byte *src,char light0,char light1,char light2,char light3)
 {
 	int i,j,tmp;
@@ -927,6 +992,83 @@ void RenderFloorTileFancy(int x,int y,int t,byte shadow,const char *theLight)
 		GouraudBox(x,y+GB_HEI,tiles[t]+GB_HEI*TILE_WIDTH,light[3],light[4],light[6],light[7]);
 		GouraudBox(x+GB_WID,y+GB_HEI,tiles[t]+GB_WID+GB_HEI*TILE_WIDTH,light[4],light[5],light[7],light[8]);
 	}
+}
+
+void RenderFloorTileFancyWater(int x,int y,int t,byte water,byte shadow,const char *theLight)
+{
+	// 9 light values are passed in:
+	//
+	//   0  1  2
+	//   3  4  5
+	//   6  7  8
+
+	int i,j;
+	char light[9];
+
+	if(x<=-TILE_WIDTH || y<=-TILE_HEIGHT || x>639 || y>479)
+		return;	// no need to render
+
+	memcpy(light,theLight,9*sizeof(char));
+	j=0;
+	light[0]=(light[0]+light[4]+light[3]+light[1])/4;
+	light[2]=(light[2]+light[4]+light[1]+light[5])/4;
+	light[6]=(light[6]+light[4]+light[3]+light[7])/4;
+	light[8]=(light[8]+light[4]+light[7]+light[5])/4;
+
+	for(i=0;i<9;i++)
+	{
+		if(light[i]==0)
+			j++;
+		if(i==1 || i==3 || i==5 || i==7)
+			light[i]=(light[4]+light[i])/2;	// average each one with this tile's central light
+	}
+
+	if(shadow==1)
+	{
+		light[2]-=8;
+		light[5]-=8;
+		light[8]-=8;
+	}
+	if(shadow==2)
+	{
+		light[2]-=8;
+		light[5]-=8;
+	}
+	if(shadow==3)
+	{
+		light[8]-=8;
+	}
+	if(shadow==4)
+	{
+		light[6]-=8;
+		light[7]-=8;
+		light[8]-=8;
+	}
+	if(shadow==5)
+	{
+		light[5]=-8;
+		light[6]-=8;
+		light[7]-=8;
+		light[8]-=8;
+	}
+	if(shadow==6)
+	{
+		light[2]=-8;
+		light[5]=-8;
+		light[6]-=8;
+		light[7]-=8;
+		light[8]-=8;
+	}
+	if(shadow==7)
+	{
+		light[6]-=8;
+		light[7]-=8;
+	}
+
+	GouraudBoxWater(x,y,tiles[t],light[0],light[1],light[3],light[4],water);
+	GouraudBoxWater(x+GB_WID,y,tiles[t]+GB_WID,light[1],light[2],light[4],light[5],water+10);
+	GouraudBoxWater(x,y+GB_HEI,tiles[t]+GB_HEI*TILE_WIDTH,light[3],light[4],light[6],light[7],water+20);
+	GouraudBoxWater(x+GB_WID,y+GB_HEI,tiles[t]+GB_WID+GB_HEI*TILE_WIDTH,light[4],light[5],light[7],light[8],water+30);
 }
 
 void RenderWallTileFancy(int x,int y,int t,const char *theLight)

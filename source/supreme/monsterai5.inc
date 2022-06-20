@@ -1064,7 +1064,7 @@ void AI_Octopus(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	{
 		if(me->seq==ANIM_ATTACK)
 		{
-			//WaterRipple(me->x/FIXAMT,me->y/FIXAMT,10*32);
+			WaterRipple(me->x/FIXAMT,me->y/FIXAMT,10*32);
 			if((me->frm==4 || me->frm==10 || me->frm==16) && me->reload==0 && goodguy)
 			{
 				// spit stuff
@@ -1080,7 +1080,7 @@ void AI_Octopus(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			}
 			if(me->frm==20)
 			{
-				//WaterRipple(me->x/FIXAMT,me->y/FIXAMT,32*32);
+				WaterRipple(me->x/FIXAMT,me->y/FIXAMT,32*32);
 				me->seq=ANIM_A2;
 				me->frm=0;
 				me->frmTimer=0;
@@ -1095,14 +1095,14 @@ void AI_Octopus(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		return;	// can't do nothin' right now
 	}
 
-	//WaterRipple((me->x+me->dx*2)/FIXAMT,(me->y+me->dy*2)/FIXAMT,8*Random(32));
+	WaterRipple((me->x+me->dx*2)/FIXAMT,(me->y+me->dy*2)/FIXAMT,8*Random(32));
 
 	if(me->mind==0)	// lurking
 	{
 		if(RangeToTarget(me,goodguy)<(300*FIXAMT) && Random(48)==0 && me->reload==0)
 		{
 			ExplodeParticles(PART_WATER,me->x,me->y,0,10);
-			//WaterRipple(me->x/FIXAMT,me->y/FIXAMT,64*32);
+			WaterRipple(me->x/FIXAMT,me->y/FIXAMT,64*32);
 			FaceGoodguy2(me,goodguy);
 			// arise
 			me->seq=ANIM_A1;
@@ -1449,7 +1449,7 @@ void AI_Log(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			me->dx=0;
 		me->mind1=0;
 	}
-	//WaterRipple(me->x/FIXAMT,me->y/FIXAMT,Random(32*20));
+	WaterRipple(me->x/FIXAMT,me->y/FIXAMT,Random(32*20));
 	me->frmAdvance=64;
 }
 
@@ -2184,7 +2184,7 @@ void AI_Octoboss(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	{
 		x=me->x/FIXAMT-60+Random(121);
 		y=me->y/FIXAMT-60+Random(121);
-		//WaterRipple(x,y,Random(32*20));
+		WaterRipple(x,y,Random(32*20));
 	}
 
 	if(me->action==ACTION_BUSY)
@@ -2251,7 +2251,7 @@ void AI_Octotentacle(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			MakeSound(SND_SPD3DIE,me->x,me->y,SND_CUTOFF,1200);
 	}
 	
-	//WaterRipple(me->x/FIXAMT,me->y/FIXAMT,MGL_random(32*20));
+	WaterRipple(me->x/FIXAMT,me->y/FIXAMT,MGL_random(32*20));
 
 	if(me->action==ACTION_BUSY)
 	{

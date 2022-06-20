@@ -50,6 +50,9 @@ static void ObtainFilenames(const char *dir, const char *ext)
 		if((menuItems&FM_NOWAVS) && !strcmp(&name[strlen(name)-3],"wav"))
 			continue;	// ignore wavs
 
+		if((menuItems&FM_PICSONLY) && strcmp(&name[strlen(name)-3],"bmp"))
+			continue;	// bmps only!
+
 		strncpy(&fnames[numFiles*FNAMELEN],name,FNAMELEN);
 		numFiles++;
 

@@ -13,6 +13,7 @@
 #include "shop.h"
 #include "goal.h"
 #include "palettes.h"
+#include "water.h"
 
 static special_t *spcl;
 static byte numSpecials;
@@ -355,6 +356,12 @@ void DefaultEffect(effect_t *eff,int x,int y,byte savetext)
 			eff->value=BLT_NONE;
 			eff->value2=BLT_HAMMER;
 			eff->x=255;
+			break;
+		case EFF_DYNAMICCOL:
+			eff->value2 = 0;
+			break;
+		case EFF_DYNAMICSCRN:
+			strcpy(eff->text, "");
 			break;
 		default:
 			break;
@@ -1765,6 +1772,16 @@ void SpecialEffect(special_t *me,Map *map)
 				else{
 					MakeNormalSound(SND_TURRETBZZT);
 				}
+				break;
+			case EFF_DYNAMICCOL:
+				if (!(me->effect[i].flags & EF_NOFX))
+					player.waterDyn = me->effect[i].value2;
+				else
+					player.lavaDyn = me->effect[i].value2;
+			case EFF_DYNAMICSCRN:
+				if (me->effect[i].text[0] != '\0')
+					ChangeWater(me->effect[i].text);
+				//NoRepeatNewMessage(me->effect[i].text,120,90);
 				break;
 		}
 	}

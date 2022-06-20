@@ -46,7 +46,7 @@ lootItem_t loot[4][13] = {
 		{SHOP_GOAL, 29},
 		{SHOP_WORLD, 70},
 		{SHOP_WORLD, 73},
-		{-1, -1},
+		{255, 255},
 	},
 	{
 		{SHOP_DISCOUNT, 1},
@@ -58,7 +58,7 @@ lootItem_t loot[4][13] = {
 		{SHOP_PLAYABLE, PLAY_MYSTIC},
 		{SHOP_WORLD, 17},
 		{SHOP_WORLD, 65},
-		{-1, -1},
+		{255, 255},
 	},
 	{
 		{SHOP_DISCOUNT, 6},
@@ -66,13 +66,13 @@ lootItem_t loot[4][13] = {
 		{SHOP_GOAL, 68},
 		{SHOP_PLAYABLE, PLAY_LUNATIC},
 		{SHOP_WORLD, 66},
-		{-1, -1},
+		{255, 255},
 	},
 	{
 		{SHOP_MODE, MODE_LUDICROUS},
 		{SHOP_GOAL, 69},
 		{SHOP_PLAYABLE, PLAY_HAPPY},
-		{-1, -1},
+		{255, 255},
 	}
 };
 
@@ -1208,7 +1208,7 @@ void LootCrateRequest(void)
 	}
 	else
 	{
-		strcpy(shopTxt,"Looks like you've got a LoonyKey or two on hand!"
+		strcpy(shopTxt,"Looks like you've got a LoonyKey or two on hand! "
 					   "Are you in the mood to roll the dice?");
 		buyMode=2;
 	}
@@ -1528,7 +1528,7 @@ void SetObtainText(void)
 
 static char rarityNames[][16] = { "common", "uncommon", "rare", "epic" };
 
-void SetUnboxText(int rarity, int value)
+void SetUnboxText(int rarity, int value1, int value2)
 {
 	char tmp[32], tmp2[32], tmp3[64];
 
@@ -1537,52 +1537,82 @@ void SetUnboxText(int rarity, int value)
 	strcat(shopTxt, " LoonyCrate, and recieved... ");
 
 	if (buying == 255) {
-		sprintf(&shopTxt[strlen(shopTxt)], " %d coins!  Don't spend 'em all in one place!", value);
+		sprintf(&shopTxt[strlen(shopTxt)], "%d coins!  Don't spend 'em all in one place!", value1);
 	}
 	else {
-		switch (shop[buying].type)
+		switch (value1)
 		{
-		case SHOP_WORLD:
-			sprintf(tmp3, "worlds/%s", worldFName[shop[buying].item]);
-			GetWorldName(tmp3, tmp, tmp2);
-			strcat(shopTxt, " the world \"");
-			strcat(shopTxt, tmp);
-			strcat(shopTxt, "\" by ");
-			strcat(shopTxt, tmp2);
-			strcat(shopTxt, " - now available to play!");
-			break;
-		case SHOP_PLAYABLE:
-			switch (shop[buying].item)
-			{
-			case PLAY_LUNATIC:
-				strcat(shopTxt, " the Mad Doctor, Dr. Lunatic - now selectable from the profile menu!");
+			case SHOP_WORLD:
+				sprintf(tmp3, "worlds/%s", worldFName[value2]);
+				GetWorldName(tmp3, tmp, tmp2);
+				strcat(shopTxt, " the world \"");
+				strcat(shopTxt, tmp);
+				strcat(shopTxt, "\" by ");
+				strcat(shopTxt, tmp2);
+				strcat(shopTxt, " - now available to play!");
 				break;
-			case PLAY_HAPPY:
-				strcat(shopTxt, " the agent of chaos, Happy Stick Man - now selectable from the profile menu!!");
+			case SHOP_PLAYABLE:
+				switch (value2)
+				{
+				case PLAY_LUNATIC:
+					strcat(shopTxt, "the Mad Doctor, Dr. Lunatic - now selectable from the profile menu!");
+					break;
+				case PLAY_HAPPY:
+					strcat(shopTxt, "the agent of chaos, Happy Stick Man - now selectable from the profile menu!!");
+					break;
+				case PLAY_MYSTIC:
+					strcat(shopTxt, "the hero of Tulipton, Kid Mystic - now selectable from the profile menu!");
+					break;
+				}
 				break;
-			case PLAY_MYSTIC:
-				strcat(shopTxt, " the hero of Tulipton, Kid Mystic - now selectable from the profile menu!");
+			case SHOP_MODE:
+				switch (value2)
+				{
+				case MODE_DISCO:
+					strcat(shopTxt, " Disco Mode - enjoy the hideous discoloration of disco lighting!");
+					break;
+				case MODE_RASTER:
+					strcat(shopTxt, " TV Mode - like playing on your old Atari!");
+					break;
+				case MODE_LUDICROUS:
+					strcat(shopTxt, " !!yebo dna raeH - edoM esreveR");
+					break;
+				case MODE_REVERSE:
+					strcat(shopTxt, " Disco Mode - enjoy the hideous discoloration of disco lighting!");
+					break;
+				case MODE_SPLATTER:
+					strcat(shopTxt, " Splatter Mode - make things much messier in combat!");
+					break;
+				case MODE_MANIC:
+					strcat(shopTxt, " Manic Mode - no time for a long game of Dr. L?  Then speed things up!");
+					break;
+				case MODE_TEENY:
+					strcat(shopTxt, " Teeny Mode - fits right in your pocket!");
+					break;
+				}
 				break;
-			}
-			break;
-		case SHOP_DISCOUNT:
-			strcat(shopTxt, "A Discount Card for 10% off of all purchases at ");
-			strcat(shopTxt, shopName[shop[buying].item]);
-			strcat(shopTxt, "!  Go shop 'til you drop!");
-			break;
+			case SHOP_DISCOUNT:
+				strcat(shopTxt, "A Discount Card for 10% off of all purchases at ");
+				strcat(shopTxt, shopName[value2]);
+				strcat(shopTxt, "!  Go shop 'til you drop!");
+				break;
+			case SHOP_EMPTY:
+				strcat(shopTxt, "Nothing!! ABSOLUTELY NOTHING!!!");
+				break;
 		}
+		//sprintf(&shopTxt[strlen(shopTxt)], " (buying #%d - type %d, item %d)", buying,value1,value2);
 	}
 }
 
 TASK(void) UnboxCrate(void){
-	byte chanceTable, rarityChance, epic, rare, uncommon, rarity, isItem;
+	byte chanceTable, rarityChance, epic, rare, uncommon, rarity, isItem=1;
 	buyMode = 1;
 	MakeNormalSound(SND_LOCKER);
 
 	profile.progress.loonyKeysUsed++;
 
 	// Decide which table to use
-	if (profile.progress.loonyKeysUsed == 1)
+	/*if (profile.progress.loonyKeysUsed == 1)
 		chanceTable = RAR_FIRST;
 	else if (profile.progress.loonyKeysUsed % 20 == 0)
 		chanceTable = RAR_EVTWENTY;
@@ -1590,11 +1620,11 @@ TASK(void) UnboxCrate(void){
 		chanceTable = RAR_EVTEN;
 	else if (profile.progress.loonyKeysUsed % 5 == 0)
 		chanceTable = RAR_EVTEN;
-	else
+	else*/
 		chanceTable = RAR_REGULAR;
 
 	rarityChance = Random(100); // Percent chance
-	isItem = Random(rarityTables[chanceTable].itemChance) == 1 ? 1 : 0;
+	//isItem = Random(rarityTables[chanceTable].itemChance) == 1 ? 1 : 0;
 
 	epic = 100 - rarityTables[chanceTable].percentages[RNK_EPIC];
 	rare = epic - rarityTables[chanceTable].percentages[RNK_RARE];
@@ -1611,28 +1641,37 @@ TASK(void) UnboxCrate(void){
 		rarity = RNK_EPIC;
 
 	if (isItem) { // get an item
-		byte listSize, i=0, select, lockedIn=0, tries=0;
+		byte lockedIn=0, tries=0;
+		int select = 0, listSize = 0, i = 0;
 
-		while (loot[rarity][i].item != -1) // Get the list size
+		while (loot[rarity][i].item != 255 && i < 13) // Get the list size, provide a failsafe to prevent endless loop
 			i++;
 		listSize = i+1;
-		while (!lockedIn && tries < 100) {
-			select = Random(listSize);
-			if (!profile.progress.purchase[buying])
-				lockedIn = 1;
-			else
-				tries++;
-		}
 
-		buying = ShopItemNumber(loot[rarity][select].type, loot[rarity][select].item);
-		profile.progress.purchase[buying]++;
-		SetUnboxText(rarity,0);
+		select = Random(listSize);
+		while (!lockedIn && tries < listSize + 1) {
+			buying = ShopItemNumber(loot[rarity][select].type, loot[rarity][select].item);
+			if (!(profile.progress.purchase[buying] & SIF_BOUGHT)) {
+				lockedIn = 1;
+			}
+			else {
+				select = (select + 1) % listSize; // Move to the next available item, I guess
+				tries++;
+			}
+		}
+		if (lockedIn) { // We got an item - unlock the item!
+			profile.progress.purchase[buying]++;
+			SetUnboxText(rarity, loot[rarity][select].type, loot[rarity][select].item);
+		}
+		else { // If no item is available, default to coins
+			isItem = 0;
+		}
 	}
-	else { // get a coin value
+	if (!isItem) { // get a coin value
 		word coins = 1000;
 		profile.progress.totalCoins += coins;
 		buying = 255;
-		SetUnboxText(rarity,coins);
+		SetUnboxText(rarity,coins,0);
 	}
 	
 	SetupShops(curMap);

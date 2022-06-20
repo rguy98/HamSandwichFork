@@ -14,7 +14,7 @@ static char songTab[23][32]={
 		"003worldpicker.ogg",
 		"004CavernHub.ogg",
 		"005CavernLevel.ogg",
-		"006CavernBoss.ogg",
+		"006cavesboss.ogg",
 		"007ForestHub.ogg",
 		"008ForestLevel.ogg",
 		"009ForestBoss.ogg",

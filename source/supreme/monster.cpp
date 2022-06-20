@@ -5,6 +5,7 @@
 #include "shop.h"
 #include "editor.h"
 #include "goal.h"
+#include "water.h"
 
 /*
  -MT_GOOD	 -MT_EVIL		 -MT_SPOOKY		-MT_ZOMBIE	 -MT_VAMPIRE	-MT_SPIDER -MT_PYGMY

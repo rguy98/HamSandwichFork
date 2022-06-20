@@ -14,6 +14,7 @@
 #define FM_PLAYSONGS 32
 #define FM_NOWAVS	64	// disregard wav files
 #define FM_MERGE	128
+#define FM_PICSONLY	256
 
 void InitFileDialog(const char *dir, const char *ext, byte menuItemsToShow,const char *defaultName);
 void ExitFileDialog(void);

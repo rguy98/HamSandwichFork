@@ -41,8 +41,10 @@
 #define MAP_WAVY		(1<<10)
 #define MAP_OXYGEN		(1<<11)
 #define MAP_BONUS		(1<<12)
+#define MAP_DYWATR		(1<<13)
+#define MAP_DYLAVA		(1<<14)
 
-#define NUM_LVL_FLAGS	13
+#define NUM_LVL_FLAGS	15
 
 // map updating modes
 #define UPDATE_GAME		0
