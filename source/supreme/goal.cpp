@@ -357,8 +357,8 @@ void GoalPurchase(void)
 		CompleteGoal(23);
 	if(AllMoviesSeen())
 		CompleteGoal(24);
-	if(AllLockersOpen())
-		CompleteGoal(25);
+	// if(AllLockersOpen())
+	//	CompleteGoal(25);
 	if(AllPurchased())
 		CompleteGoal(26);
 

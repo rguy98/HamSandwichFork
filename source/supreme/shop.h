@@ -15,6 +15,7 @@
 #define SHOP_KIDS		9
 #define SHOP_DESERT		10
 #define SHOP_HUNGER		11
+#define SHOP_LOOTCRATE	12
 
 // purchase types
 #define SHOP_WORLD		0
@@ -28,6 +29,7 @@
 #define SHOP_MODE		8	// toggleable goofy things in the lockers
 #define SHOP_DISCOUNT	9	// discount card for a store
 #define SHOP_DONATION	10	// the donation at the hunger sign
+#define SHOP_UNBOX		11	// the new loot system
 
 // abilities
 #define ABIL_BRAIN		1	// brain radar
@@ -71,6 +73,18 @@
 #define MODE_TEENY		6
 #define NUM_MODES		7
 
+// ranks for lootcrates
+#define RNK_COMMON		0 	// 1 in 2
+#define RNK_UNCOMMON	1	// 3 in 10
+#define RNK_RARE		2	// 3 in 20
+#define RNK_EPIC		3	// 1 in 20
+
+#define RAR_REGULAR		0
+#define RAR_FIRST		1
+#define RAR_EVFIVE		2
+#define RAR_EVTEN		3
+#define RAR_EVTWENTY	4
+
 typedef struct shopItem_t
 {
 	byte shop;
@@ -79,13 +93,36 @@ typedef struct shopItem_t
 	byte item;	// which # of the items of "type" it is
 } shopItem_t;
 
+typedef struct lootItem_t
+{
+	byte type;
+	byte item;	// which # of the items of "type" it is
+} lootItem_t;
+
+typedef struct lootCoin_t
+{
+	word minimum;
+	word maximum;
+} lootCoin_t;
+
+typedef struct lootTable_t
+{
+	word percentages[4];
+	byte itemChance;
+} lootTable_t;
+
+/*
+	50% money prize
+
+*/
+
 class Map;
 
 byte CanPlayWorld(const char *fname);
 byte ItemPurchased(byte type,byte num);
 byte AllOfTypePurchased(byte type);
 byte AllPurchased(void);
-byte AllLockersOpen(void);
+//byte AllLockersOpen(void);
 
 byte ShopItemNumber(byte type,byte num);
 void SetupShops(Map *map);

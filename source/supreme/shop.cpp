@@ -10,10 +10,71 @@
 #include "gallery.h"
 #include "goal.h"
 
-#define NUMSHOPITEMS		(158)
+#define NUMSHOPITEMS		(136)
 #define NUMBUILTINWORLDS	(79)
 
 word moneyAmts[11]={25,75,1500,5000,2222,250,17,300,2,716,42};
+
+lootTable_t rarityTables[5]{
+	{{50,30,18,2},3}, // regular
+	{{1,97,1,1},1}, // first key
+	{{38,36,24,2},2}, // every five keys
+	{{20,45,30,5},1}, // every ten keys
+	{{5,50,30,15},1}, // every twenty keys
+};
+
+// Money values - unlimited.
+lootCoin_t moneyValues[4] = {
+	{300,750},
+	{751,1500},
+	{1501,3000},
+	{3001,5000},
+};
+
+// Limited loot items - one per player.
+lootItem_t loot[4][13] = {
+	{
+		{SHOP_DISCOUNT, 0},
+		{SHOP_DISCOUNT, 2},
+		{SHOP_DISCOUNT, 4},
+		{SHOP_DISCOUNT, 5},
+		{SHOP_DISCOUNT, 7},
+		{SHOP_DISCOUNT, 8},
+		{SHOP_MODE, MODE_RASTER},
+		{SHOP_MODE, MODE_SPLATTER},
+		{SHOP_MODE, MODE_TEENY},
+		{SHOP_GOAL, 29},
+		{SHOP_WORLD, 70},
+		{SHOP_WORLD, 73},
+		{-1, -1},
+	},
+	{
+		{SHOP_DISCOUNT, 1},
+		{SHOP_DISCOUNT, 3},
+		{SHOP_DISCOUNT, 9},
+		{SHOP_MODE, MODE_DISCO},
+		{SHOP_MODE, MODE_REVERSE},
+		{SHOP_GOAL, 59},
+		{SHOP_PLAYABLE, PLAY_MYSTIC},
+		{SHOP_WORLD, 17},
+		{SHOP_WORLD, 65},
+		{-1, -1},
+	},
+	{
+		{SHOP_DISCOUNT, 6},
+		{SHOP_MODE, MODE_MANIC},
+		{SHOP_GOAL, 68},
+		{SHOP_PLAYABLE, PLAY_LUNATIC},
+		{SHOP_WORLD, 66},
+		{-1, -1},
+	},
+	{
+		{SHOP_MODE, MODE_LUDICROUS},
+		{SHOP_GOAL, 69},
+		{SHOP_PLAYABLE, PLAY_HAPPY},
+		{-1, -1},
+	}
+};
 
 shopItem_t shop[NUMSHOPITEMS]={
 
@@ -468,31 +529,18 @@ shopItem_t shop[NUMSHOPITEMS]={
 	 SHOP_ABILITY,
 	 ABIL_MOVESHOOT},	// move and shoot ability
 
-	 // lockers
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_DISCOUNT,
 	 0},		// #1 - discount card #0
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_EMPTY,
-	 0},		// #2 - empty
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_DISCOUNT,
 	 1},		// #3 - discount card #1
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_MONEY,
-	 0},		// #4 - 25 coins
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_MODE,
 	 MODE_DISCO}, // #5 - disco mode
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 1},			// #6 - 75c
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_GOAL,
@@ -503,37 +551,16 @@ shopItem_t shop[NUMSHOPITEMS]={
 	 2},		// #8 - discount card #2
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_MONEY,
-	 2},		// #9 - 1500 coins
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_PLAYABLE,
 	 PLAY_HAPPY}, // #10 - playas happy stick
-
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_MODE,
 	 MODE_RASTER}, // #11 - TV mode
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_MONEY,
-	 3},			// #12 - 5000 coins
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_WORLD,
 	 70},			// #13 - world: Bouapha: HUD Inspector
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 0},			// #14 - empty
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 4},			// #15 - 2222 coins
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 0},			// #16 - empty
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_DISCOUNT,
@@ -544,25 +571,8 @@ shopItem_t shop[NUMSHOPITEMS]={
 	 65},			// #18 - world: TV Lunacy
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_EMPTY,
-	 0},			// #19 - empty
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 5},			// #20 - 250 coins
-
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 6},			// #21 - 17 coins
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_WORLD,
 	 66},			// #22 - world: Blockbusters
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 0},			// #23 - empty
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_DISCOUNT,
@@ -589,16 +599,8 @@ shopItem_t shop[NUMSHOPITEMS]={
 	 29},			// #29 - gallery goal #29
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_EMPTY,
-	 0},			// #30 - empty
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_GOAL,
 	 59},			// #31 - gallery goal #59
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 7},			// #32 - 300 coins
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_DISCOUNT,
@@ -609,16 +611,8 @@ shopItem_t shop[NUMSHOPITEMS]={
 	 MODE_REVERSE}, // #34 - reverse mode
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_EMPTY,
-	 0},			// #35 - empty
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_MODE,
-	 MODE_SPLATTER},		// #36 - splatter mode
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 0},			// #37 - empty
+	 MODE_SPLATTER},// #36 - splatter mode
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_DISCOUNT,
@@ -635,43 +629,19 @@ shopItem_t shop[NUMSHOPITEMS]={
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_MODE,
-	 MODE_MANIC},		// #41 - manic mode
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 0},			// #42 - empty
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 10},			// #43 - 42 coins
+	 MODE_MANIC},	// #41 - manic mode
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_PLAYABLE,
-	 PLAY_LUNATIC},			// #44 - Dr. Lunatic
+	 PLAY_LUNATIC},	// #44 - Dr. Lunatic
 	{SHOP_LOCKERS,
 	 0,
 	 SHOP_DISCOUNT,
 	 9},			// #45 - discount card #9
 	{SHOP_LOCKERS,
 	 0,
-	 SHOP_MONEY,
-	 8},			// #46 - 2 coins
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 6},			// #47 - XXXXXXXXXXXXXXXX
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_MONEY,
-	 9},			// #48 - 716 coins
-	{SHOP_LOCKERS,
-	 0,
-	 SHOP_EMPTY,
-	 0},			// #49 - empty
-	{SHOP_LOCKERS,
-	 0,
 	 SHOP_MODE,
-	 MODE_TEENY},		// #50 - teeny mode
+	 MODE_TEENY},	// #50 - teeny mode
 
 	 // the hunger sign
 	{SHOP_HUNGER,
@@ -829,6 +799,7 @@ byte AllOfTypePurchased(byte type)
 	return 1;	// they've all been bought!
 }
 
+/*
 byte AllLockersOpen(void)
 {
 	int j;
@@ -842,6 +813,7 @@ byte AllLockersOpen(void)
 	}
 	return 1;	// they've all been opened
 }
+*/
 
 byte AllPurchased(void)
 {
@@ -983,7 +955,7 @@ void SetupShops(Map *map)
 	}
 
 	// now open/mess with the lockers
-	lockStart=ShopItemNumber(SHOP_DISCOUNT,0);	// this is what's in locker #0, so this is where the locker list starts
+	/*lockStart=ShopItemNumber(SHOP_DISCOUNT,0);	// this is what's in locker #0, so this is where the locker list starts
 	x=124;
 	y=9;
 	for(i=0;i<50;i++)
@@ -1017,6 +989,7 @@ void SetupShops(Map *map)
 			y+=4;
 		}
 	}
+	*/
 
 	if(ItemPurchased(SHOP_MAJOR,MAJOR_BESTIARY))
 	{
@@ -1060,8 +1033,8 @@ void DefaultShopAvailability(void)
 		else
 			profile.progress.purchase[i]=SIF_AVAILABLE;
 
-		if(shop[i].shop==SHOP_LOCKERS)	// all locker items are available, deal with it!
-			profile.progress.purchase[i]=SIF_AVAILABLE;
+		//if(shop[i].shop==SHOP_LOCKERS)	// all locker items are available, deal with it!
+		//	profile.progress.purchase[i]=SIF_AVAILABLE;
 	}
 }
 
@@ -1090,6 +1063,7 @@ static byte buying,buyMode;
 static byte shopSize;
 static byte cursor;
 
+/*
 void OpenLocker(int x,int y)
 {
 	char modeName[][16]={"Disco","TV","Ludicrous","Subliminal","Splatter","Manic","Handheld"};
@@ -1195,6 +1169,7 @@ void OpenLocker(int x,int y)
 		CompleteGoal(shop[x].item);
 	GoalPurchase();
 }
+*/
 
 void HungerSign(void)
 {
@@ -1212,6 +1187,30 @@ void HungerSign(void)
 	{
 		strcpy(shopTxt,"Would you care to donate 10,000 coins to world hunger relief?");
 		buyMode=0;
+	}
+	modeToToggle=0;
+	cursor=0;
+	GetTaps();
+	GetArrowTaps();
+}
+
+void LootCrateRequest(void)
+{
+	SendMessageToGame(MSG_SHOPNOW,0);
+	shopSize=0;
+	buying=ShopItemNumber(SHOP_UNBOX,0);
+	if(profile.progress.loonyKeys-profile.progress.loonyKeysUsed<=0)
+	{
+		strcpy(shopTxt,"Hey buddy, don't have any LoonyKeys to trade in! "
+					   "Come back when you're a little richer, hmm?");
+		buying=255;
+		buyMode=3;
+	}
+	else
+	{
+		strcpy(shopTxt,"Looks like you've got a LoonyKey or two on hand!"
+					   "Are you in the mood to roll the dice?");
+		buyMode=2;
 	}
 	modeToToggle=0;
 	cursor=0;
@@ -1293,16 +1292,18 @@ TASK(void) InitShopping(int x,int y)
 		RestoreGameplayGfx();
 		CO_RETURN;
 	}
-	if(x>=124 && y>=9 && x<=154 && y<=30)
-	{
-		goodguy->x=(goodguy->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
-		goodguy->y=(goodguy->mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
-		goodguy->dx=0;
-		goodguy->dy=0;
-		OpenLocker(x,y);
-		RestoreGameplayGfx();
-		CO_RETURN;
-	}
+	/*
+		if(x>=124 && y>=9 && x<=154 && y<=30)
+		{
+			goodguy->x=(goodguy->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
+			goodguy->y=(goodguy->mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
+			goodguy->dx=0;
+			goodguy->dy=0;
+			OpenLocker(x,y);
+			RestoreGameplayGfx();
+			CO_RETURN;
+		}
+	*/
 	if(x==87 && y==54)
 	{
 		goodguy->x=(goodguy->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
@@ -1310,6 +1311,15 @@ TASK(void) InitShopping(int x,int y)
 		goodguy->dx=0;
 		goodguy->dy=0;
 		HungerSign();
+		CO_RETURN;
+	}
+	if(x==128 && y==23)
+	{
+		goodguy->x=(goodguy->mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
+		goodguy->y=(goodguy->mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
+		goodguy->dx=0;
+		goodguy->dy=0;
+		LootCrateRequest();
 		CO_RETURN;
 	}
 
@@ -1469,12 +1479,6 @@ void SetObtainText(void)
 		case SHOP_PLAYABLE:
 			switch(shop[buying].item)
 			{
-				case PLAY_HAPPY:
-					strcpy(shopTxt,"You can now choose to play as Happy Stick Man from the Profile menu!");
-					break;
-				case PLAY_LUNATIC:
-					strcpy(shopTxt,"You can now choose to play as Dr. Lunatic from the Profile menu!");
-					break;
 				case PLAY_MECHA:
 					strcpy(shopTxt,"You can now choose to play as MechaBouapha from the Profile menu!");
 					break;
@@ -1521,6 +1525,119 @@ void SetObtainText(void)
 			break;
 	}
 }
+
+static char rarityNames[][16] = { "common", "uncommon", "rare", "epic" };
+
+void SetUnboxText(int rarity, int value)
+{
+	char tmp[32], tmp2[32], tmp3[64];
+
+	strcpy(shopTxt, "You unboxed a ");
+	strcat(shopTxt, rarityNames[rarity]);
+	strcat(shopTxt, " LoonyCrate, and recieved... ");
+
+	if (buying == 255) {
+		sprintf(&shopTxt[strlen(shopTxt)], " %d coins!  Don't spend 'em all in one place!", value);
+	}
+	else {
+		switch (shop[buying].type)
+		{
+		case SHOP_WORLD:
+			sprintf(tmp3, "worlds/%s", worldFName[shop[buying].item]);
+			GetWorldName(tmp3, tmp, tmp2);
+			strcat(shopTxt, " the world \"");
+			strcat(shopTxt, tmp);
+			strcat(shopTxt, "\" by ");
+			strcat(shopTxt, tmp2);
+			strcat(shopTxt, " - now available to play!");
+			break;
+		case SHOP_PLAYABLE:
+			switch (shop[buying].item)
+			{
+			case PLAY_LUNATIC:
+				strcat(shopTxt, " the Mad Doctor, Dr. Lunatic - now selectable from the profile menu!");
+				break;
+			case PLAY_HAPPY:
+				strcat(shopTxt, " the agent of chaos, Happy Stick Man - now selectable from the profile menu!!");
+				break;
+			case PLAY_MYSTIC:
+				strcat(shopTxt, " the hero of Tulipton, Kid Mystic - now selectable from the profile menu!");
+				break;
+			}
+			break;
+		case SHOP_DISCOUNT:
+			strcat(shopTxt, "A Discount Card for 10% off of all purchases at ");
+			strcat(shopTxt, shopName[shop[buying].item]);
+			strcat(shopTxt, "!  Go shop 'til you drop!");
+			break;
+		}
+	}
+}
+
+TASK(void) UnboxCrate(void){
+	byte chanceTable, rarityChance, epic, rare, uncommon, rarity, isItem;
+	buyMode = 1;
+	MakeNormalSound(SND_LOCKER);
+
+	profile.progress.loonyKeysUsed++;
+
+	// Decide which table to use
+	if (profile.progress.loonyKeysUsed == 1)
+		chanceTable = RAR_FIRST;
+	else if (profile.progress.loonyKeysUsed % 20 == 0)
+		chanceTable = RAR_EVTWENTY;
+	else if (profile.progress.loonyKeysUsed % 10 == 0)
+		chanceTable = RAR_EVTEN;
+	else if (profile.progress.loonyKeysUsed % 5 == 0)
+		chanceTable = RAR_EVTEN;
+	else
+		chanceTable = RAR_REGULAR;
+
+	rarityChance = Random(100); // Percent chance
+	isItem = Random(rarityTables[chanceTable].itemChance) == 1 ? 1 : 0;
+
+	epic = 100 - rarityTables[chanceTable].percentages[RNK_EPIC];
+	rare = epic - rarityTables[chanceTable].percentages[RNK_RARE];
+	uncommon = rare - rarityTables[chanceTable].percentages[RNK_UNCOMMON];
+
+	// Decide rarity
+	if (rarityChance < uncommon)
+		rarity = RNK_COMMON;
+	else if (rarityChance < rare)
+		rarity = RNK_UNCOMMON;
+	else if (rarityChance < epic) 
+		rarity = RNK_RARE;
+	else
+		rarity = RNK_EPIC;
+
+	if (isItem) { // get an item
+		byte listSize, i=0, select, lockedIn=0, tries=0;
+
+		while (loot[rarity][i].item != -1) // Get the list size
+			i++;
+		listSize = i+1;
+		while (!lockedIn && tries < 100) {
+			select = Random(listSize);
+			if (!profile.progress.purchase[buying])
+				lockedIn = 1;
+			else
+				tries++;
+		}
+
+		buying = ShopItemNumber(loot[rarity][select].type, loot[rarity][select].item);
+		profile.progress.purchase[buying]++;
+		SetUnboxText(rarity,0);
+	}
+	else { // get a coin value
+		word coins = 1000;
+		profile.progress.totalCoins += coins;
+		buying = 255;
+		SetUnboxText(rarity,coins);
+	}
+	
+	SetupShops(curMap);
+}
+
 
 TASK(void) BuyItem(void)
 {
@@ -1607,6 +1724,21 @@ TASK(byte) UpdateShopping(MGLDraw *mgl)
 				CO_RETURN 0;
 		}
 	}
+	else if(buyMode==2) // unbox crate time!
+	{
+		if(c&CONTROL_LF)
+			cursor=0;
+		if(c&CONTROL_RT)
+			cursor=1;
+
+		if(c&CONTROL_B1)
+		{
+			if(cursor==1)
+				AWAIT UnboxCrate();
+			else
+				CO_RETURN 0;
+		}
+	}
 	else
 	{
 		if(c&CONTROL_B1)
@@ -1648,22 +1780,39 @@ void RenderShopping(MGLDraw *mgl)
 	if(shopSize>2)
 		mgl->Box(320-shopSize+1,240-shopSize/2+1,320+shopSize-1,240+shopSize/2-1,32*1+16);
 
-	if(buyMode==0)
-	{
-		if(shopSize>=150)
-		{
-			PrintGlowRect(320-shopSize+4,240-shopSize/2+4,320+shopSize-4,240+shopSize/2-4,18,shopTxt,2);
+	switch(buyMode){
+		case 0:
+		default:
+			if(shopSize>=150)
+			{
+				PrintGlowRect(320-shopSize+4,240-shopSize/2+4,320+shopSize-4,240+shopSize/2-4,18,shopTxt,2);
 
-			RenderShopButton((cursor==0),320-shopSize+10,240+shopSize/2-27,95,"No Thanks!",mgl);
-			RenderShopButton((cursor==1),320+shopSize-105,240+shopSize/2-27,95,"Yes Please!",mgl);
-		}
-	}
-	else
-	{
-		if(shopSize>=150)
-		{
-			PrintGlowRect(320-shopSize+4,240-shopSize/2+4,320+shopSize-4,240+shopSize/2-4,18,shopTxt,2);
-			RenderShopButton(1,320-48,240+shopSize/2-27,95,"Thank you!",mgl);
-		}
+				RenderShopButton((cursor==0),320-shopSize+10,240+shopSize/2-27,95,"No Thanks!",mgl);
+				RenderShopButton((cursor==1),320+shopSize-105,240+shopSize/2-27,95,"Yes Please!",mgl);
+			}
+			break;
+		case 1:
+			if(shopSize>=150)
+			{
+				PrintGlowRect(320-shopSize+4,240-shopSize/2+4,320+shopSize-4,240+shopSize/2-4,18,shopTxt,2);
+				RenderShopButton(1,320-48,240+shopSize/2-27,95,"Thank you!",mgl);
+			}
+			break;
+		case 2: // roll the dice?
+			if (shopSize >= 150)
+			{
+				PrintGlowRect(320 - shopSize + 4, 240 - shopSize / 2 + 4, 320 + shopSize - 4, 240 + shopSize / 2 - 4, 18, shopTxt, 2);
+
+				RenderShopButton((cursor == 0), 320 - shopSize + 10, 240 + shopSize / 2 - 27, 95, "Maybe later", mgl);
+				RenderShopButton((cursor == 1), 320 + shopSize - 105, 240 + shopSize / 2 - 27, 95, "Sure thing!", mgl);
+			}
+			break;
+		case 3: // not enough loonykeys
+			if(shopSize>=150)
+			{
+				PrintGlowRect(320-shopSize+4,240-shopSize/2+4,320+shopSize-4,240+shopSize/2-4,18,shopTxt,2);
+				RenderShopButton(1,320-48,240+shopSize/2-27,95,"Okay",mgl);
+			}
+			break;
 	}
 }
