@@ -68,10 +68,11 @@ class Guy
 		byte frozen;
 
 		//NEW STUFF
-		byte ignited; //burn damage (red)
-		byte weak; //weakness affliction (dark red)
-		byte strong; //steelskin defense (dark grey)
-		byte confuse; //are they confused (light pink)
+		byte ignited;	// burn damage (red)
+		byte weak;		// weakness affliction - more damage taken (dark red)
+		byte strong;	// steelskin defense - increased resistance (dark grey)
+		byte confuse;	// confusion - inverted movement controls (light pink)
+		byte special;	// special flags (rainbow, white flash)
 
 		int aiType;
 		byte fromColor,toColor;

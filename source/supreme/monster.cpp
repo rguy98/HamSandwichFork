@@ -227,7 +227,8 @@ sprite_t *GetMonsterSprite(dword type,byte seq,byte frm,byte facing)
 	return monsType[type].spr->GetSprite(v);
 }
 
-void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byte facing,char bright,byte ouch,byte poison,byte frozen,sprite_set_t* set)
+void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byte facing,char bright,byte ouch,
+	byte poison,byte frozen,byte weak,byte strong,byte ignited,byte confuse,byte special,sprite_set_t* set)
 {
 	sprite_t *curSpr;
 	int v;
@@ -299,6 +300,19 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+8,curSpr,DISPLAY_DRAWME); // purple
 			return;
 		}
+		else if(ignited)
+		{
+			curSpr=set->GetSprite(v);
+			if(!curSpr)
+				return;
+			if(!(monsType[type].flags&MF_NOSHADOW))
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
+			if(ouch==0)
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+12,curSpr,DISPLAY_DRAWME);	// light red
+			else
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+4,curSpr,DISPLAY_DRAWME); // red
+			return;
+		}
 		else if(poison)
 		{
 			curSpr=set->GetSprite(v);
@@ -310,6 +324,45 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,1,bright-4,curSpr,DISPLAY_DRAWME);	// green
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,5,bright,curSpr,DISPLAY_DRAWME); // yellow
+			return;
+		}
+		else if(confuse)
+		{
+			curSpr=set->GetSprite(v);
+			if(!curSpr)
+				return;
+			if(!(monsType[type].flags&MF_NOSHADOW))
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
+			if(ouch==0)
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+8,curSpr,DISPLAY_DRAWME);	// purple
+			else
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+16,curSpr,DISPLAY_DRAWME); // red
+			return;
+		}
+		else if(strong)
+		{
+			curSpr=set->GetSprite(v);
+			if(!curSpr)
+				return;
+			if(!(monsType[type].flags&MF_NOSHADOW))
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
+			if(ouch==0)
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,0,bright-4,curSpr,DISPLAY_DRAWME);	// dark grey
+			else
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,floor(Random(7)),bright+4,curSpr,DISPLAY_DRAWME); // rainbow
+			return;
+		}
+		else if(weak)
+		{
+			curSpr=set->GetSprite(v);
+			if(!curSpr)
+				return;
+			if(!(monsType[type].flags&MF_NOSHADOW))
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
+			if(ouch==0)
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright-4,curSpr,DISPLAY_DRAWME);	// dark red
+			else
+				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME); // brown
 			return;
 		}
 		else if(player.invisibility)
@@ -358,13 +411,20 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 	}
 	else
 	{
-		if(poison)
-			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,5,bright,curSpr,DISPLAY_DRAWME);
-		else if(frozen)
+		if(frozen)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+8,curSpr,DISPLAY_DRAWME);
+		else if(ignited)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+4,curSpr,DISPLAY_DRAWME);
+		else if(poison)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,5,bright,curSpr,DISPLAY_DRAWME);
+		else if(confuse)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+16,curSpr,DISPLAY_DRAWME);
+		else if (strong)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,0,bright+12,curSpr,DISPLAY_DRAWME);
+		else if (weak)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME);
 		else
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright,curSpr,DISPLAY_DRAWME);
-
 	}
 }
 

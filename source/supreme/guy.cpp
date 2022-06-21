@@ -874,7 +874,7 @@ void Guy::Render(byte light)
 	}
 	oldBrt=GetMonsterType(t)->brtChg;
 	GetMonsterType(t)->brtChg=brtChange;
-	MonsterDraw(x,y,z,type,aiType,seq,frm,facing,bright*(light>0),ouch,poison,frozen,customSpr);
+	MonsterDraw(x,y,z,type,aiType,seq,frm,facing,bright*(light>0),ouch,poison,frozen,weak,strong,ignited,confuse,special,customSpr);
 	if(recolor)
 	{
 		GetMonsterType(t)->fromCol=oldFrom;

@@ -42,7 +42,8 @@
 #define TRG_EQUVAR		31	// true if var V1 is EQUATION or less/more/exactly (equation is stored in corresponding effect slot!)
 #define TRG_BULLETRECT  32  // true if there are any of bullet X in rect
 #define TRG_BONUSGOAL	33  // true if bonus goal is achieved
-#define MAX_TRIGGER		34
+#define TRG_GAMEMODE	34  // true if game mode X is activated (shop modes)
+#define MAX_TRIGGER		35
 
 // effects
 #define EFF_NONE		0

@@ -117,7 +117,8 @@ static char trigName[][16]={
 	"Equation",
 	"Var Equation",
 	"Bullet In Rect",
-	"Got Bonus Goal"
+	"Got Bonus Goal",
+	"Game Mode",
 };
 
 static char effName[][16]={
@@ -390,11 +391,12 @@ static void ChooseTriggerClick(int id)
 	mode=SMODE_PICKTRIG;
 	curTrig=(trgStart + id/100)-1;
 	prevType=spcl.trigger[curTrig].type;
-	selectY=(curTrig*38+30)-(TRG_H*MAX_TRIGGER)/2;
+	selectY = 24;
+		/*(curTrig * 38 + 30) - (TRG_H * TRG_L) / 2;
 	if(selectY<0)
 		selectY=0;
 	if(selectY+TRG_H*MAX_TRIGGER>475)
-		selectY=475-TRG_H*MAX_TRIGGER;
+		selectY=475-TRG_H*TRG_L;*/
 }
 
 static void ChooseEffectClick(int id)
@@ -411,11 +413,12 @@ static void ChooseEffectClick(int id)
 	curEff=effStart + (id-ID_EFF0)/100;
 	prevType=spcl.effect[curEff].type;
 
-	selectY=(curEff*38+264)-(EFF_H*EFF_L)/2;
-	if(selectY<0)
+	//selectY=(curEff*38+264)-(EFF_H*EFF_L)/2;
+	selectY = 24;
+	/*if (selectY<0)
 		selectY=0;
 	if(selectY+EFF_H*EFF_MAX>475)
-		selectY=475-EFF_H*EFF_L;
+		selectY=475-EFF_H*EFF_L;*/
 }
 
 static void MonsterClick(int id)
@@ -2649,6 +2652,8 @@ void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 					spcl.trigger[curTrig].type=(mouseY-selectY)/TRG_H + floor((mouseX-40)/TRG_W)*TRG_L;
 				else
 					spcl.trigger[curTrig].type=TRG_NONE;
+				if(spcl.trigger[curTrig].type > MAX_TRIGGER) // Failsafe to ensure no blank specials
+					spcl.trigger[curTrig].type = TRG_NONE;
 				mode=SMODE_NORMAL;
 				if(prevType!=spcl.trigger[curTrig].type)
 				{
@@ -2673,6 +2678,8 @@ void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 					spcl.effect[curEff].type=(mouseY-selectY)/EFF_H + floor((mouseX-40)/EFF_W)*EFF_L;
 				else
 					spcl.effect[curEff].type=EFF_NONE;
+				if (spcl.effect[curEff].type > EFF_MAX) // Failsafe to ensure no blank specials
+					spcl.effect[curEff].type = EFF_NONE;
 			}
 			else
 			{
