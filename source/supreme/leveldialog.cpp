@@ -192,9 +192,10 @@ static void AutoBrainsClick(int id)
 					if(BrainsGiven(m->special[i].effect[j].value2)>0)
 						m->numBrains+=BrainsGiven(m->special[i].effect[j].value2);
 					if(m->special[i].effect[j].value==MONS_ZOMBIE || m->special[i].effect[j].value==MONS_ZOMBONI ||
-						m->special[i].effect[j].value==MONS_MUTANT)
+						m->special[i].effect[j].value==MONS_MUTANT || m->special[i].effect[j].value==MONS_FSTZOMBIE ||
+						m->special[i].effect[j].value==MONS_FROZOMBIE)
 						m->numBrains++;
-					if(m->special[i].effect[j].value==MONS_SUPERZOMBIE)
+					if(m->special[i].effect[j].value==MONS_SUPERZOMBIE || m->special[i].effect[j].value==MONS_SUMUZOMBIE)
 						m->numBrains+=2;
 				}
 			}

@@ -401,8 +401,14 @@ void AI_Zombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	{
 		if(me->seq==ANIM_ATTACK && me->frm==5)
 		{
-			me->dx=Cosine(me->facing*32)*8;
-			me->dy=Sine(me->facing*32)*8;
+			if(me->aiType==MONS_FSTZOMBIE){
+				me->dx=Cosine(me->facing*32)*16;
+				me->dy=Sine(me->facing*32)*16;
+			}
+			else{
+				me->dx=Cosine(me->facing*32)*8;
+				me->dy=Sine(me->facing*32)*8;
+			}
 		}
 		if(me->seq==ANIM_ATTACK && me->frm>6)
 		{
@@ -434,6 +440,8 @@ void AI_Zombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				me->frm=0;
 				me->frmTimer=0;
 				me->frmAdvance=64;
+				if(me->aiType==MONS_FSTZOMBIE)
+					me->frmAdvance=128;
 				me->action=ACTION_BUSY;
 				me->dx=0;
 				me->dy=0;
@@ -443,19 +451,36 @@ void AI_Zombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 
 			FaceGoodguy(me,goodguy);
 
-			me->dx=Cosine(me->facing*32)*1;
-			me->dy=Sine(me->facing*32)*1;
+			if(me->aiType==MONS_FSTZOMBIE){
+				me->dx=Cosine(me->facing*32)*4;
+				me->dy=Sine(me->facing*32)*4;
+			}
+			else{
+				me->dx=Cosine(me->facing*32)*1;
+				me->dy=Sine(me->facing*32)*1;
+			}
 			if(me->seq!=ANIM_MOVE)
 			{
 				me->seq=ANIM_MOVE;
 				me->frm=0;
 				me->frmTimer=0;
 				me->frmAdvance=64;
+				if(me->aiType==MONS_FSTZOMBIE)
+					me->frmAdvance=256;
 			}
-			if(Random(64)==0)
-			{
-				me->mind=1;		// occasionally wander
-				me->mind1=1;
+			if(me->aiType==MONS_FSTZOMBIE){
+				if(Random(128)==0)
+				{
+					me->mind=1;		// occasionally wander
+					me->mind1=1;
+				}
+			}
+			else{
+				if(Random(64)==0)
+				{
+					me->mind=1;		// occasionally wander
+					me->mind1=1;
+				}
 			}
 		}
 		else
@@ -474,15 +499,24 @@ void AI_Zombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				me->facing=(byte)Random(8);
 			me->mind1=Random(40)+1;
 		}
-
-		me->dx=Cosine(me->facing*32)*1;
-		me->dy=Sine(me->facing*32)*1;
+		
+		if(me->aiType==MONS_FSTZOMBIE){
+			me->dx=Cosine(me->facing*32)*4;
+			me->dy=Sine(me->facing*32)*4;
+		}
+		else{
+			me->dx=Cosine(me->facing*32)*1;
+			me->dy=Sine(me->facing*32)*1;
+		}
+		
 		if(me->seq!=ANIM_MOVE)
 		{
 			me->seq=ANIM_MOVE;
 			me->frm=0;
 			me->frmTimer=0;
 			me->frmAdvance=64;
+			if(me->aiType==MONS_FSTZOMBIE)
+				me->frmAdvance=256;
 		}
 	}
 }

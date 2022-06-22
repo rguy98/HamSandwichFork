@@ -519,3 +519,326 @@ void AI_Incadark(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		}
 	}
 }
+
+void AI_NightTerror(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y,i;
+	byte f;
+
+	if(!goodguy)
+		return;
+	
+	if(me->reload)
+		me->reload--;
+
+	if(me->ouch==4)
+	{
+		if(me->hp>0)
+			MakeSound(SND_VAMPOUCH,me->x,me->y,SND_CUTOFF,1200);
+		else
+			MakeSound(SND_VAMPDIE,me->x,me->y,SND_CUTOFF,1200);
+	}
+
+	if(me->action==ACTION_BUSY)
+	{
+
+		if(me->seq==ANIM_DIE)
+		{
+			if(Random(2))
+			{
+				x = me->x >> FIXSHIFT;
+				y = me->y >> FIXSHIFT;
+				BlowSmoke((x + me->rectx + Random(me->rectx2 - me->rectx)) << FIXSHIFT,
+					(y + me->recty + Random(me->recty2 - me->recty)) << FIXSHIFT,
+					me->z, FIXAMT);
+			}
+		}
+		if(me->seq==ANIM_A1 && me->frm==3 && me->reload==0 && goodguy)
+		{
+			FaceGoodguy(me,goodguy);
+			x=me->x+Cosine(me->facing*32)*16;
+			y=me->y+Sine(me->facing*32)*16;
+			if(me->AttackCheck(20,x>>FIXSHIFT,y>>FIXSHIFT,goodguy))
+			{
+				goodguy->GetShot(Cosine(me->facing*32)*4,Sine(me->facing*32)*4,24,map,world);
+			}
+			me->reload=5;
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind1)
+		me->mind1--;
+	
+	if (me->mind1 % 2 == 1 && me->mind !=2)
+	{
+		if(me->hp<me->maxHP && me->seq!=ANIM_DIE)
+		{
+			i=me->hp;
+			me->hp+=1;
+			if(me->hp>me->maxHP)
+			me->hp=me->maxHP;
+		}
+	}
+
+	if(map->map[me->mapx+me->mapy*map->width].templight>-8)	// if you can see him, RUN!
+	{
+		me->mind=2;	// dash at you
+		me->mind1=3;
+	}
+
+	switch(me->mind)
+	{
+		case 0:	// normal heading towards you
+			FaceGoodguy(me,goodguy);
+			if(me->mind1==0)
+			{
+				me->mind=1;
+				me->facing=Random(8);
+				me->mind1=10+Random(40);
+			}
+			me->dx=Cosine(me->facing*32)*2;
+			me->dy=Sine(me->facing*32)*2;
+			me->frmAdvance=128;
+			if(goodguy->x>me->x-FIXAMT*64 && goodguy->x<me->x+FIXAMT*48 && goodguy->y>me->y-FIXAMT*64 && goodguy->y<me->y+FIXAMT*48 && goodguy->ouch==0)
+			goodguy->GetShot(0,0,1,map,world);
+			break;
+		case 1:	// normal wandering
+			if(me->mind1==0)
+			{
+				me->mind=0;
+				me->mind1=10+Random(90);
+			}
+			me->dx=Cosine(me->facing*32)*1;
+			me->dy=Sine(me->facing*32)*1;
+			me->frmAdvance=128;
+			if(goodguy->x>me->x-FIXAMT*64 && goodguy->x<me->x+FIXAMT*48 && goodguy->y>me->y-FIXAMT*64 && goodguy->y<me->y+FIXAMT*48 && goodguy->ouch==0)
+			goodguy->GetShot(0,0,2,map,world);
+			break;
+		case 2:	// dashing at you
+			if(me->mind1==0)
+			{
+				me->mind=1;
+				me->mind1=10+Random(40);
+			}
+			FaceGoodguy(me,goodguy);
+			me->dx=Cosine(me->facing*32)*8;
+			me->dy=Sine(me->facing*32)*8;
+			me->frmAdvance=200;
+			if(goodguy->x>me->x-FIXAMT*64 && goodguy->x<me->x+FIXAMT*48 && goodguy->y>me->y-FIXAMT*64 && goodguy->y<me->y+FIXAMT*48 && goodguy->ouch==0)
+			goodguy->GetShot(0,0,1,map,world);
+			break;
+	}
+
+	if(goodguy)
+	{
+
+		x=RangeToTarget(me,goodguy);
+		if(x<(128*FIXAMT) && Random(16)==0 && me->reload==0 && me->mind == 2)
+		{
+			MakeSound(SND_VAMPATTK,me->x,me->y,SND_CUTOFF,1200);
+			FaceGoodguy(me,goodguy);
+			// bite him
+			me->seq=ANIM_A1;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=100;
+			me->action=ACTION_BUSY;
+			me->dx=0;
+			me->dy=0;
+			me->reload=1;
+			return;
+		}
+	}
+
+	if(me->mind!=2)	// when dashing, he ignores light, but otherwise wants to avoid it
+	{
+		x=(me->x+me->dx)/(TILE_WIDTH*FIXAMT);
+		y=(me->y+me->dy)/(TILE_HEIGHT*FIXAMT);
+		if(map->map[me->mapx+me->mapy*map->width].templight<-5 &&
+			map->map[x+y*map->width].templight>=-5)	// you are in darkness now, but wouldn't be on moving
+		{
+			me->dx=0;
+			me->dy=0;
+			me->seq=ANIM_IDLE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+			return;
+		}
+		if(map->map[me->mapx+me->mapy*map->width].templight<=-5)	// if you are in light at any time, run
+		{
+			me->dx=(me->dx*3)/4;
+			me->dy=(me->dy*3)/4;
+			me->frmAdvance=160;
+		}
+	}
+
+	if(me->seq!=ANIM_MOVE)
+	{
+		me->seq=ANIM_MOVE;
+		me->frm=0;
+		me->frmTimer=0;
+		me->frmAdvance=128;
+	}
+}
+
+void AI_RevengeClone(Guy *me, Map *map, world_t *world, Guy *goodguy)
+{
+	int x, y, x2, y2, f;
+
+	if (me->reload)
+		me->reload--;
+
+	if (me->ouch == 4)
+	{
+		if (me->hp > 0)
+			MakeSound(SND_ROBOBOUAPHAOUCH, me->x, me->y, SND_CUTOFF, 1200);
+	}
+
+	if (me->action == ACTION_BUSY)
+	{
+		if (me->seq == ANIM_ATTACK && me->frm > 3 && me->frm < 12 && me->frm % 2 == 1 && me->reload == 0 && goodguy)
+		{
+			MakeSound(SND_ARMORSHOOT, me->x, me->y, SND_CUTOFF, 1200);
+			f = me->facing * 32 - 64;
+			x = me->x + Cosine(me->facing * 32)*20;
+			y = me->y + Sine(me->facing * 32)*20;
+			x2 = x + Cosine(f)*32;
+			y2 = y + Sine(f)*32;
+			FireBullet(x2, y2, me->facing * 32, BLT_BIGSHELL, me->friendly);
+			x2 = x - Cosine(f)*32;
+			y2 = y - Sine(f)*32;
+			FireBullet(x2, y2, me->facing * 32, BLT_BIGSHELL, me->friendly);
+			me->mind1 = 1;
+		}
+		if (me->seq == ANIM_A1 && me->frm == 2 && me->reload == 0 && goodguy)
+		{
+			QuadMissile(me->x, me->y, me->facing*32, me->friendly);
+			me->reload = 5;
+			me->mind1 = 1;
+		}
+		if (me->frm >= 3 && me->seq == ANIM_DIE)
+			{
+				x = me->x >> FIXSHIFT;
+				y = me->y >> FIXSHIFT;
+				BlowUpGuy(x + me->rectx, y + me->recty, x + me->rectx2, y + me->recty2, me->z, 2);
+				BlowSmoke((x + me->rectx + Random(me->rectx2 - me->rectx)) << FIXSHIFT,
+						(y + me->recty + Random(me->recty2 - me->recty)) << FIXSHIFT,
+						me->z, FIXAMT);
+			}
+		if (me->frm == 4 && me->seq == ANIM_DIE)
+			{
+				// become an evil clone...
+				FireBullet(me->x, me->y, 0, BLT_BOOM, me->friendly);
+				me->type=MONS_EVILCLONE;	// become a lesser clone
+				me->aiType=MONS_EVILCLONE;
+				strcpy(me->name,monsType[me->aiType].name);
+				me->hp=32;
+				me->maxHP=32;
+				me->mind=0;
+				me->mind1=0;
+				me->facing=2;
+			}
+		return; // can't do nothin' right now
+	}
+
+	if (me->mind == 0) // when mind=0, singlemindedly lumber towards Bouapha
+	{
+		if (RangeToTarget(me, goodguy)<(512 * FIXAMT) && Random(32) == 0)
+		{
+			// spit at him
+			me->seq = ANIM_ATTACK;
+			me->frm = 0;
+			me->frmTimer = 0;
+			me->frmAdvance = 256;
+			me->action = ACTION_BUSY;
+			me->dx = 0;
+			me->dy = 0;
+			me->reload = 0;
+			FaceGoodguy(me, goodguy);
+			return;
+		}
+		else if (RangeToTarget(me, goodguy)<(512 * FIXAMT) && Random(128) == 0)
+		{
+			// spit at him
+			me->seq = ANIM_A1;
+			me->frm = 0;
+			me->frmTimer = 0;
+			me->frmAdvance = 256;
+			me->action = ACTION_BUSY;
+			me->dx = 0;
+			me->dy = 0;
+			me->reload = 0;
+			FaceGoodguy(me, goodguy);
+			return;
+		}
+		FaceGoodguy(me, goodguy);
+
+		me->dx = Cosine(me->facing * 32)*4;
+		me->dy = Sine(me->facing * 32)*4;
+		if (me->seq != ANIM_MOVE)
+		{
+			me->seq = ANIM_MOVE;
+			me->frm = 0;
+			me->frmTimer = 0;
+			me->frmAdvance = 128;
+		}
+		if (Random(64) == 0)
+		{
+			me->mind = 1; // occasionally wander
+			me->mind1 = 1;
+		}
+	}
+	else if (me->mind == 1) // random wandering
+	{
+		if (RangeToTarget(me, goodguy)<(512 * FIXAMT) && Random(32) == 0)
+		{
+			// spit at him
+			MakeSound(SND_HAMMERTOSS, me->x, me->y, SND_CUTOFF, 1200);
+			me->seq = ANIM_ATTACK;
+			me->frm = 0;
+			me->frmTimer = 0;
+			me->frmAdvance = 256;
+			me->action = ACTION_BUSY;
+			me->dx = 0;
+			me->dy = 0;
+			me->reload = 0;
+			FaceGoodguy(me, goodguy);
+			return;
+		}
+		else if (RangeToTarget(me, goodguy)<(512 * FIXAMT) && Random(128) == 0)
+		{
+			// spit at him
+			me->seq = ANIM_A1;
+			me->frm = 0;
+			me->frmTimer = 0;
+			me->frmAdvance = 256;
+			me->action = ACTION_BUSY;
+			me->dx = 0;
+			me->dy = 0;
+			me->reload = 0;
+			FaceGoodguy(me, goodguy);
+			return;
+		}
+
+		if (!(me->mind1--)) // time to get a new direction
+		{
+			if ((goodguy) && Random(3) == 0)
+				me->mind = 0; // get back on track
+			else
+				me->facing = (byte) Random(8);
+			me->mind1 = Random(40) + 1;
+		}
+
+		me->dx = Cosine(me->facing * 32)*5;
+		me->dy = Sine(me->facing * 32)*5;
+		if (me->seq != ANIM_MOVE)
+		{
+			me->seq = ANIM_MOVE;
+			me->frm = 0;
+			me->frmTimer = 0;
+			me->frmAdvance = 128;
+		}
+	}
+}

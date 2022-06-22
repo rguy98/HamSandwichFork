@@ -4,6 +4,8 @@
 #include "pause.h"
 #include "appdata.h"
 
+#define NDEBUG 1
+
 // special codes in the credits:
 // @ = use GirlsRWeird font
 // # = draw a major horizontal line
@@ -279,12 +281,12 @@ byte MainMenuUpdate(MGLDraw *mgl,title_t *title,int *lastTime)
 			MakeNormalSound(SND_MENUSELECT);
 			return 2;
 		}
-#ifndef NDEBUG
 		if(c=='e')
 		{
 			title->cursor=3;
 			return 1;
 		}
+#ifndef NDEBUG
 #endif
 		*lastTime-=TIME_PER_FRAME;
 	}

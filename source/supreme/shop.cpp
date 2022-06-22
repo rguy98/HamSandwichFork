@@ -1651,13 +1651,14 @@ TASK(void) UnboxCrate(void){
 		select = Random(listSize);
 		while (!lockedIn && tries < listSize + 1) {
 			buying = ShopItemNumber(loot[rarity][select].type, loot[rarity][select].item);
+
 			if (!(profile.progress.purchase[buying] & SIF_BOUGHT)) {
 				lockedIn = 1;
 			}
 			else {
 				select = (select + 1) % listSize; // Move to the next available item, I guess
-				tries++;
 			}
+			tries++;
 		}
 		if (lockedIn) { // We got an item - unlock the item!
 			profile.progress.purchase[buying]++;

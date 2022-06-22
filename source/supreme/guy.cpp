@@ -1102,6 +1102,9 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		GoalKilledSomebody(this,type,frozen);
 		ignited=0;
 		frozen=0;
+		confuse=0;
+		weak=0;
+		strong=0;
 		newHP=0;
 		seq=ANIM_DIE;
 		if(aiType==MONS_BOUAPHA && parent && parent->aiType==MONS_SUPERZOMBIE)
@@ -1118,14 +1121,14 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 			type==MONS_TROOPER2 || type==MONS_PATTY || type==MONS_SCARAB)
 			facing=2;	// these can only die facing forward, artistically speaking
 		// possible item drop
-		if(type==MONS_ZOMBIE || type==MONS_MUTANT)	// zombies always drop a brain
+		if(type==MONS_ZOMBIE || type==MONS_MUTANT || type==MONS_FSTZOMBIE || type==MONS_FROZOMBIE)	// zombies always drop a brain
 		{
 			if(!map->DropItem(mapx,mapy,ITM_BRAIN))
 			{
 				PlayerGetBrain(1);	// if you can't drop it, just give it to the player!
 			}
 		}
-		else if(type==MONS_SUPERZOMBIE)	// super zombies always drop 2 brains
+		else if(type==MONS_SUPERZOMBIE || type==MONS_SUMUZOMBIE)	// super zombies always drop 2 brains
 		{
 			if(!map->DropItem(mapx,mapy,ITM_BRAIN))
 			{
@@ -1376,6 +1379,16 @@ void UpdateGuys(Map *map,world_t *world)
 						guys[i]->Render(1);
 						guys[i]->Update(map,world);
 					}
+					if(guys[i]->aiType==MONS_MUMBLE2 && guys[i]->type!=0 && guys[i]->seq==ANIM_ATTACK)
+					{
+						guys[i]->Render(1);
+						guys[i]->Update(map,world);
+					}
+					if(guys[i]->aiType==MONS_FSTZOMBIE && guys[i]->type!=0 && guys[i]->seq==ANIM_ATTACK)
+					{
+						guys[i]->Render(1);
+						guys[i]->Update(map,world);
+					}
 				}
 			}
 		}
@@ -1561,6 +1574,9 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->ID=i;
 			guys[i]->frozen=0;
 			guys[i]->ignited = 0;
+			guys[i]->weak = 0;
+			guys[i]->strong = 0;
+			guys[i]->confuse = 0;
 			guys[i]->mapx=(guys[i]->x>>FIXSHIFT)/TILE_WIDTH;
 			guys[i]->mapy=(guys[i]->y>>FIXSHIFT)/TILE_HEIGHT;
 			guys[i]->item=ITM_RANDOM;
@@ -4146,7 +4162,8 @@ void FindMonsterBrain(int myx,int myy)
 	{
 		if(guys[i]->type && guys[i]->hp && guys[i]->aiType!=MONS_BOUAPHA)
 		{
-			if(guys[i]->type==MONS_ZOMBIE || guys[i]->type==MONS_ZOMBONI || guys[i]->type==MONS_MUTANT || guys[i]->type==MONS_SUPERZOMBIE)
+			if(guys[i]->type==MONS_ZOMBIE || guys[i]->type==MONS_ZOMBONI || guys[i]->type==MONS_MUTANT || guys[i]->type==MONS_SUPERZOMBIE ||
+			guys[i]->type==MONS_FSTZOMBIE || guys[i]->type==MONS_FROZOMBIE || guys[i]->type==MONS_SUMUZOMBIE)
 			{
 				if((myx-guys[i]->mapx)*(myx-guys[i]->mapx)+(myy-guys[i]->mapy)*(myy-guys[i]->mapy)<j)
 				{

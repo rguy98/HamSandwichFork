@@ -27,7 +27,7 @@ byte NewWorld(world_t *world,MGLDraw *mgl)
 	return 1;
 }
 
-byte LoadWorld(world_t *world,char *fname)
+byte LoadWorld(world_t *world,const char *fname)
 {
 	FILE *f;
 	int i;
@@ -56,22 +56,28 @@ byte LoadWorld(world_t *world,char *fname)
 	return 1;
 }
 
-byte SaveWorld(world_t *world,char *fname)
+byte SaveWorld(world_t *world, const char *fname)
 {
 	FILE *f;
 	int i;
 
-	f=AssetOpen_Write(fname);
-	if(!f)
+	world->totalPoints = 0;
+	for (i = 1; i < MAX_MAPS; i++)
+		if (world->map[i])
+			world->totalPoints += 100; // each level is worth 100 points except the hub which is worth nothing
+
+	f = AssetOpen_Write(fname);
+	if (!f)
 		return 0;
 
-	fwrite(&world->numMaps,1,1,f);
+	fwrite(&world->numMaps, 1, 1, f);
+	fwrite(&world->totalPoints, 1, sizeof (int), f);
 
 	SaveTiles(f);
 
-	fwrite(world->terrain,200,sizeof(terrain_t),f);
+	fwrite(world->terrain, 200, sizeof (terrain_t), f);
 
-	for(i=0;i<world->numMaps;i++)
+	for (i = 0; i < world->numMaps; i++)
 		world->map[i]->Save(f);
 
 	fclose(f);

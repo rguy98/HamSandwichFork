@@ -266,7 +266,7 @@
 #define MONS_PEEPBOMB	230
 #define MONS_PEEPBOMB2	231 //	reverse peeping bomb
 #define MONS_TRAPAZOID	232
-#define MONS_TRAPAZOID2 233 // hiding trapazoid, not meant for use on its own
+#define MONS_TRAPAZOID2 233 // fast trapazoid
 #define MONS_WHACKAZOID	234
 #define MONS_SLUG   	235
 #define MONS_SNAIL	 	236
@@ -338,19 +338,37 @@
 #define MONS_CRAZYBUSH2	298		// Burning Bush (Crazy Bush)
 #define MONS_OCTOPUS2	299		// Calamari (Octon)
 #define MONS_SLUG2		300		// Banana Slug (Slimy Slug)
+#define MONS_PEEPER2	301		// Jeeper's Peeper (Oculoid)
+#define MONS_TOWER2		302		// Jeeper's Peeper (Oculoid)
+#define MONS_INCADARK	303		// horiz
+#define MONS_INCADARK2	304		// vert
 
 // Operation SCARE Editions
-#define MONS_GOLEMEVIL	301		// Evil Grumpy Golem 
-#define MONS_PUNKEVIL	302		// Evil Punk Bunny
-#define MONS_CLONESHRM	303		// Evil Clone (Shtupid Shroom)
-#define MONS_CLONEDRL	304		// Evil Clone (Dr. Lunatic)
-#define MONS_CLONELUNA	305		// Evil Clone (LunaChick)
-#define MONS_CLONEKM	306		// Evil Clone (Kid Mystic)
-#define MONS_BOMB		307		// Live bomb
-#define MONS_INCADARK	308		// horiz
-#define MONS_INCADARK2	309		// vert
+#define MONS_GOLEMEVIL	305		// Evil Grumpy Golem 
+#define MONS_PUNKEVIL	306		// Evil Punk Bunny
+#define MONS_CLONESHRM	307		// Evil Clone (Shtupid Shroom)
+#define MONS_CLONEDRL	308		// Evil Clone (Dr. Lunatic)
+#define MONS_CLONELUNA	309		// Evil Clone (LunaChick)
+#define MONS_CLONEKM	310		// Evil Clone (Kid Mystic)
+#define MONS_BOMB		311		// Live bomb
+#define MONS_DEATHCAP	312
+#define MONS_FSTZOMBIE	313
+#define MONS_FROZOMBIE	314
+#define MONS_SANDMAN	315
+#define MONS_THINGY4	316
+#define MONS_SUMUZOMBIE	317
+#define MONS_ICYPUMPKN	318		// Cold to the touch
+#define MONS_WACKYPUMP	319		// Switches colors (red-yellow-blue)
+#define MONS_SEAPUMPKN	320		// Swims
+#define MONS_CENTIBBODY 321
+#define MONS_CENTIBHEAD 322
+#define MONS_MISSOZOID	323
+#define MONS_KELVOZOID	324
+#define MONS_ARMORCLONE	325
+#define MONS_NIGHTVAMP	326
+#define MONS_VOLTAGE	327		// Electric Jack Frost
 
-#define NUM_MONSTERS  310    // Can grow as needed
+#define NUM_MONSTERS  328    // Can grow as needed
 #define NUM_PROFILE_MONSTERS 248 // Do not change without redoing the profile format
 
 // fake monster codes
@@ -718,5 +736,8 @@ void AI_LiveBomb(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Incadark(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Laser(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Deadhead(Guy* me, Map* map, world_t* world, Guy* goodguy);
+
+void AI_NightTerror(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_RevengeClone(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 #endif
