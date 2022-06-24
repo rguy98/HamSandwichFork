@@ -163,7 +163,11 @@ void ChangeBullet(byte fx,int x,int y,int type,int newtype); // for specials to 
 byte BulletFacingType(byte type); // To check if a type of bullet uses none, 0-7, or 0-255 facings
 void RenderMysticalHammerItem(byte col, int x, int y);
 void EraseLasers(int mapx, int mapy);
+void BurnHay(int x, int y);
 
 void GetBulletDeltas(int *bdx,int *bdy);
+
+void SaveBullets(FILE* f);
+void LoadBullets(FILE* f);
 
 #endif

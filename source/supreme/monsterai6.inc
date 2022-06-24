@@ -174,9 +174,9 @@ void AI_MadCow(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	if(me->ouch==4)
 	{
 		if(me->hp>0)
-			MakeSound(SND_TRICEROUCH,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_COWOUCH,me->x,me->y,SND_CUTOFF,1200);
 		else
-			MakeSound(SND_TRICERDIE,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_COWDIE,me->x,me->y,SND_CUTOFF,1200);
 	}
 
 	if(me->action==ACTION_BUSY)
@@ -213,7 +213,7 @@ void AI_MadCow(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			me->frm=0;
 			me->frmTimer=0;
 			me->frmAdvance=128;
-			MakeSound(SND_TRICERAROAR,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_COWMOO,me->x,me->y,SND_CUTOFF,1200);
 			// pick a new direction
 			if(Random(2)==0)
 			{
@@ -295,9 +295,9 @@ void AI_MadCow2(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	if(me->ouch==4)
 	{
 		if(me->hp>0)
-			MakeSound(SND_TRICEROUCH,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_COWOUCH,me->x,me->y,SND_CUTOFF,1200);
 		else
-			MakeSound(SND_TRICERDIE,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_COWDIE,me->x,me->y,SND_CUTOFF,1200);
 	}
 
 	if(me->hp<me->maxHP)
@@ -339,7 +339,7 @@ void AI_MadCow2(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		me->frm=0;
 		me->frmTimer=0;
 		me->frmAdvance=128;
-		MakeSound(SND_TRICERAROAR,me->x,me->y,SND_CUTOFF,1200);
+		MakeSound(SND_COWMOO,me->x,me->y,SND_CUTOFF,1200);
 		if(Random(2))
 			me->facing=(me->facing+1)&7;
 		else

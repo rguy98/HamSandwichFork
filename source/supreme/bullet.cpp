@@ -1240,6 +1240,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_IGNITE:
+			BurnHay(me->x, me->y);
 			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 16, 0, 0, 0, map, world, me->friendly))
 			{
 				if (!reflect)
@@ -1313,6 +1314,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_FLAME:
+			BurnHay(me->x, me->y);
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,1,map,world,me->friendly))
 			{
 				// no noise, just let them scream
@@ -1324,6 +1326,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				// no noise, just let them scream
 			}
 		case BLT_FLAME2:
+			BurnHay(me->x, me->y);
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,1,map,world,me->friendly))
 			{
 				// no noise, just let him scream
@@ -1338,7 +1341,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
-			//BurnHay(me->x, me->y);
+			BurnHay(me->x, me->y);
 			if (FindVictims2(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 1, map, world, me->friendly))
 			{
 				BlowSmoke(me->x, me->y, me->z, FIXAMT);
@@ -1468,6 +1471,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_BADFBALL:
+			BurnHay(me->x, me->y);
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
 			{
 				me->type=BLT_NONE;
@@ -1682,6 +1686,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_COMETBOOM:
 			me->anim++;
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BOMBED)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
 		case BLT_HOLESHOT:
@@ -1952,12 +1958,16 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			me->anim++;
 			map->BrightTorch((me->x/TILE_WIDTH)>>FIXSHIFT,
 							 (me->y/TILE_HEIGHT)>>FIXSHIFT,18,8);
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BOMBED)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
 		case BLT_SHROOM:
 			HitBadguys(me,map,world);
 			break;
 		case BLT_MEGABEAM:
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BOMBED)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			if(me->anim<(4*5))
 				me->anim++;
 			else	// FIRE!
@@ -1982,6 +1992,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_FLAME:
 		case BLT_FLAME2:
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BURNT)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			if(me->timer&1)	// every other frame
 				HitBadguys(me,map,world);
 			map->BrightTorch((me->x/TILE_WIDTH)>>FIXSHIFT,
@@ -1998,7 +2010,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 				me->anim=4;
 			break;
 		case BLT_FLAME3:
-			//BurnHay(me->x, me->y);
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BURNT)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			map->BrightTorch((me->x / TILE_WIDTH) >> FIXSHIFT,
 				(me->y / TILE_HEIGHT) >> FIXSHIFT, 8, 4);
 			me->dz += Random(FIXAMT / 8);		//anti gravity
@@ -2014,6 +2027,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BURNT)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			if (me->timer & 1)	// every other frame
 			{
 				HitBadguys(me, map, world);
@@ -2029,11 +2044,15 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			me->anim = Random(5);
 			break;
 		case BLT_IGNITE:
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BURNT)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me, map, world);
 			BlowSmoke(me->x, me->y, me->z, FIXAMT);
 			break;
 		case BLT_LASER:
 		case BLT_LASERBEAM:
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BURNT)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
 		case BLT_BOMB:
@@ -2064,6 +2083,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 		case BLT_BOOM:
 			map->BrightTorch((me->x/TILE_WIDTH)>>FIXSHIFT,
 							 (me->y/TILE_HEIGHT)>>FIXSHIFT,18,8);
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_BOMBED)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
 		case BLT_ICECLOUD:
@@ -4068,4 +4089,61 @@ byte BulletFacingType(byte type)
 byte GetBulletAttackType(void)
 {
 	return attackType;
+}
+
+void SaveBullets(FILE *f)
+{
+	int i;
+
+	fwrite(&config.numBullets,1,sizeof(int),f);
+	for(i=0;i<config.numBullets;i++)
+	{
+		fwrite(&bullet[i].type,1,sizeof(byte),f);
+		if(bullet[i].type!=0)
+		{
+			fwrite(&bullet[i],sizeof(bullet_t),1,f);
+		}
+	}
+}
+
+void LoadBullets(FILE *f)
+{
+	int i;
+
+	fread(&config.numBullets,1,sizeof(int),f);
+	for(i=0;i<config.numBullets;i++)
+	{
+		fread(&bullet[i].type,1,sizeof(byte),f);
+		if(bullet[i].type!=0)
+		{
+			fread(&bullet[i],sizeof(bullet_t),1,f);
+		}
+	}
+}
+
+void BurnHay(int x, int y)
+{
+	int i, j, k;
+
+	x /= (TILE_WIDTH * FIXAMT);
+	y /= (TILE_HEIGHT * FIXAMT);
+
+	for (i = x - 1; i <= x + 1; i++)
+		for (j = y - 1; j <= y + 1; j++)
+		{
+			if (i < 0 || j < 0 || i >= curMap->width || j >= curMap->height)
+				return;
+
+			if (curMap->map[i + j * curMap->width].item == ITM_HAYBALE || curMap->map[i + j * curMap->width].item == ITM_MINEBLOCK)	// hay or minecart blocks
+			{
+				//if(curMap->map[i+j*curMap->width].item==85)
+				{
+					FireBullet((i * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT, (j * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT, 0, BLT_BADSITFLAME, 0);
+				}
+				curMap->map[i + j * curMap->width].item = 0;
+				for (k = 0; k < 4; k++)
+					BlowSmoke((i * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT, (j * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT, 5, FIXAMT);
+				MakeSound(SND_FLAMEGO, (i * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT, (j * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT, SND_CUTOFF, 500);
+			}
+		}
 }

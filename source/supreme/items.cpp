@@ -711,8 +711,16 @@ item_t baseItems[]={
 		IF_PICKUP,
 		IT_PICKUP|IT_WEAPON|IT_POWERUP,
 		ITR_GET,IE_POWERUP,PU_CHEESE,"Supreme Squeezy Cheese!",SND_WEAPON},
-	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused2
-	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused3
+	{"Hay Bale",0,0,170,0,0,0,
+		0,
+		IF_SOLID|IF_SHADOW,
+		IT_DECOR|IT_OBSTACLE,
+		ITR_BURNT,IE_DESTROY,5,"",0 },
+	{"Wooden Barrel",0,0,169,0,0,0,
+		0,
+		IF_SOLID|IF_SHADOW,
+		IT_DECOR|IT_OBSTACLE,
+		ITR_NONE,IE_NONE,0,"",0 },
 	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused4
 	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused5
 	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused6
@@ -896,12 +904,16 @@ void RenderItem(int x,int y,byte type,char bright,byte flags)
 		else
 			sprite = itmSpr->GetSprite(items[type].sprNum);
 
-		if(items[type].flags&IF_SHADOW)
+		if(items[type].flags&IF_SHADOW && (items[type].effect!=IE_WEAPON || items[type].flags & IF_USERJSP))
 		{
 			SprDraw(x+items[type].xofs,y,-items[type].yofs+1,0,bright+items[type].bright,
 				sprite,DISPLAY_DRAWME|DISPLAY_SHADOW);
 		}
-		if(items[type].flags&IF_LOONYCOLOR)
+		if(items[type].name[0]=='$' && !(items[type].flags & IF_USERJSP)) // left-facing hammer sprite
+		{
+			RenderMysticalHammerItem(items[type].toColor,x*FIXAMT,y*FIXAMT);
+		}
+		else if(items[type].flags&IF_LOONYCOLOR)
 		{
 			b=abs(16-(glowism&31));
 			SprDraw(x+items[type].xofs,y,-items[type].yofs+1,glowism/32,bright+b+items[type].bright,
@@ -935,7 +947,6 @@ void InstaRenderItem(int x,int y,byte type,char bright,MGLDraw *mgl)
 
 	if(type>=numItems || type==0)
 		return;
-
 
 	if (items[type].flags & IF_USERJSP)
 	{
@@ -1782,6 +1793,16 @@ byte BulletHitItem(byte bulType,mapTile_t *m,int x,int y)
 			if(profile.progress.grassChopped>=100)
 				CompleteGoal(89);
 
+			MakeCustomSound(items[type].sound,(x*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT,(y*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT,SND_CUTOFF,1000);
+			if(items[type].msg[0])
+				NewMessage(items[type].msg,75,0);
+		}
+	}
+	if((bulType==BLT_FLAME||bulType==BLT_FLAME2||bulType==BLT_FLAME3||
+	bulType==BLT_SITFLAME||bulType==BLT_BADSITFLAME) && (items[type].trigger&ITR_BURNT))
+	{
+		if(TriggerItem(NULL,m,x,y))
+		{
 			MakeCustomSound(items[type].sound,(x*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT,(y*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT,SND_CUTOFF,1000);
 			if(items[type].msg[0])
 				NewMessage(items[type].msg,75,0);

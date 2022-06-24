@@ -3751,7 +3751,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{26,27,28,29,30,31,32,33,255},	// attack
 			}},
 		{"Mad Cow",255,255,0,AI_MadCow,
-		 22,15,20,250,"graphics/cow.jsp",0,MF_NOMOVE,
+		 22,15,20,250,"sleepless/graphics/cow.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_ANIMAL,
 			{
 				{0,255},	// idle
@@ -3775,7 +3775,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{13,14,15,16,17,18,18,18,18,18,19,255},	// attack
 			}},
 		{"Extremely Mad Cow",2,4,0,AI_MadCow2,
-		 32,15,1000,250,"!72",0,MF_NOMOVE,
+		 32,15,1000,250,"sleepless/graphics/cow.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_ANIMAL,
 			{
 				{0,255},	// idle

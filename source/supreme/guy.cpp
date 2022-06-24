@@ -1379,14 +1379,9 @@ void UpdateGuys(Map *map,world_t *world)
 						guys[i]->Render(1);
 						guys[i]->Update(map,world);
 					}
-					if(guys[i]->aiType==MONS_MUMBLE2 && guys[i]->type!=0 && guys[i]->seq==ANIM_ATTACK)
+					if((guys[i]->aiType==MONS_MUMBLE2||guys[i]->aiType==MONS_FSTZOMBIE) && guys[i]->type!=0)
 					{
-						guys[i]->Render(1);
-						guys[i]->Update(map,world);
-					}
-					if(guys[i]->aiType==MONS_FSTZOMBIE && guys[i]->type!=0 && guys[i]->seq==ANIM_ATTACK)
-					{
-						guys[i]->Render(1);
+						guys[i]->Render(2);
 						guys[i]->Update(map,world);
 					}
 				}

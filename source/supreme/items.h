@@ -145,8 +145,8 @@
 #define ITM_STRTLIGHT	132
 #define ITM_SUPREME		133
 // unused items
-#define ITM_UNUSED2		134
-#define ITM_UNUSED3		135
+#define ITM_HAYBALE		134		// For Mad Cow
+#define ITM_BARREL4		135		// For Polterguy
 #define ITM_UNUSED4		136
 #define ITM_UNUSED5		137
 #define ITM_UNUSED6		138
@@ -199,15 +199,17 @@
 #define IT_CUSTOM	(1<<16)	// the custom theme, "My Theme"
 
 // triggers
-#define ITR_NONE	0	// can't be triggered
-#define ITR_GET		1	// triggered on pickup
-#define ITR_SHOOT	2	// triggers when shot (must be shootable)
-#define ITR_PLAYERBUMP	4	// triggers when stepped on/bumped into by player
-#define ITR_ENEMYBUMP 8	// triggers when bumped by an enemy
-#define ITR_FRIENDBUMP 16	// step/bump by friendly monster
-#define ITR_CHOP	32	// triggers when hit by machete or other chopper
-#define ITR_MINECART 64	// triggers when crashed into by a minecart
-#define ITR_ALWAYS	128	// triggers repeatedly, as fast as tiles animate
+#define ITR_NONE		0		// can't be triggered
+#define ITR_GET			(1<<0)	// triggered on pickup
+#define ITR_SHOOT		(1<<1)	// triggers when shot (must be shootable)
+#define ITR_PLAYERBUMP	(1<<2)	// triggers when stepped on/bumped into by player
+#define ITR_ENEMYBUMP	(1<<3)	// triggers when bumped by an enemy
+#define ITR_FRIENDBUMP	(1<<4)	// step/bump by friendly monster
+#define ITR_CHOP		(1<<5)	// triggers when hit by machete or other chopper
+#define ITR_MINECART	(1<<6)	// triggers when crashed into by a minecart
+#define ITR_ALWAYS		(1<<7)	// triggers repeatedly, as fast as tiles animate
+#define ITR_BOMBED		(1<<8)	// triggers when explodinated
+#define ITR_BURNT		(1<<9)	// triggers when burnt by fire (hay)
 
 // effects
 // what occurs when you pick up the item if it's a pickup,
