@@ -333,42 +333,103 @@
 #define MONS_TOADGEN	295
 #define MONS_PUMPKINFLY2 296
 
+// Loonyland enemies
+#define MONS_KIDLOONY	297
+#define MONS_REDBONE	298
+#define MONS_GANGRENE	299
+#define MONS_NUMBSKULL	300
+#define MONS_BOMBIE		301
+#define MONS_ZOMBIELORD	302
+#define MONS_VILLAGERM	303
+#define MONS_VILLAGERF	304
+#define MONS_FROG3		305
+#define MONS_RAGMAN		306
+#define MONS_PHARAOHF	307
+#define MONS_PHARAOHG	308
+#define MONS_EVILTREE	309
+#define MONS_EVILTREE2	310
+#define MONS_BAT2		311
+#define MONS_BAT3		312
+#define MONS_WOLF3		313
+#define MONS_LARRY		314
+#define MONS_SWAMPDOG	315
+#define MONS_SWAMPDOG2	316
+#define MONS_SWAMPDOG3	317
+#define MONS_GHOST2		318
+#define MONS_GHOST3		319
+#define MONS_VAMPIRE2	320
+#define MONS_VAMPIRE3	321
+#define MONS_VAMPIRE4	322
+#define MONS_STICKWITCH	323
+#define MONS_LOONYTOAD	324
+#define MONS_FRANKENJ	325
+#define MONS_HAND		326
+#define MONS_POLTERGUY	327
+#define MONS_JUNK		328
+#define MONS_FARLEY		329
+#define MONS_ELDER		330
+#define MONS_ELDER2		331
+#define MONS_ELDER3		332
+#define MONS_ELDER4		333
+#define MONS_BUBBLE		334
+#define MONS_BONKULA	335
+#define MONS_EVILIZER	336
+#define MONS_STEAMPUMP	337
+#define MONS_PLAYWOLF	338
+#define MONS_SKULLY		339
+#define MONS_ELDER5		340
+#define MONS_HARRY		341
+#define MONS_FROG4		342
+#define MONS_EVILTREE3	343
+#define MONS_BAT4		344
+#define MONS_SWAMPDOG4	345
+#define MONS_MUMMY5		346
+#define MONS_GHASTLY	347
+#define MONS_BOMBIELORD	348
+#define MONS_PINKPUMPKN	349
+#define MONS_MINIFRANK	350
+#define MONS_MECHABONK	351
+#define MONS_ARCTICWOLF	352
+#define MONS_GRABBYBAT	353
+#define MONS_HOTDOG		354
+
 // Kid Mystic addon enemies
-#define MONS_EYEGUY2	297		// Deadeye (Peeping Bomb)
-#define MONS_CRAZYBUSH2	298		// Burning Bush (Crazy Bush)
-#define MONS_OCTOPUS2	299		// Calamari (Octon)
-#define MONS_SLUG2		300		// Banana Slug (Slimy Slug)
-#define MONS_PEEPER2	301		// Jeeper's Peeper (Oculoid)
-#define MONS_TOWER2		302		// Jeeper's Peeper (Oculoid)
-#define MONS_INCADARK	303		// horiz
-#define MONS_INCADARK2	304		// vert
+#define MONS_EYEGUY2	355	// Deadeye (Peeping Bomb)
+#define MONS_CRAZYBUSH2	356	// Burning Bush (Crazy Bush)
+#define MONS_OCTOPUS2	357	// Calamari (Octon)
+#define MONS_SLUG2		358	// Banana Slug (Slimy Slug)
+#define MONS_PEEPER2	359	// Jeeper's Peeper (Oculoid)
+#define MONS_TOWER2		360	// Jeeper's Peeper (Oculoid)
+#define MONS_INCADARK	361	// horiz
+#define MONS_INCADARK2	362	// vert
 
 // Operation SCARE Editions
-#define MONS_GOLEMEVIL	305		// Evil Grumpy Golem 
-#define MONS_PUNKEVIL	306		// Evil Punk Bunny
-#define MONS_CLONESHRM	307		// Evil Clone (Shtupid Shroom)
-#define MONS_CLONEDRL	308		// Evil Clone (Dr. Lunatic)
-#define MONS_CLONELUNA	309		// Evil Clone (LunaChick)
-#define MONS_CLONEKM	310		// Evil Clone (Kid Mystic)
-#define MONS_BOMB		311		// Live bomb
-#define MONS_DEATHCAP	312
-#define MONS_FSTZOMBIE	313
-#define MONS_FROZOMBIE	314
-#define MONS_SANDMAN	315
-#define MONS_THINGY4	316
-#define MONS_SUMUZOMBIE	317
-#define MONS_ICYPUMPKN	318		// Cold to the touch
-#define MONS_WACKYPUMP	319		// Switches colors (red-yellow-blue)
-#define MONS_SEAPUMPKN	320		// Swims
-#define MONS_CENTIBBODY 321
-#define MONS_CENTIBHEAD 322
-#define MONS_MISSOZOID	323
-#define MONS_KELVOZOID	324
-#define MONS_ARMORCLONE	325
-#define MONS_NIGHTVAMP	326
-#define MONS_VOLTAGE	327		// Electric Jack Frost
+#define MONS_GOLEMEVIL	363	// Evil Grumpy Golem 
+#define MONS_PUNKEVIL	364	// Evil Punk Bunny
+#define MONS_CLONESHRM	365	// Evil Clone (Shtupid Shroom)
+#define MONS_CLONEDRL	366	// Evil Clone (Dr. Lunatic)
+#define MONS_CLONELUNA	367	// Evil Clone (LunaChick)
+#define MONS_CLONEKM	368	// Evil Clone (Kid Mystic)
+#define MONS_BOMB		369	// Live bomb
+#define MONS_HAMMER		370	// Live hammer
+#define MONS_DEATHCAP	371
+#define MONS_FSTZOMBIE	372
+#define MONS_FROZOMBIE	373
+#define MONS_SANDMAN	374
+#define MONS_THINGY4	375
+#define MONS_SUMUZOMBIE	376
+#define MONS_ICYPUMPKN	377 // Cold to the touch
+#define MONS_WACKYPUMP	378 // Switches colors (red-yellow-blue)
+#define MONS_SEAPUMPKN	379 // Swims
+#define MONS_CENTIBBODY 380
+#define MONS_CENTIBHEAD 381
+#define MONS_MISSOZOID	382
+#define MONS_KELVOZOID	383
+#define MONS_ARMORCLONE	384
+#define MONS_NIGHTVAMP	385
+#define MONS_VOLTAGE	386 // Electric Jack Frost
 
-#define NUM_MONSTERS  328    // Can grow as needed
+#define NUM_MONSTERS  387    // Can grow as needed
 #define NUM_PROFILE_MONSTERS 248 // Do not change without redoing the profile format
 
 // fake monster codes
@@ -392,7 +453,7 @@
 #define ANIM_A5		8
 #define NUM_ANIMS	9
 
-#define ANIM_LENGTH	24
+#define ANIM_LENGTH	32
 
 // flags
 #define MF_FLYING	 1
@@ -457,7 +518,7 @@ typedef struct monsterType_t
 	byte framesPerDir;
 	word hp;
 	word points;
-	char sprName[32];
+	char sprName[64];
 	sprite_set_t *spr;
 	word flags;
 	dword theme;

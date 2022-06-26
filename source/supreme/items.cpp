@@ -909,9 +909,24 @@ void RenderItem(int x,int y,byte type,char bright,byte flags)
 			SprDraw(x+items[type].xofs,y,-items[type].yofs+1,0,bright+items[type].bright,
 				sprite,DISPLAY_DRAWME|DISPLAY_SHADOW);
 		}
-		if(items[type].name[0]=='$' && !(items[type].flags & IF_USERJSP)) // left-facing hammer sprite
-		{
-			RenderMysticalHammerItem(items[type].toColor,x*FIXAMT,y*FIXAMT);
+		else if (items[type].name[0] == '$' && !(items[type].flags & IF_USERJSP)) {// left-facing hammer sprite
+			switch (items[type].name[1]) {
+				case 'C':
+					RenderSimpleAnimatedItem(items[type].fromColor, items[type].toColor, items[type].bright, x * FIXAMT, y * FIXAMT, 10, 509, 8, 2); // little coin
+					break;
+				case 'D':
+					RenderSimpleAnimatedItem(items[type].fromColor, items[type].toColor, items[type].bright, x * FIXAMT, y * FIXAMT, 10, 517, 8, 2); // big coin
+					break;
+				case 'H':
+					RenderMysticalHammerItem(items[type].fromColor, items[type].toColor, items[type].bright, x * FIXAMT, y * FIXAMT); // hammer
+					break;
+				case 'O':
+					RenderSimpleAnimatedItem(items[type].fromColor, items[type].toColor, items[type].bright, x * FIXAMT, y * FIXAMT, 10, 359, 8, 2); // orbiter
+					break;
+				case 'S':
+					RenderSimpleAnimatedItem(items[type].fromColor, items[type].toColor, items[type].bright, x * FIXAMT, y * FIXAMT, 10, 464, 16, 2); // skull
+					break;
+			}
 		}
 		else if(items[type].flags&IF_LOONYCOLOR)
 		{

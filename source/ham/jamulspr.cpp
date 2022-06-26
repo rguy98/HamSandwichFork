@@ -1066,6 +1066,7 @@ void sprite_set_t::Free(void)
 
 sprite_t *sprite_set_t::GetSprite(int which)
 {
+
 	if(spr && which<count && spr[which])
 		return spr[which];
 	return NULL;

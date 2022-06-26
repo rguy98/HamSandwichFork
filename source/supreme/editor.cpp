@@ -61,6 +61,7 @@ byte InitEditor(void)
 	musicPlaying=0;
 	lastKey=0;
 	InitPlayer(0,"TEST");
+	InitBullets();
 	// modify monsters for the editor
 	strcpy(MonsterName(MONS_ROLLER2),"Roly Poly Rvs");
 	strcpy(MonsterName(MONS_ROLLER4),"Rumbly Tumbly Rvs");
@@ -97,11 +98,14 @@ byte InitEditor(void)
 	strcpy(MonsterName(MONS_CLONEDRL), "Evil Clone:Lunatic");
 	strcpy(MonsterName(MONS_CLONELUNA), "Evil Clone:Chick");
 	strcpy(MonsterName(MONS_CLONEKM), "Evil Clone:Mystic");
+	strcpy(MonsterName(MONS_CENTIBODY), "Centipumpkin:Segment");
+	strcpy(MonsterName(MONS_CENTIBBODY), "Centiboomkin:Segment");
 
 	for(i=MONS_SUCKER1;i<=MONS_BLOWER4;i++)
 	{
 		MonsterAnim(i,0)[0]=0;
 	}
+	MonsterAnim(MONS_DARKNESS, 0)[0] = 1;
 
 	ChangeOffColor(MONS_SHARK,2,4);
 	ChangeOffColor(MONS_SNKYSHRK2,2,4);
@@ -131,6 +135,7 @@ void ExitEditor(void)
 
 	ExitFileDialog();
 	ToolExit();
+	ExitBullets();
 
 	EditorSaveWorld("worlds/backup_exit.dlw");
 
@@ -171,6 +176,8 @@ void ExitEditor(void)
 	strcpy(MonsterName(MONS_CLONEDRL), "Evil Clone");
 	strcpy(MonsterName(MONS_CLONELUNA), "Evil Clone");
 	strcpy(MonsterName(MONS_CLONEKM), "Evil Clone");
+	strcpy(MonsterName(MONS_CENTIBODY), "Centipumpkin");
+	strcpy(MonsterName(MONS_CENTIBBODY), "Centiboomkin");
 
 	for(i=MONS_SUCKER1;i<=MONS_BLOWER4;i++)
 	{
@@ -882,6 +889,8 @@ static TASK(void) HandleKeyPresses(void)
 				int cx,cy;
 				GetCamera(&cx,&cy);
 				AWAIT TestLevel(EditorGetWorld(),EditorGetMapNum());
+				player.clock = 0;
+				InitBullets();
 				StopSong();
 				SetPlayerStart(-1,-1);
 				ExitPlayer();

@@ -2396,7 +2396,7 @@ void RenderStinky(int x,int y,int z,char bright,byte frm)
 	SprDraw(x,y,z,255,bright-64,bulletSpr->GetSprite(SPR_STINKY+frm),DISPLAY_DRAWME|DISPLAY_GHOST);
 }
 
-void RenderMysticalHammerItem(byte col, int x, int y)
+void RenderMysticalHammerItem(byte col1, byte col2, char brt, int x, int y)
 {
 	int v;
 	sprite_t* curSpr;
@@ -2410,7 +2410,22 @@ void RenderMysticalHammerItem(byte col, int x, int y)
 	curSpr = bulletSpr->GetSprite(v);
 	SprDraw(x >> FIXSHIFT, y >> FIXSHIFT, 0, 255, 0, curSpr,
 		DISPLAY_DRAWME | DISPLAY_SHADOW);
-	SprDrawOff(x >> FIXSHIFT, y >> FIXSHIFT, 10, 4, col, 0, curSpr,
+	SprDrawOff(x >> FIXSHIFT, y >> FIXSHIFT, 10, col1, col2, brt, curSpr,
+		DISPLAY_DRAWME | DISPLAY_OFFCOLOR);
+}
+
+void RenderSimpleAnimatedItem(byte col1, byte col2, char brt, int x, int y, int z, int a, int b, int c) {
+
+	int v;
+	sprite_t* curSpr;
+	byte f;
+
+	f = ((player.clock / c) % b);
+	v = a + f;
+	curSpr = bulletSpr->GetSprite(v);
+	SprDraw(x >> FIXSHIFT, y >> FIXSHIFT, 0, 255, 0, curSpr,
+		DISPLAY_DRAWME | DISPLAY_SHADOW);
+	SprDrawOff(x >> FIXSHIFT, y >> FIXSHIFT, z, col1, col2, brt, curSpr,
 		DISPLAY_DRAWME | DISPLAY_OFFCOLOR);
 }
 

@@ -13,6 +13,7 @@
 
 #define ID_EXIT		1
 #define ID_MOREMONS 2
+#define ID_SURPRISE 3
 #define ID_GROUPS	150
 #define ID_PICKTHEME 200
 #define ID_PICKMONS  500
@@ -88,6 +89,22 @@ static void MoreMonstersClick(int id)
 			break;
 	}
 	MakeButton(BTN_NORMAL,ID_MOREMONS,0,2,pos,156,16,"More Monsters...",MoreMonstersClick);
+}
+
+static void SurpriseClick(int id)
+{
+	PurgeMonsterSprites();
+	curMons = Random(NUM_MONSTERS);
+	SetupMonsterDisplay();
+	if (realClick)
+	{
+		PurgeMonsterSprites();
+		SetEditMode(rememberMode);
+		PickedTile(curMons);
+		MakeNormalSound(SND_MENUCLICK);
+		saveCurMons = curMons;
+		saveCurTheme = curTheme;
+	}
 }
 
 static void MakeMonsterList(void)
@@ -190,6 +207,7 @@ static void MonsterEditSetupButtons(void)
 
 	// delete, move, and exit
 	MakeButton(BTN_NORMAL,ID_EXIT,0,480,460,158,14,"Exit Monster List",ExitClick);
+	MakeButton(BTN_NORMAL, ID_SURPRISE, 0, 480, 460 - 32, 158, 14, "Surprise Me!", SurpriseClick);
 }
 
 static void SetupMonsterDisplay(void)
@@ -298,6 +316,8 @@ void MonsterEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 	}
 	else
 		PrintRect(164,290,470,479,13,"NO DATA ON MONSTER!",1);
+	sprintf(s, "ID: %d", curMons);
+	Print(364, 464, s, 0, 1);
 
 	RenderButtons(mouseX,mouseY,mgl);
 

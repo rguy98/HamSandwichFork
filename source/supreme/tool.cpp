@@ -158,6 +158,8 @@ TASK(void) ToolUpdate(int msx,int msy,byte editMenu,MGLDraw *mgl)
 							int cx,cy;
 							GetCamera(&cx,&cy);
 							AWAIT TestLevel(EditorGetWorld(),EditorGetMapNum());
+							player.clock = 0;
+							InitBullets();
 							StopSong();
 							SetPlayerStart(-1,-1);
 							AddMapGuys(EditorGetMap());

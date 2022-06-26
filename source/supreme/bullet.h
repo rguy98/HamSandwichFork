@@ -161,7 +161,8 @@ int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets
 void ChangeBullet(byte fx,int x,int y,int type,int newtype); // for specials to change bullets
 byte BulletFacingType(byte type); // To check if a type of bullet uses none, 0-7, or 0-255 facings
-void RenderMysticalHammerItem(byte col, int x, int y);
+void RenderMysticalHammerItem(byte col1, byte col2, char brt, int x, int y);
+void RenderSimpleAnimatedItem(byte col1, byte col2, char brt, int x, int y, int z, int a, int b, int c);
 void EraseLasers(int mapx, int mapy);
 void BurnHay(int x, int y);
 
