@@ -378,6 +378,7 @@
 #define MONS_NONPLAYER	(-4)	// anybody but the player
 #define MONS_TAGGED		(-5)	// the tagged monster
 #define MONS_PLAYER		(-6)	// the player
+#define MONS_HOSTILE	(-7)	// hostile enemies - attack all
 
 // the animations
 #define ANIM_IDLE	0

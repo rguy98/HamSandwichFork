@@ -1865,6 +1865,8 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 				me->timer = 8;
 				break;
 			}
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_FROZEN)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			if(me->timer==4)
 				FireBulletAfter(me->x+Cosine(me->facing)*16*FIXAMT,me->y+Sine(me->facing)*16*FIXAMT,me->facing,BLT_ICEBEAM,me,me->friendly);
@@ -1914,12 +1916,16 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_FROZEN)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
 		case BLT_FREEZE:
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
+			if (GetItem(map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT))->item)->trigger & ITR_FROZEN)
+				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
 		case BLT_SPORE:
@@ -4134,9 +4140,9 @@ void BurnHay(int x, int y)
 			if (i < 0 || j < 0 || i >= curMap->width || j >= curMap->height)
 				return;
 
-			if (curMap->map[i + j * curMap->width].item == ITM_HAYBALE || curMap->map[i + j * curMap->width].item == ITM_MINEBLOCK)	// hay or minecart blocks
+			if (curMap->map[i + j * curMap->width].item == ITM_HAYBALE)	// hay or minecart blocks
 			{
-				//if(curMap->map[i+j*curMap->width].item==85)
+				if (curMap->map[i+j*curMap->width].item == ITM_HAYBALE)
 				{
 					FireBullet((i * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT, (j * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT, 0, BLT_BADSITFLAME, 0);
 				}

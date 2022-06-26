@@ -1121,14 +1121,14 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 			type==MONS_TROOPER2 || type==MONS_PATTY || type==MONS_SCARAB)
 			facing=2;	// these can only die facing forward, artistically speaking
 		// possible item drop
-		if(type==MONS_ZOMBIE || type==MONS_MUTANT || type==MONS_FSTZOMBIE || type==MONS_FROZOMBIE)	// zombies always drop a brain
+		if(IsZombie(this))	// zombies always drop a brain
 		{
 			if(!map->DropItem(mapx,mapy,ITM_BRAIN))
 			{
 				PlayerGetBrain(1);	// if you can't drop it, just give it to the player!
 			}
 		}
-		else if(type==MONS_SUPERZOMBIE || type==MONS_SUMUZOMBIE)	// super zombies always drop 2 brains
+		else if(IsSuperZombie(this))	// super zombies always drop 2 brains
 		{
 			if(!map->DropItem(mapx,mapy,ITM_BRAIN))
 			{
@@ -2685,12 +2685,12 @@ void KillMonster(int x,int y,int type,byte nofx)
 			guys[i]->type=MONS_NONE;
 
 			// handle item drops
-			if(guys[i]->type==MONS_ZOMBIE || guys[i]->type==MONS_MUTANT)	// zombies always drop a brain
+			if(IsZombie(guys[i]))	// zombies always drop a brain
 			{
 				if(!curMap->DropItem(guys[i]->mapx,guys[i]->mapy,ITM_BRAIN))
 					curMap->GetTile(guys[i]->mapx,guys[i]->mapy)->item=ITM_BRAIN;	// force the drop if it failed
 			}
-			else if(guys[i]->type==MONS_SUPERZOMBIE)	// super zombies always drop 2 brains
+			else if(IsSuperZombie(guys[i]))	// super zombies always drop 2 brains
 			{
 				if(!curMap->DropItem(guys[i]->mapx,guys[i]->mapy,ITM_BRAIN))
 					curMap->GetTile(guys[i]->mapx,guys[i]->mapy)->item=ITM_BRAIN;	// force the drop if it failed
@@ -4083,6 +4083,12 @@ int CountMonstersInRect(int type,int x,int y,int x2,int y2)
 			if(TaggedMonster()!=NULL && guys[i]->type==TaggedMonster()->type && guys[i]->mapx>=x && guys[i]->mapy>=y && guys[i]->mapx<=x2 && guys[i]->mapy<=y2)
 				cnt++;
 	}
+	else if(type==MONS_HOSTILE)	// hostile to anyone besides themselves
+	{
+		for(i=0;i<maxGuys;i++)
+			if(guys[i]->type>0 && guys[i]->type!=MONS_NOBODY && guys[i]->hostile && guys[i]->mapx>=x && guys[i]->mapy>=y && guys[i]->mapx<=x2 && guys[i]->mapy<=y2)
+				cnt++;
+	}
 	return cnt;
 }
 
@@ -4107,12 +4113,12 @@ void Telefrag(Guy *g)
 					player.enemiesSlain++;
 
 				// handle item drops
-				if(guys[i]->type==MONS_ZOMBIE || guys[i]->type==MONS_MUTANT)	// zombies always drop a brain
+				if(IsZombie(guys[i]))	// zombies always drop a brain
 				{
 					if(!curMap->DropItem(guys[i]->mapx,guys[i]->mapy,ITM_BRAIN))
 						curMap->GetTile(guys[i]->mapx,guys[i]->mapy)->item=ITM_BRAIN;	// force the drop if it failed
 				}
-				else if(guys[i]->type==MONS_SUPERZOMBIE)	// super zombies always drop 2 brains
+				else if(IsSuperZombie(guys[i]))	// super zombies always drop 2 brains
 				{
 					if(!curMap->DropItem(guys[i]->mapx,guys[i]->mapy,ITM_BRAIN))
 						curMap->GetTile(guys[i]->mapx,guys[i]->mapy)->item=ITM_BRAIN;	// force the drop if it failed
@@ -4144,6 +4150,15 @@ void Telefrag(Guy *g)
 		}
 }
 
+byte IsZombie(Guy* g) {
+	return (g->type==MONS_ZOMBIE||g->type==MONS_ZOMBONI||g->type==MONS_MUTANT||
+		g->type==MONS_FSTZOMBIE||g->type==MONS_FROZOMBIE);
+}
+
+byte IsSuperZombie(Guy* g) {
+	return (g->type == MONS_SUPERZOMBIE || g->type == MONS_SUMUZOMBIE);
+}
+
 void FindMonsterBrain(int myx,int myy)
 {
 	int i,j;
@@ -4157,8 +4172,7 @@ void FindMonsterBrain(int myx,int myy)
 	{
 		if(guys[i]->type && guys[i]->hp && guys[i]->aiType!=MONS_BOUAPHA)
 		{
-			if(guys[i]->type==MONS_ZOMBIE || guys[i]->type==MONS_ZOMBONI || guys[i]->type==MONS_MUTANT || guys[i]->type==MONS_SUPERZOMBIE ||
-			guys[i]->type==MONS_FSTZOMBIE || guys[i]->type==MONS_FROZOMBIE || guys[i]->type==MONS_SUMUZOMBIE)
+			if(IsZombie(guys[i])||IsSuperZombie(guys[i]))
 			{
 				if((myx-guys[i]->mapx)*(myx-guys[i]->mapx)+(myy-guys[i]->mapy)*(myy-guys[i]->mapy)<j)
 				{
@@ -4222,6 +4236,9 @@ byte Guy::IsAwake(void)
 		case MONS_STARFISH:		// only awake if shooting at you
 		case MONS_DARKCOFFIN:
 		case MONS_XENOEGG:
+		case MONS_INCAGEN:
+		case MONS_BLASTER:
+		case MONS_LIGHTSWITCH:
 			return (seq==ANIM_ATTACK);	// only awake if actively making a monster
 			break;
 		case MONS_ROBOFACTORY:
@@ -4293,7 +4310,45 @@ byte Guy::IsAwake(void)
 		case MONS_WEATHERMAN:
 		case MONS_PUNKBUNNY:
 		case MONS_JALAPENO:
+		case MONS_EYEGUY:
+		case MONS_PEEPER:
+		case MONS_TOWER:
+		case MONS_TOWER2:
+		case MONS_GOLEM:
+		case MONS_OCTOPUS:
+		case MONS_OCTOPUS2:
+		case MONS_INCABOT:
+		case MONS_PEEPBOMB:
+		case MONS_PEEPBOMB2:
+		case MONS_SLUG:
+		case MONS_SLUG2:
+		case MONS_SNAIL:
+		case MONS_OCTOTENT:
+		case MONS_OCTOTENT2:
+		case MONS_GOAT3:
+		case MONS_STKSHROOM:
+		case MONS_STKSPIDER:
+		case MONS_STKCORPSE:
+		case MONS_STKBAT:
+		case MONS_FROG:
+		case MONS_FROG2:
+		case MONS_MADCOW:
+		case MONS_SPARK:
+		case MONS_LIGHTSLIDE:
+		case MONS_BIGHEAD1:
+		case MONS_BIGHEAD2:
+		case MONS_BIGHEAD3:
+		case MONS_SPEEDY:
+		case MONS_IRONSKULL:
+		case MONS_RAFE:
+		case MONS_SCAREDYBAT:
+		case MONS_SPATULA:
+		case MONS_GOLEMEVIL:
+		case MONS_PUNKEVIL:
 			return (mind!=0);
+			break;
+		case MONS_GRUE:
+			return (mind!=1);
 			break;
 		case MONS_LOONYGUN:
 		case MONS_LOONYCORE:
@@ -4301,11 +4356,20 @@ byte Guy::IsAwake(void)
 			return (parent && parent->mind != 0);
 			break;
 		case MONS_LAZYBONE:
+		case MONS_TRAPAZOID:
+		case MONS_TRAPAZOID2:
+		case MONS_WHACKAZOID:
+		case MONS_GOAT1:
+		case MONS_GOAT2:
 			return (seq!=ANIM_IDLE);
 			break;
 		case MONS_PUFFYFISH:
 		case MONS_PUFFYFISH2:
 			return (seq!=ANIM_MOVE);	// awake if puffed to any degree
+			break;
+		case MONS_REFLECTION:
+		case MONS_GOODBONE:		// awake if moving
+			return (dx != 0 && dy != 0);
 			break;
 		case MONS_YUGO:
 		case MONS_PATROLLR:
@@ -4314,6 +4378,7 @@ byte Guy::IsAwake(void)
 		case MONS_DPATROLUD:
 		case MONS_INCAGOLD:
 		case MONS_INCAGOLD2:
+		case MONS_PINKEYE:
 			return (mind==2);	// awake if being driven
 			break;
 		default:

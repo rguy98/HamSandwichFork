@@ -55,7 +55,7 @@ class Guy
 		byte frm;
 		byte seq;
 		char bright;
-		byte friendly;
+		byte friendly,hostile;
 
 		word mindControl;
 		Guy *target;
@@ -162,6 +162,10 @@ byte Walkable(Guy *me, int x, int y, Map* map, world_t* world);
 void SpreadCharge(Guy* me);
 void GetSpook(void);
 void PutSpook(void);
+
+// Helpful new functions
+byte IsZombie(Guy *g);
+byte IsSuperZombie(Guy *g);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

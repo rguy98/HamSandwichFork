@@ -200,16 +200,17 @@
 
 // triggers
 #define ITR_NONE		0		// can't be triggered
-#define ITR_GET			(1<<0)	// triggered on pickup
-#define ITR_SHOOT		(1<<1)	// triggers when shot (must be shootable)
-#define ITR_PLAYERBUMP	(1<<2)	// triggers when stepped on/bumped into by player
-#define ITR_ENEMYBUMP	(1<<3)	// triggers when bumped by an enemy
-#define ITR_FRIENDBUMP	(1<<4)	// step/bump by friendly monster
-#define ITR_CHOP		(1<<5)	// triggers when hit by machete or other chopper
-#define ITR_MINECART	(1<<6)	// triggers when crashed into by a minecart
-#define ITR_ALWAYS		(1<<7)	// triggers repeatedly, as fast as tiles animate
-#define ITR_BOMBED		(1<<8)	// triggers when explodinated
-#define ITR_BURNT		(1<<9)	// triggers when burnt by fire (hay)
+#define ITR_GET			1		// triggered on pickup
+#define ITR_SHOOT		2		// triggers when shot (must be shootable)
+#define ITR_PLAYERBUMP	4		// triggers when stepped on/bumped into by player
+#define ITR_ENEMYBUMP	8		// triggers when bumped by an enemy
+#define ITR_FRIENDBUMP	16		// step/bump by friendly monster
+#define ITR_CHOP		32		// triggers when hit by machete or other chopper
+#define ITR_MINECART	64		// triggers when crashed into by a minecart
+#define ITR_ALWAYS		128		// triggers repeatedly, as fast as tiles animate
+#define ITR_BOMBED		256		// triggers when explodinated
+#define ITR_BURNT		512		// triggers when burnt by fire (hay)
+#define ITR_FROZEN		1024	// triggers when frozen
 
 // effects
 // what occurs when you pick up the item if it's a pickup,
@@ -244,21 +245,28 @@
 #define IE_INCVAR	26	// increment variable N
 #define IE_DECVAR	27	// decrement variable N
 #define IE_MOVE		28	// move up/down/left/right (only if it could move there as a pushable item)
+#define IE_MOVE2	29	// move UDLR, leaving a trail of permanent light, and exploding if it hits a solid object
 
-#define IE_MAX		29	// max # of effects
+#define IE_MAX		30	// max # of effects
 
 // power ups
-#define PU_REVERSE	1	// reverse hammer
-#define PU_REFLECT	2	// reflect hammer
-#define PU_SHIELD	3	// energy shield
-#define PU_GARLIC	4	// garlic
-#define PU_SPEED	5	// particle accelerator effect
-#define PU_INVISO	6	// invisibility
-#define PU_AMMO		7	// infinite ammo
-#define PU_AMMO2	8	// reload current weapon
-#define PU_CHEESE	9	// supreme cheese
-#define PU_POISON	10	// poison
-#define MAX_POWERUP 11
+#define PU_REVERSE		1	// reverse hammer
+#define PU_REFLECT		2	// reflect hammer
+#define PU_SHIELD		3	// energy shield
+#define PU_GARLIC		4	// garlic
+#define PU_SPEED		5	// particle accelerator effect
+#define PU_INVISO		6	// invisibility
+#define PU_AMMO			7	// infinite ammo
+#define PU_AMMO2		8	// reload current weapon
+#define PU_CHEESE		9	// supreme cheese
+#define PU_POISON		10	// poison
+#define PU_FROZEN		11	// frozen
+#define PU_IGNITED		12	// ignited
+#define PU_WEAKNESS		13	// weakness
+#define PU_STRENGTH		14	// strength
+#define PU_WATERWALK	15	// water walk
+#define PU_CONFUSION	16	// confusion
+#define MAX_POWERUP		17
 
 typedef struct item_t
 {
