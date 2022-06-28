@@ -439,7 +439,7 @@
 #define MONS_NONPLAYER	(-4)	// anybody but the player
 #define MONS_TAGGED		(-5)	// the tagged monster
 #define MONS_PLAYER		(-6)	// the player
-#define MONS_HOSTILE	(-7)	// hostile enemies - attack all
+#define MONS_BOSS		(-7)	// boss enemy - has special hp bar if existent
 
 // the animations
 #define ANIM_IDLE	0
@@ -543,8 +543,7 @@ byte MonsterFrames(dword type,byte aiType);
 word MonsterHP(dword type);
 word MonsterPoints(dword type);
 char *MonsterName(short type);
-void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byte facing,char bright,byte ouch,
-	byte poison,byte frozen,byte weak,byte strong,byte ignited,byte confuse,byte special,sprite_set_t* set);
+void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byte facing,char bright,Guy *g,sprite_set_t* set);
 void InstaRenderMonster(int x,int y,dword type,char bright,MGLDraw *mgl);
 int InstaRenderScannedMonster(int x,int y,dword type,char bright,MGLDraw *mgl);
 sprite_t *GetMonsterSprite(dword type,byte seq,byte frm,byte facing);

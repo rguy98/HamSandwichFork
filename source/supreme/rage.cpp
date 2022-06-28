@@ -34,9 +34,9 @@ byte UpdateRage(MGLDraw *mgl)
 
 void StartRaging(void)
 {
-	rageWpn=player.weapon;
+	rageWpn=player.wpns[player.curSlot].wpn;
 	goodguy->facing=rageFace;
-	switch(player.weapon)
+	switch(player.wpns[player.curSlot].wpn)
 	{
 		case WPN_NONE:
 			player.rageClock=10;

@@ -22,6 +22,11 @@ char cheatName[NUM_CHEATS][16]={
 	"No-Skid Boots",
 	"Super Speed",
 	"Max. Rage",
+	"Quick Fix",
+	"Presto Change-O",
+	"Death Aura",
+	"Brain Seeker",
+	"Candle Seeker",
 };
 
 #define NUM_TYPE_CHEATS	2
@@ -33,6 +38,7 @@ char cheatCode[NUM_TYPE_CHEATS][12]={
 #else
 	"scummypunk",	// get all cheats
 	"leartiste",	// get the editor
+	"idspispopd",	// plays a sound
 #endif
 };
 
@@ -109,6 +115,9 @@ void CheatKey(char c)
 					profile.progress.purchase[ShopItemNumber(SHOP_MAJOR,MAJOR_EDITOR)]&=(~SIF_AVAILABLE);
 					NewBigMessage("THE EDITOR IS YOURS!",60);
 					break;
+				case 2:	// editor
+					NewBigMessage("IDSPISPOPD!",60);
+					break;
 			}
 #endif
 
@@ -141,7 +150,7 @@ void DoCheat(byte w)
 			player.hammers=5;
 			player.hamSpeed=0;
 			player.cheesePower=255;
-			player.hammerFlags|=HMR_REVERSE|HMR_REFLECT;
+			player.cheatFlags^=CHT_ULTRA;
 			MakeNormalSound(SND_HAMMERUP);
 			NewMessage("ULTRA HAMMER UP!!",30,0);
 			break;
@@ -182,18 +191,19 @@ void DoCheat(byte w)
 			NewMessage("I am the keymaster!",30,0);
 			break;
 		case CHEAT_SCANNER:
-			player.weapon=WPN_SCANNER;
-			player.ammo=5;
+			player.wpns[player.curSlot].wpn=WPN_SCANNER;
+			player.wpns[player.curSlot].ammo=5;
 			NewMessage("Scanner!",30,0);
 			break;
 		case CHEAT_AMMO:
-			if(player.weapon==0 || player.ammo==0)
-				player.weapon=WPN_AK8087;
+			if (!player.wpns[player.curSlot].wpn || !player.wpns[player.curSlot].ammo) {
+				player.wpns[player.curSlot].wpn = WPN_AK8087;
+			}
 			player.ammoCrate=255;
 			NewMessage("Ammo Crate!",30,0);
 			break;
 		case CHEAT_LIGHT:
-			player.hammerFlags^=HMR_LIGHT;
+			player.cheatFlags^=CHT_LIGHT;
 			MakeNormalSound(SND_LIGHTSON);
 			break;
 		case CHEAT_WATER:
@@ -201,16 +211,16 @@ void DoCheat(byte w)
 			MakeNormalSound(SND_CHEATWIN);
 			break;
 		case CHEAT_OXYGEN:
-			player.hammerFlags^=HMR_OXYGEN;
+			player.cheatFlags^=CHT_OXYGEN;
 			player.oxygen=127*256;
 			MakeNormalSound(SND_CHEATWIN);
 			break;
 		case CHEAT_NOSKID:
-			player.hammerFlags^=HMR_NOSKID;
+			player.cheatFlags^=CHT_NOSKID;
 			MakeNormalSound(SND_CHEATWIN);
 			break;
 		case CHEAT_SPEED:
-			player.hammerFlags^=HMR_SPEED;
+			player.cheatFlags^=CHT_SPEED;
 			MakeNormalSound(SND_CHEATWIN);
 			break;
 		case CHEAT_RAGE:

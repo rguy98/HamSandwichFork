@@ -732,8 +732,8 @@ byte CheckForItem(byte item,int count,byte flags)
 			amt=player.life;
 			break;
 		case IE_WEAPON:	// weapons
-			if(player.weapon==GetItem(item)->effectAmt)
-				amt=player.ammo;
+			if(player.wpns[player.curSlot].wpn==GetItem(item)->effectAmt)
+				amt=player.wpns[player.curSlot].ammo;
 			else
 				amt=0;
 			break;
@@ -1678,9 +1678,9 @@ void SpecialEffect(special_t *me,Map *map)
 							(v2*TILE_HEIGHT)<<FIXSHIFT,SND_CUTOFF|SND_ONE,1300);
 				break;
 			case EFF_WEAPON:
-				if(me->effect[i].value2==0 && player.weapon==me->effect[i].value)	// don't reload if already using
+				if(me->effect[i].value2==0 && player.wpns[player.curSlot].wpn==me->effect[i].value)	// don't reload if already using
 					break;
-				player.weapon=0;
+				player.wpns[player.curSlot].wpn=0;
 				if(me->effect[i].value!=0)
 					PlayerGetWeapon(me->effect[i].value,0,0);
 				break;

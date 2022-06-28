@@ -394,7 +394,7 @@ void Map::Update(byte mode,world_t *world)
 		else if(mode==UPDATE_GAME)
 		{
 			// make the lights approach what they are supposed to be
-			if(player.hammerFlags&HMR_LIGHT)
+			if(player.cheatFlags&CHT_LIGHT)
 			{
 				if(map[i].templight>0)
 					map[i].templight--;
@@ -749,6 +749,32 @@ byte TorchCallback(int x,int y,int cx,int cy,int value,Map *map)
 	return 1;
 }
 
+byte InstaTorchCallback(int x,int y,int cx,int cy,int value,Map *map)
+{
+	int b;
+
+	b=((cx-x)*(cx-x)+(cy-y)*(cy-y))/2;
+	b=value-b;
+
+	if(b>16)
+	{
+		b/=4;
+	}
+	else if(b>=0)
+		b=0;
+
+	if(b<0)
+		return 1; // not bright enough
+
+	if(map->GetTile(x,y)->light<b)
+		map->GetTile(x,y)->light=b;
+	if(map->GetTile(x,y)->light>MAX_LIGHT)
+		map->GetTile(x,y)->light=MAX_LIGHT;
+	map->GetTile(x,y)->templight=map->GetTile(x,y)->light;
+
+	return 1;
+}
+
 byte DarkTorchCallback(int x,int y,int cx,int cy,int value,Map *map)
 {
 	int b;
@@ -913,6 +939,11 @@ void Map::GlowCursor(int x,int y,char brt,byte size)
 void Map::DimTorch(int x,int y,byte size)
 {
 	LOS(x,y,size,120,TempDimCallback);
+}
+
+void Map::InstaTorch(int x,int y,char brt)
+{
+	LOS(x,y,brt/2,brt,InstaTorchCallback);
 }
 
 void Map::LightSpecial(int x,int y,char brt,byte size)

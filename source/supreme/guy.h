@@ -55,7 +55,7 @@ class Guy
 		byte frm;
 		byte seq;
 		char bright;
-		byte friendly,hostile;
+		byte friendly;
 
 		word mindControl;
 		Guy *target;
@@ -72,7 +72,7 @@ class Guy
 		byte weak;		// weakness affliction - more damage taken (dark red)
 		byte strong;	// steelskin defense - increased resistance (dark grey)
 		byte confuse;	// confusion - inverted movement controls (light pink)
-		byte special;	// special flags (rainbow, white flash)
+		byte specialFlags;	// special flags (rainbow, white flash)
 
 		int aiType;
 		byte fromColor,toColor;
@@ -81,6 +81,10 @@ class Guy
 
 		sprite_set_t* customSpr; // custom sprites
 };
+
+#define GSF_NEWAI	1	// New AI
+#define GSF_LOONY	2	// Rainbow
+#define GSF_FASTFWD	4	// 2x speed
 
 extern Guy *goodguy;
 

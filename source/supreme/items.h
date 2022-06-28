@@ -246,8 +246,9 @@
 #define IE_DECVAR	27	// decrement variable N
 #define IE_MOVE		28	// move up/down/left/right (only if it could move there as a pushable item)
 #define IE_MOVE2	29	// move UDLR, leaving a trail of permanent light, and exploding if it hits a solid object
+#define IE_POCKET	30	// gives you N pockets (negative values allowed, max pockets is 4)
 
-#define IE_MAX		30	// max # of effects
+#define IE_MAX		31	// max # of effects
 
 // power ups
 #define PU_REVERSE		1	// reverse hammer

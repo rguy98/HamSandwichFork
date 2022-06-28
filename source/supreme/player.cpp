@@ -56,7 +56,13 @@ void InitPlayer(byte level,const char *fname)
 	player.levelProg=GetLevelProgress(player.worldName,player.levelNum);
 
 	for(i=0;i<4;i++)
-		player.keys[i]=0;
+		player.keys[i] = 0;
+
+	for (i = 0; i < 4; i++) {
+		player.wpns[i].wpn = WPN_NONE;
+		player.wpns[i].used = i==0?1:0;
+		player.wpns[i].ammo = 0;
+	}
 
 	for(i=0;i<8;i++)
 		player.var[i]=0;
@@ -73,13 +79,15 @@ void InitPlayer(byte level,const char *fname)
 	player.candles=0;
 	player.boredom=0;
 	player.hammers=0;
+	player.curSlot=0; // first slot
 	player.hamSpeed=16;
-	player.weapon=WPN_NONE;
+	player.wpns[player.curSlot].wpn=WPN_NONE;
 	player.lastWeapon=WPN_NONE;
-	player.ammo=0;
+	player.wpns[player.curSlot].ammo=0;
 	player.reload=10;
 	player.wpnReload=10;
 	player.hammerFlags=0;
+	player.cheatFlags=0;
 	player.life=128;
 	player.shield=0;
 	playerGlow=0;
@@ -209,6 +217,23 @@ void KeyChainAllCheck(void)
 	}
 }
 
+int NumFilledPockets() {
+	int n=0;
+	for(int i = 0; i < 4; i++){
+		n += player.wpns[i].used;
+	}
+	return n;
+}
+
+int GetAmmoFill(byte wpn)
+{
+	int ammo = maxAmmo[wpn],
+		pockets = NumFilledPockets();
+	float nerfs[5] = { 0,1,0.75,0.66,0.5 };
+
+	return ammo * nerfs[pockets - 1];
+}
+
 int WeaponMaxAmmo(byte wpn)
 {
 	return maxAmmo[wpn];
@@ -222,31 +247,25 @@ byte PlayerGetWeapon(byte wpn,int x,int y)
 	cx<<=FIXSHIFT;
 	cy<<=FIXSHIFT;
 
-	if(player.weapon && wpn!=player.weapon && profile.progress.wpnLock)
+	byte curWpn = player.wpns[player.curSlot].wpn,
+		curAmmo = player.wpns[player.curSlot].ammo;
+
+	if (curWpn && wpn != curWpn && profile.progress.wpnLock)
 		return 0;	// can't pick up weapons while armed!
 
-	if((player.weapon==WPN_PWRARMOR || player.weapon==WPN_MINISUB) && (wpn!=player.weapon))
-	{
-		return 0;	// can't pick up other weapons
+	if(curWpn == WPN_PWRARMOR || curWpn == WPN_MINISUB){ // timed "weapons"
+		if (wpn != curWpn)
+			return 0; // can't pick up other weapons
+		if (FindNextUnusedPocketSlot() > 0)
+			player.curSlot = FindNextUnusedPocketSlot();
 	}
 
-	if(player.weapon==wpn && player.ammo==maxAmmo[wpn])
+	if(curWpn==wpn && player.wpns[player.curSlot].ammo>=GetAmmoFill(wpn))
 		return 0;	// don't pick it up if you've already got it
 
-	if(wpn==WPN_PWRARMOR)
+	if(wpn==WPN_PWRARMOR || wpn == WPN_MINISUB)
 	{
-		player.weapon=WPN_PWRARMOR;
-		player.ammo=maxAmmo[wpn];
-		goodguy->seq=ANIM_A2;
-		goodguy->frm=0;
-		goodguy->frmTimer=0;
-		goodguy->frmAdvance=64;
-		goodguy->action=ACTION_BUSY;
-	}
-	else if(wpn==WPN_MINISUB)
-	{
-		player.weapon=WPN_MINISUB;
-		player.ammo=maxAmmo[wpn];
+		WeaponAddOrReplace(wpn);
 		goodguy->seq=ANIM_A2;
 		goodguy->frm=0;
 		goodguy->frmTimer=0;
@@ -256,8 +275,17 @@ byte PlayerGetWeapon(byte wpn,int x,int y)
 	else
 	{
 		player.lastWeapon=wpn;
-		player.weapon=wpn;
-		player.ammo=maxAmmo[wpn];
+		WeaponAddOrReplace(wpn);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (!player.wpns[i].used)
+			continue;
+		else
+		{
+			if(player.wpns[i].ammo>GetAmmoFill(player.wpns[i].wpn))
+				player.wpns[i].ammo=GetAmmoFill(player.wpns[i].wpn);
+		}
 	}
 
 	ScoreEvent(SE_PICKUP,1);
@@ -267,6 +295,8 @@ byte PlayerGetWeapon(byte wpn,int x,int y)
 
 byte PlayerPowerup(char powerup)
 {
+	byte curWpn = player.wpns[player.curSlot].wpn,
+		curAmmo = player.wpns[player.curSlot].ammo;
 	if(powerup>0)
 	{
 		switch(powerup)
@@ -290,16 +320,16 @@ byte PlayerPowerup(char powerup)
 				player.invisibility=255;
 				break;
 			case PU_AMMO:
-				if(player.weapon==0)
+				if(player.wpns[player.curSlot].wpn==0)
 					return 0;
 				player.ammoCrate=255;
 				break;
 			case PU_AMMO2:
-				if((player.weapon==0 && player.lastWeapon==0) || player.ammo==maxAmmo[player.weapon])
+				if((curWpn==0 && player.lastWeapon==0) || curAmmo==maxAmmo[curWpn])
 					return 0;
-				if(player.weapon==0)
-					player.weapon=player.lastWeapon;
-				player.ammo=maxAmmo[player.weapon];
+				if(curWpn==0)
+					player.wpns[player.curSlot].wpn=player.lastWeapon;
+				player.wpns[player.curSlot].ammo=maxAmmo[curWpn];
 				break;
 			case PU_CHEESE:
 				player.cheesePower=255;
@@ -338,8 +368,8 @@ byte PlayerPowerup(char powerup)
 				player.ammoCrate=0;
 				break;
 			case PU_AMMO2:
-				player.ammo=0;
-				player.weapon=0;
+				player.wpns[player.curSlot].ammo=0;
+				player.wpns[player.curSlot].wpn=0;
 				break;
 			case PU_POISON:
 				goodguy->poison=0;
@@ -534,12 +564,12 @@ void PlayerGetCoin(int amt)
 
 void ToggleWaterwalk(void)
 {
-	player.hammerFlags^=HMR_WATERWALK;
+	player.cheatFlags^=CHT_JESUS;
 }
 
 byte PlayerCanWaterwalk(void)
 {
-	return (player.hammerFlags&HMR_WATERWALK);
+	return (player.cheatFlags&CHT_JESUS);
 }
 
 byte PlayerPushMore(void)
@@ -715,37 +745,40 @@ void PlayerFireWeapon(Guy *me)
 	if(player.life==0)
 		return;	// no shooting when you're dead
 
-	switch(player.weapon)
+	byte curWpn = player.wpns[player.curSlot].wpn,
+		curAmmo = player.wpns[player.curSlot].ammo;
+
+	switch(curWpn)
 	{
 		case WPN_MISSILES:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				FireBullet(me->x,me->y,me->facing,BLT_MISSILE,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=2;
 			break;
 		case WPN_BOMBS:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				FireBullet(me->x,me->y,me->facing*32,BLT_BOMB,1);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=15;
 			break;
 		case WPN_AK8087:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				FireBullet(me->x,me->y,me->facing,BLT_LASER,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
@@ -765,7 +798,7 @@ void PlayerFireWeapon(Guy *me)
 			DoPlayerFacing(c,me);
 			break;
 		case WPN_FLAME:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				if(curMap->flags&MAP_UNDERWATER)
@@ -778,7 +811,7 @@ void PlayerFireWeapon(Guy *me)
 				}
 				else
 					FireBullet(me->x,me->y,me->facing,BLT_FLAME,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
@@ -793,35 +826,35 @@ void PlayerFireWeapon(Guy *me)
 			DoPlayerFacing(c,me);
 			break;
 		case WPN_BIGAXE:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				FireBullet(me->x,me->y,me->facing,BLT_BIGAXE,1);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=10;
 			break;
 		case WPN_FREEZE:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				FireBullet(me->x,me->y,me->facing*32,BLT_FREEZE,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=10;
 			break;
 		case WPN_LIGHTNING:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				// fire lightning
 				FireBullet(me->x,me->y,me->facing,BLT_LIGHTNING,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
@@ -838,45 +871,45 @@ void PlayerFireWeapon(Guy *me)
 			DoPlayerFacing(c,me);
 			break;
 		case WPN_SPEAR:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x,me->y,me->facing,BLT_SPEAR,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=5;
 			break;
 		case WPN_MACHETE:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_SLASH,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
 					me->facing,BLT_SLASH,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=2;
 			break;
 		case WPN_MINES:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_MINELAY,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x-Cosine(me->facing*32)*32,me->y-Sine(me->facing*32)*32,
 					me->facing,BLT_MINE,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=15;
 			break;
 		case WPN_TURRET:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				Guy *g;
 
@@ -892,7 +925,7 @@ void PlayerFireWeapon(Guy *me)
 				else
 				{
 					MakeSound(SND_MINELAY,me->x,me->y,SND_CUTOFF,1200);
-					player.ammo--;
+					player.wpns[player.curSlot].ammo--;
 					if(!editing && !player.cheated && verified)
 						profile.progress.shotsFired++;
 				}
@@ -900,25 +933,25 @@ void PlayerFireWeapon(Guy *me)
 			}
 			break;
 		case WPN_MINDCONTROL:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_MINDWIPE,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
 					me->facing,BLT_MINDWIPE,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				player.wpnReload=15;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 			}
 			break;
 		case WPN_REFLECTOR:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x,me->y,me->facing,BLT_REFLECT,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 				c=GetControls();
@@ -934,34 +967,34 @@ void PlayerFireWeapon(Guy *me)
 			}
 			break;
 		case WPN_JETPACK:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				player.jetting=5;
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 				player.wpnReload=3;
 			}
 			break;
 		case WPN_SWAPGUN:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x,me->y,me->facing,BLT_SWAP,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 				player.wpnReload=10;
 			}
 			break;
 		case WPN_TORCH:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,1200);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 				player.wpnReload=3;
@@ -970,23 +1003,23 @@ void PlayerFireWeapon(Guy *me)
 			}
 			break;
 		case WPN_SCANNER:
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x,me->y,me->facing,BLT_SCANNER,1);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 				player.wpnReload=20;
 			}
 			break;
 		case WPN_STOPWATCH:
-			if(player.ammo && !player.timeStop)	// can't use it when time is already stopped
+			if(curAmmo && !player.timeStop)	// can't use it when time is already stopped
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
 				player.wpnReload=20;
@@ -1067,7 +1100,7 @@ void PlayerFireWeapon(Guy *me)
 				if(g)
 				{
 					g->type=MONS_NONE;
-					player.ammo+=1;
+					curAmmo+=1;
 				}
 			}
 			else
@@ -1086,11 +1119,89 @@ void PlayerFireWeapon(Guy *me)
 			break;
 	}
 	if(player.ammoCrate)
-		player.ammo=maxAmmo[player.weapon];
+		player.wpns[player.curSlot].ammo=maxAmmo[curWpn];
 
-	if(!player.ammo)
-		player.weapon=0;
+	if (!player.wpns[player.curSlot].ammo)
+		WeaponRanOut(player.curSlot);
+
 	GoalFire();
+}
+
+void WipeSlot(byte slot,byte isUsed) {
+	player.wpns[slot].used = isUsed;
+	player.wpns[slot].wpn = 0;
+	player.wpns[slot].ammo = 0;
+}
+
+void WeaponRanOut(byte slot) {
+	player.wpns[slot].wpn = WPN_NONE;
+	for (int i = slot; i < 3; i++) { // move all weapons down by one
+		player.wpns[i].wpn = player.wpns[i+1].wpn;
+		player.wpns[i].ammo = player.wpns[i+1].ammo;
+		WipeSlot(i+1, 1);
+	}
+	player.curSlot=FindNextUsedPocketSlot(); //finds next used slot
+}
+
+byte AddPocketSlot(){ // Adds a pocket slot (Max: 4)
+	for(int i = 0; i < 4; i++){
+		if (!player.wpns[i].used) {
+			player.wpns[i].used=1;
+			return 1; // Pocket slot successfully added
+		}
+	}
+	return 0; // Maxed out on pocket slots
+}
+
+byte RemovePocketSlot(){ // Removes a pocket slot
+	for(int i = 3; i > -1; i--) {
+		if (player.wpns[i-1].used) {
+			WipeSlot(i,0);
+			return 1; // Pocket slot successfully added
+		}
+	}
+	return 0; // No pocket slots to remove
+}
+
+byte WeaponAddOrReplace(byte w) {
+	for(int i = 0; i < 4; i++){
+		if (player.wpns[i].used) {
+			if (player.wpns[i].wpn == w) {
+				player.wpns[i].ammo = GetAmmoFill(w);
+				return 1; // Weapon successfully refilled
+			}
+			if (player.wpns[i].wpn == WPN_NONE) {
+				player.wpns[i].used = 1;
+				player.wpns[i].wpn = w;
+				player.wpns[i].ammo = GetAmmoFill(w);
+				return 1; // Weapon successfully added
+			}
+		}
+	}
+	if(player.wpns[0].used){
+		player.wpns[0].wpn = w;
+		player.wpns[0].ammo = GetAmmoFill(w);
+		return 1; // Weapon had to be replaced
+	}
+	return 0; // cannot add weapon :(
+}
+
+byte FindNextUnusedPocketSlot() {
+	for (int i = 0; i < 4; i++) {
+		if (!player.wpns[i].used) {
+			return i+1; // Pocket slot successfully added
+		}
+	}
+	return 0; // Maxed out on pocket slots
+}
+
+byte FindNextUsedPocketSlot() {
+	for (int i = player.curSlot+1; i < 4; i++) {
+		if (player.wpns[i].used && player.wpns[i].wpn) {
+			return i+1; // Pocket slot successfully added
+		}
+	}
+	return 0; // Maxed out on pocket slots
 }
 
 void PlayerFirePowerArmor(Guy *me,byte mode)
@@ -1113,18 +1224,18 @@ void PlayerFirePowerArmor(Guy *me,byte mode)
 			x2=x-Cosine(f)*32;
 			y2=y-Sine(f)*32;
 			FireBullet(x2,y2,me->facing*32-8+Random(17),BLT_BIGSHELL,1);
-			if(player.ammo>2)
-				player.ammo-=2;
+			if(player.wpns[player.curSlot].ammo>2)
+				player.wpns[player.curSlot].ammo-=2;
 			if(!editing && !player.cheated && verified)
 				profile.progress.shotsFired++;
 			break;
 		case 2:
 			ScoreEvent(SE_SHOOT,4);
 			QuadMissile(me->x,me->y,me->facing,1);
-			if(player.ammo>25)
-				player.ammo-=25;
+			if(player.wpns[player.curSlot].ammo>25)
+				player.wpns[player.curSlot].ammo-=25;
 			else
-				player.ammo=0;
+				player.wpns[player.curSlot].ammo=0;
 			if(!editing && !player.cheated && verified)
 				profile.progress.shotsFired++;
 			break;
@@ -1162,12 +1273,14 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 {
 	byte c;
 	int x,y,i;
+	byte curWpn = player.wpns[player.curSlot].wpn,
+		curAmmo = player.wpns[player.curSlot].ammo;
 
 	player.stealthy=0;
 
 	player.life=me->hp;
 
-	if(player.hammerFlags&HMR_SPEED)
+	if(player.hammerFlags&CHT_SPEED)
 		player.speed=255;
 
 	if(player.rage)
@@ -1187,8 +1300,8 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(player.ammoCrate)
 	{
 		player.ammoCrate--;
-		if(player.weapon)
-			player.ammo=maxAmmo[player.weapon];
+		if(curWpn)
+			player.wpns[player.curSlot].ammo=maxAmmo[curWpn];
 	}
 
 	if(player.rageClock && GetGameMode()!=GAMEMODE_RAGE)
@@ -1225,12 +1338,12 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 		player.jetting--;
 	}
 
-	if(player.weapon==WPN_PWRARMOR)
+	if(curWpn==WPN_PWRARMOR)
 	{
 		PlayerControlPowerArmor(me,mapTile,world);
 		return;
 	}
-	if(player.weapon==WPN_MINISUB)
+	if(curWpn ==WPN_MINISUB)
 	{
 		PlayerControlMiniSub(me,mapTile,world);
 		return;
@@ -1263,7 +1376,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 		tportclock--;
 
 	// ice is slippery
-	if(!(GetTerrain(world,mapTile->floor)->flags&TF_ICE) || (player.hammerFlags&HMR_NOSKID))
+	if(!(GetTerrain(world,mapTile->floor)->flags&TF_ICE) || (player.cheatFlags&CHT_NOSKID))
 	{
 		if((player.jetting || (me->z>0 && player.vehicle==0)) && me->mind1)
 		{
@@ -1578,6 +1691,21 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(!player.jetting)
 		DoPlayerFacing(c,me);
 
+	if (c & CONTROL_B3 && !player.reload) { // switch slots
+		switch(player.wpns[player.curSlot].wpn){
+			case WPN_PWRARMOR:
+			case WPN_MINISUB:
+				MakeNormalSound(SND_KMNOBUY);
+				break;
+			default:
+				if(player.wpns[1].used) { // Needs at least two slots!
+					player.curSlot = FindNextUsedPocketSlot() ? FindNextUsedPocketSlot() - 1 : 0;
+					MakeNormalSound(SND_WORLDTURN);
+				}
+				break;
+		}
+		player.reload=10;
+	}
 	if((c&(CONTROL_B1|CONTROL_B2))==(CONTROL_B1|CONTROL_B2) && (player.rage/256)>=player.life && player.ability[ABIL_RAGE])
 	{
 		// RAGE!!!!!!!
@@ -1619,19 +1747,19 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			return;
 		}
 	}
-	if((c&CONTROL_B2) && player.wpnReload==0 && player.weapon)	// pushed wpn use button
+	if((c&CONTROL_B2) && player.wpnReload==0 && curWpn)	// pushed wpn use button
 	{
-		if(player.weapon==WPN_TORCH)
+		if(curWpn==WPN_TORCH)
 		{
-			if(player.ammo)
+			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,1200);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				player.wpnReload=17;
 				player.torch=30;
-				if(player.ammo==0 && !player.ammoCrate)
-					player.weapon=0;
+				if(curAmmo==0 && !player.ammoCrate)
+					WeaponRanOut(player.curSlot);
 			}
 		}
 		else
@@ -1653,7 +1781,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	// if you are moving indeed
 	if((c&(CONTROL_UP|CONTROL_DN|CONTROL_LF|CONTROL_RT)) && (!player.jetting || me->z==0) && (player.vehicle!=VE_RAFT && player.vehicle!=VE_MINECART))
 	{
-		if(!(GetTerrain(world,mapTile->floor)->flags&TF_ICE) || (player.hammerFlags&HMR_NOSKID))
+		if(!(GetTerrain(world,mapTile->floor)->flags&TF_ICE) || (player.cheatFlags&CHT_NOSKID))
 		{
 			me->dx+=Cosine(me->facing*32)*3/2;
 			me->dy+=Sine(me->facing*32)*3/2;
@@ -1668,7 +1796,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			me->dy+=Sine(me->facing*32)/4;
 		}
 
-		if(!(GetTerrain(world,mapTile->floor)->flags&TF_MUD) || (player.hammerFlags&HMR_NOSKID))
+		if(!(GetTerrain(world,mapTile->floor)->flags&TF_MUD) || (player.cheatFlags&CHT_NOSKID))
 		{
 			Clamp(&me->dx,PLYR_MAXSPD);
 			Clamp(&me->dy,PLYR_MAXSPD);
@@ -1707,7 +1835,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	else	// you aren't trying to move
 	{
 		// ice is slippery
-		if(me->z==0 && me->dz==0 && (!(GetTerrain(world,mapTile->floor)->flags&TF_ICE)  || (player.hammerFlags&HMR_NOSKID)))
+		if(me->z==0 && me->dz==0 && (!(GetTerrain(world,mapTile->floor)->flags&TF_ICE)  || (player.cheatFlags&CHT_NOSKID)))
 		{
 			Dampen(&me->dx,PLYR_DECEL/2);
 			Dampen(&me->dy,PLYR_DECEL/2);
@@ -1777,10 +1905,10 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 	me->mind1=0;
 	player.boredom=0;
 
-	if(player.ammo)
-		player.ammo--;
+	if(player.wpns[player.curSlot].ammo)
+		player.wpns[player.curSlot].ammo--;
 
-	if(player.ammo==0 && me->seq!=ANIM_DIE)
+	if(player.wpns[player.curSlot].ammo==0 && me->seq!=ANIM_DIE)
 	{
 		me->seq=ANIM_DIE;
 		me->frm=0;
@@ -1823,7 +1951,7 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 		{
 			PlayerFirePowerArmor(me,1);
 		}
-		if(me->seq==ANIM_ATTACK && me->frm==4 && player.ammo>0)
+		if(me->seq==ANIM_ATTACK && me->frm==4 && player.wpns[player.curSlot].ammo>0)
 		{
 			if(c&CONTROL_B1)
 			{
@@ -1953,10 +2081,10 @@ void PlayerControlMiniSub(Guy *me,mapTile_t *mapTile,world_t *world)
 	// ice is not slippery for sub
 	player.boredom=0;
 
-	if(player.ammo)
-		player.ammo--;
+	if(player.wpns[player.curSlot].ammo)
+		player.wpns[player.curSlot].ammo--;
 
-	if(player.ammo==0 && me->seq!=ANIM_DIE)
+	if(player.wpns[player.curSlot].ammo==0 && me->seq!=ANIM_DIE)
 	{
 		me->seq=ANIM_DIE;
 		me->frm=0;
@@ -2015,19 +2143,19 @@ void PlayerControlMiniSub(Guy *me,mapTile_t *mapTile,world_t *world)
 	if((c&CONTROL_B1) && player.reload==0)	// pushed fire button
 	{
 		PlayerFirePowerArmor(me,3);
-		if(player.ammo>2)
-			player.ammo-=2;
+		if(player.wpns[player.curSlot].ammo>2)
+			player.wpns[player.curSlot].ammo-=2;
 		else
-			player.ammo=0;
+			player.wpns[player.curSlot].ammo=0;
 		player.reload=4;
 	}
 	if((c&CONTROL_B2) && player.wpnReload==0)	// pushed mine button
 	{
 		PlayerFirePowerArmor(me,4);
-		if(player.ammo>20)
-			player.ammo-=20;
+		if(player.wpns[player.curSlot].ammo>20)
+			player.wpns[player.curSlot].ammo-=20;
 		else
-			player.ammo=0;
+			player.wpns[player.curSlot].ammo=0;
 		player.wpnReload=30;
 	}
 

@@ -1663,10 +1663,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 		BulletHitFloor(me,map,world);
 
 	// all gravity-affected bullets, get gravitized
-	if(me->type==BLT_HAMMER || me->type==BLT_HAMMER2 || me->type==BLT_BOMB || me->type==BLT_GRENADE
-		|| me->type==BLT_ROCK || me->type==BLT_EVILHAMMER || me->type==BLT_SPEAR || me->type==BLT_BADSPEAR
-		|| me->type==BLT_BUBBLE || me->type==BLT_COIN || me->type==BLT_BIGCOIN || me->type==BLT_SITFLAME
-		|| me->type==BLT_BADSITFLAME || me->type==BLT_FLAME3)
+	if(me->flags&BFL_GRAVITY)
 		me->dz-=FIXAMT;
 
 	me->timer--;
@@ -1675,6 +1672,33 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 
 	if(!me->type)
 		return;
+
+	if (me->flags & BFL_HOMING) {
+		if (me->timer == 40)
+		{
+			if (me->friendly)
+				me->target = LockOnEvil(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
+			else
+				me->target = LockOnGood(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
+		}
+
+		if (!GetGuyPos(me->target, &mapx, &mapy))
+			me->target = 65535;
+		else
+		{
+			if (me->x > mapx)
+				me->dx -= FIXAMT;
+			else
+				me->dx += FIXAMT;
+			if (me->y > mapy)
+				me->dy -= FIXAMT;
+			else
+				me->dy += FIXAMT;
+
+			Clamp(&me->dx, FIXAMT * 6);
+			Clamp(&me->dy, FIXAMT * 6);
+		}
+	}
 
 	// special things like animation
 	switch(me->type)
@@ -2895,6 +2919,17 @@ void RenderBullets(void)
 			RenderBullet(&bullet[i]);
 }
 
+byte HasGravity(bullet_t* me) {
+	return (me->type == BLT_HAMMER || me->type == BLT_HAMMER2 || me->type == BLT_BOMB || me->type == BLT_GRENADE
+		|| me->type == BLT_ROCK || me->type == BLT_EVILHAMMER || me->type == BLT_SPEAR || me->type == BLT_BADSPEAR
+		|| me->type == BLT_BUBBLE || me->type == BLT_COIN || me->type == BLT_BIGCOIN || me->type == BLT_SITFLAME
+		|| me->type == BLT_BADSITFLAME || me->type == BLT_FLAME3);
+}
+
+byte HasHoming(bullet_t* me) {
+	return (me->type == BLT_PAPER);
+}
+
 void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 {
 	int f;
@@ -2905,6 +2940,12 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 	me->y=y;
 	me->facing=facing;
 	me->bright=0;
+	
+	if(HasGravity(me))
+		me->flags |= BFL_GRAVITY;
+
+	if(HasHoming(me))
+		me->flags |= BFL_HOMING;
 
 	switch(me->type)
 	{
@@ -3486,6 +3527,7 @@ void QuadMissile(int x,int y,byte facing,byte friendly)
 			me->z=FIXAMT*20;
 			me->dz=0;
 			me->target=65535;
+			me->flags=0;
 			me->x+=Cosine(me->facing*16)*10;
 			me->y+=Sine(me->facing*16)*10;
 			me->dx=Cosine(me->facing*16)*4;
@@ -3624,6 +3666,14 @@ void FireExactBullet(int x,int y,int z,int dx,int dy,int dz,byte anim,byte timer
 			bullet[i].facing=facing;
 			bullet[i].type=type;
 			bullet[i].target=65535;
+			bullet[i].flags=0;
+
+			if(HasGravity(&bullet[i]))
+				bullet[i].flags|=BFL_GRAVITY;
+
+			if(HasHoming(&bullet[i]))
+				bullet[i].flags|=BFL_HOMING;
+
 			break;
 		}
 }

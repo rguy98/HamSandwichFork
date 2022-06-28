@@ -614,14 +614,16 @@ void DrawHammers(int x,int y,MGLDraw *mgl)
 
 void UpdateInterface(Map *map)
 {
-	int i,j;
+	int i,j,wpn;
 
 	if(player.comboClock && player.combo>1 && comboY<2)
 		comboY+=2;
 	if(!player.comboClock && comboY>-22)
 		comboY-=2;
-	if(player.comboClock && player.combo>1)
-		curCombo=player.combo;
+	if (player.comboClock && player.combo > 1)
+		curCombo = player.combo;
+
+	wpn = player.wpns[player.curSlot].wpn;
 
 	if(player.shield || player.garlic || player.speed || player.invisibility || player.ammoCrate || (goodguy && goodguy->poison) ||
 		player.cheesePower)
@@ -727,7 +729,7 @@ void UpdateInterface(Map *map)
 		intf[INTF_BRAINS].tx=639;
 		intf[INTF_BRAINS].ty=25;
 	}
-	if(player.weapon)
+	if(wpn)
 	{
 		intf[INTF_WEAPON].tx=639;
 		intf[INTF_WEAPON].ty=9;
@@ -786,8 +788,8 @@ void UpdateInterface(Map *map)
 				intf[i].vDesired=player.coins;
 				break;
 			case INTF_WEAPON:
-				if(player.weapon>0)
-					intf[i].vDesired=player.ammo*intf[i].valueLength/WeaponMaxAmmo(player.weapon);
+				if(wpn)
+					intf[i].vDesired=player.wpns[player.curSlot].ammo*intf[i].valueLength/WeaponMaxAmmo(wpn);
 				else
 					intf[i].vDesired=0;
 				break;
@@ -860,6 +862,7 @@ void RenderInterface(MGLDraw *mgl)
 {
 	int i;
 	char combo[16],debuggy[32];
+	byte wpn;
 
 	//sprintf(combo,"%d:%02d:%02d",(profile.progress.totalTime/(30*60*60)),(profile.progress.totalTime/(30*60))%60,(profile.progress.totalTime/30)%60);
 	//PrintGlow(5,240,combo,0,2);
@@ -935,16 +938,17 @@ void RenderInterface(MGLDraw *mgl)
 		}
 		if(i==INTF_WEAPON)
 		{
-			if(player.weapon)
-				intfaceSpr->GetSprite(SPR_WPNNAME+player.weapon-1)->Draw(intf[i].x,intf[i].y,mgl);
+			wpn = player.wpns[player.curSlot].wpn;
+			if(wpn)
+				intfaceSpr->GetSprite(SPR_WPNNAME+wpn-1)->Draw(intf[i].x,intf[i].y,mgl);
 		}
 	}
 
 	sprintf(combo,"Combo x%d",curCombo);
 	PrintGlow(240,comboY,combo,0,2);
 
-	//sprintf(debuggy, "DEBUG - x%d", player.vehicle);
-	//PrintGlow(240, 80, debuggy, 0, 2);
+	sprintf(debuggy, "WPNS - %d,%d,%d,%d", player.wpns[0].wpn, player.wpns[1].wpn, player.wpns[2].wpn, player.wpns[3].wpn);
+	PrintGlow(240, 80, debuggy, 0, 2);
 }
 
 void RenderCollectedStuff(int x,int y,MGLDraw *mgl)

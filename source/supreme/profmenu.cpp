@@ -42,11 +42,11 @@
 // keyconfig buttons
 #define BTN_K1		10
 #define BTN_K2		20
-#define BTN_DEFAULT	30
-#define BTN_EXITKEYS 31
+#define BTN_DEFAULT	32
+#define BTN_EXITKEYS 33
 
 // modeconfig buttons (1-8)
-#define BTN_M1		32
+#define BTN_M1		34
 #define BTN_EXITMODES (BTN_M1 + NUM_MODES)
 
 typedef struct profButton_t
@@ -91,6 +91,8 @@ static profButton_t kcBtn[]={
 	{90,156,102,"",BTN_K1+3},
 	{90,178,102,"",BTN_K1+4},
 	{90,200,102,"",BTN_K1+5},
+	{90,222,102,"",BTN_K1+6},
+	{90,244,102,"",BTN_K1+7},
 
 	{196,90,102,"",BTN_K2+0},
 	{196,112,102,"",BTN_K2+1},
@@ -98,11 +100,13 @@ static profButton_t kcBtn[]={
 	{196,156,102,"",BTN_K2+3},
 	{196,178,102,"",BTN_K2+4},
 	{196,200,102,"",BTN_K2+5},
+	{196,222,102,"",BTN_K2+6},
+	{196,244,102,"",BTN_K2+7},
 
 	{20,300,200,"Default Controls",BTN_DEFAULT},
 	{20,350,200,"Exit",BTN_EXITKEYS},
 };
-#define NUM_KC_BTNS	14
+#define NUM_KC_BTNS	18
 
 static byte mode,kcMode,kBtnNum,canHitKeys;
 static int msx,msy;
@@ -237,9 +241,9 @@ void InitKeyConfig(void)
 
 	for(j=0;j<2;j++)
 	{
-		for(i=0;i<6;i++)
+		for(i=0;i<8;i++)
 		{
-			strcpy(kcBtn[i+j*6].txt,ScanCodeText(profile.control[j][i]));
+			strcpy(kcBtn[i+j*8].txt,ScanCodeText(profile.control[j][i]));
 		}
 	}
 	ApplyControlSettings();
@@ -430,14 +434,14 @@ byte UpdateProfMenu(int *lastTime,MGLDraw *mgl)
 						{
 							kBtnNum=i;
 							MakeNormalSound(SND_MENUSELECT);
-							if(kcBtn[i].id>=BTN_K1 && kcBtn[i].id<BTN_K1+6)
+							if(kcBtn[i].id>=BTN_K1 && kcBtn[i].id<BTN_K1+8)
 							{
 								kcMode=kcBtn[i].id-BTN_K1+1;
 								canHitKeys=0;
 							}
-							else if(kcBtn[i].id>=BTN_K2 && kcBtn[i].id<BTN_K2+6)
+							else if(kcBtn[i].id>=BTN_K2 && kcBtn[i].id<BTN_K2+8)
 							{
-								kcMode=kcBtn[i].id-BTN_K2+7;
+								kcMode=kcBtn[i].id-BTN_K2+9;
 								canHitKeys=0;
 							}
 							else if(kcBtn[i].id==BTN_EXITKEYS)
@@ -496,10 +500,10 @@ byte UpdateProfMenu(int *lastTime,MGLDraw *mgl)
 						{
 							if(key[i])
 							{
-								if(kcMode<7)
+								if(kcMode<9)
 									profile.control[0][kcMode-1]=(byte)i;
 								else
-									profile.control[1][kcMode-7]=(byte)i;
+									profile.control[1][kcMode-9]=(byte)i;
 								kcMode=0;
 								InitKeyConfig();
 							}
@@ -725,6 +729,8 @@ void RenderKeyConfigMenu(MGLDraw *mgl)
 	PrintGlow(20,156,"Right",0,2);
 	PrintGlow(20,178,"Hammer",0,2);
 	PrintGlow(20,200,"Weapon",0,2);
+	PrintGlow(20,222,"Special",0,2);
+	PrintGlow(20,244,"Switch",0,2);
 
 	PrintGlow(90,68,"Keyboard1",0,2);
 	PrintGlow(196,68,"Keyboard2",0,2);

@@ -96,18 +96,18 @@ byte *MonsterAnim(dword type,byte anim)
 
 word MonsterFlags(dword type,byte aiType)
 {
-	if(aiType==MONS_BOUAPHA && player.weapon==WPN_PWRARMOR)
+	if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 		return monsType[MONS_PWRBOUAPHA].flags;
-	if(aiType==MONS_BOUAPHA && player.weapon==WPN_MINISUB)
+	if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_MINISUB)
 		return monsType[MONS_MINISUB].flags;
 	return monsType[type].flags;
 }
 
 byte MonsterFrames(dword type,byte aiType)
 {
-	if(aiType==MONS_BOUAPHA && player.weapon==WPN_PWRARMOR)
+	if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 		return monsType[MONS_PWRBOUAPHA].framesPerDir;
-	if(aiType==MONS_BOUAPHA && player.weapon==WPN_MINISUB)
+	if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_MINISUB)
 		return monsType[MONS_MINISUB].framesPerDir;
 	return monsType[type].framesPerDir;
 }
@@ -181,9 +181,9 @@ sprite_t *GetMonsterSprite(dword type,byte seq,byte frm,byte facing)
 
 	if(type==MONS_BOUAPHA)
 	{
-		if(player.weapon==WPN_PWRARMOR)
+		if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 			type=MONS_PWRBOUAPHA;
-		else if(player.weapon==WPN_MINISUB)
+		else if(player.wpns[player.curSlot].wpn==WPN_MINISUB)
 			type=MONS_PWRBOUAPHA;
 		else if(type==MONS_BOUAPHA)
 		{
@@ -227,18 +227,18 @@ sprite_t *GetMonsterSprite(dword type,byte seq,byte frm,byte facing)
 	return monsType[type].spr->GetSprite(v);
 }
 
-void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byte facing,char bright,byte ouch,
-	byte poison,byte frozen,byte weak,byte strong,byte ignited,byte confuse,byte special,sprite_set_t* set)
+void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byte facing,char bright,Guy *g,sprite_set_t* set)
 {
 	sprite_t *curSpr;
 	int v;
-	byte shld,isBouapha;
+	byte shld,isBouapha,b;
+	word flgs;
 
 	if(aiType==MONS_BOUAPHA)
 	{
-		if(player.weapon==WPN_PWRARMOR)
+		if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 			type=MONS_PWRBOUAPHA;
-		else if(player.weapon==WPN_MINISUB)
+		else if(player.wpns[player.curSlot].wpn==WPN_MINISUB)
 			type=MONS_MINISUB;
 		else if(type==MONS_BOUAPHA)
 		{
@@ -287,79 +287,79 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 			return;
 		if(shld)
 			SprDraw(x>>FIXSHIFT,(y>>FIXSHIFT)+1,1+(z>>FIXSHIFT),255,bright,curSpr,DISPLAY_DRAWME|DISPLAY_GLOW);
-		if(frozen)
+		if(g->frozen)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
 				return;
 			if(!(monsType[type].flags&MF_NOSHADOW))
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
-			if(ouch==0)
+			if(g->ouch==0)
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,7,bright+4,curSpr,DISPLAY_DRAWME);	// aqua
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+8,curSpr,DISPLAY_DRAWME); // purple
 			return;
 		}
-		else if(ignited)
+		else if(g->ignited)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
 				return;
 			if(!(monsType[type].flags&MF_NOSHADOW))
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
-			if(ouch==0)
+			if(g->ouch==0)
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+12,curSpr,DISPLAY_DRAWME);	// light red
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+4,curSpr,DISPLAY_DRAWME); // red
 			return;
 		}
-		else if(poison)
+		else if(g->poison)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
 				return;
 			if(!(monsType[type].flags&MF_NOSHADOW))
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
-			if(ouch==0)
+			if(g->ouch==0)
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,1,bright-4,curSpr,DISPLAY_DRAWME);	// green
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,5,bright,curSpr,DISPLAY_DRAWME); // yellow
 			return;
 		}
-		else if(confuse)
+		else if(g->confuse)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
 				return;
 			if(!(monsType[type].flags&MF_NOSHADOW))
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
-			if(ouch==0)
+			if(g->ouch==0)
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+8,curSpr,DISPLAY_DRAWME);	// purple
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+16,curSpr,DISPLAY_DRAWME); // red
 			return;
 		}
-		else if(strong)
+		else if(g->strong)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
 				return;
 			if(!(monsType[type].flags&MF_NOSHADOW))
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
-			if(ouch==0)
+			if(g->ouch==0)
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,0,bright-4,curSpr,DISPLAY_DRAWME);	// dark grey
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,floor(Random(7)),bright+4,curSpr,DISPLAY_DRAWME); // rainbow
 			return;
 		}
-		else if(weak)
+		else if(g->weak)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
 				return;
 			if(!(monsType[type].flags&MF_NOSHADOW))
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
-			if(ouch==0)
+			if(g->ouch==0)
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright-4,curSpr,DISPLAY_DRAWME);	// dark red
 			else
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME); // brown
@@ -372,6 +372,11 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 				return;
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,255,bright,curSpr,DISPLAY_DRAWME|DISPLAY_GLOW);
 			return;
+		}
+		else if(g->specialFlags&GSF_LOONY)
+		{
+			b=abs(16-(player.clock&31));
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,player.clock/32,bright+b,curSpr,DISPLAY_DRAWME);
 		}
 	}
 
@@ -388,12 +393,24 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 	if(!(monsType[type].flags&MF_NOSHADOW))
 		SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
 
-	if(ouch==0)
+	if(g->ouch==0)
 	{
-		if(frozen)
+		if(g->frozen)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,7,bright+4,curSpr,DISPLAY_DRAWME);
-		else if(poison)
+		else if(g->ignited)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+16,curSpr,DISPLAY_DRAWME);
+		else if(g->poison)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,1,bright,curSpr,DISPLAY_DRAWME);
+		else if(g->confuse)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+4,curSpr,DISPLAY_DRAWME);
+		else if (g->strong)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,0,bright-4,curSpr,DISPLAY_DRAWME);
+		else if (g->weak)
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME);
+		else if(g->specialFlags&GSF_LOONY) {// Imitated loony color effect - switches between all eight colors
+			b=abs(16-(player.clock&31));
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,player.clock/32,bright+monsType[type].brtChg+b,curSpr, flgs);
+		}
 		else if(!(monsType[type].flags&(MF_GHOST|MF_GLOW)))
 		{
 			if(monsType[type].fromCol==255)
@@ -411,17 +428,17 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 	}
 	else
 	{
-		if(frozen)
+		if(g->frozen)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+8,curSpr,DISPLAY_DRAWME);
-		else if(ignited)
+		else if(g->ignited)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+4,curSpr,DISPLAY_DRAWME);
-		else if(poison)
+		else if(g->poison)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,5,bright,curSpr,DISPLAY_DRAWME);
-		else if(confuse)
+		else if(g->confuse)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+16,curSpr,DISPLAY_DRAWME);
-		else if (strong)
+		else if (g->strong)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,0,bright+12,curSpr,DISPLAY_DRAWME);
-		else if (weak)
+		else if (g->weak)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME);
 		else
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright,curSpr,DISPLAY_DRAWME);

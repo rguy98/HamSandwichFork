@@ -104,6 +104,7 @@ class Map
 		void BrightTorch(int x,int y,char brt,byte size);
 		void GlowCursor(int x,int y,char brt,byte size);
 		void DimTorch(int x,int y,byte size);
+		void InstaTorch(int x, int y, char brt);
 		void LightSpecial(int x,int y,char brt,byte size);
 		void LightRect(int x,int y,int x2,int y2,char brt,byte perm);
 		void Update(byte mode,world_t *world);

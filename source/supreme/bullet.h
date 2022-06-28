@@ -98,20 +98,86 @@
 #define BLT_BADSITFLAME	82
 #define BLT_LASERBEAM	83
 
+/*
+#define BLT_ENERGY2		84	// Redbone bullet
+#define BLT_FLAMEWALL	85	// Flame wall
+#define BLT_EARTHSPIKE	86	// more advanced than the regular
+#define BLT_GASBLAST	87	// Green gas blast
+#define BLT_MEGABOOM	88	// Giant explosion
+
+// Player bullets
+#define BLT_WHOOPEE		89	// Whoopee cushion (yellow gas)
+#define BLT_CACTUS		90	// Potted cactus
+#define BLT_BOOMERANG	91	// Player boomerang
+#define BLT_ICEWAND		92	// Ice wand blast
+#define BLT_BIGBOMB		93	// Loonyland bomb
+#define BLT_BIGBOOM		94	// Big bomb blast
+#define BLT_HOTPANTS	95	// Big bomb blast
+
+// Non-player bullets
+#define BLT_SWAMPGAS	96	// swamp gas
+#define BLT_ORBGRENADE	97	// Frankenjulie grenade
+#define BLT_ROCKET		98	// non-guided rocket
+#define BLT_HEATSEEKER	99	// guided rocket
+#define BLT_ROCKETSMOKE	100	// guided rocket
+
+// Player bullets
+#define BLT_ICEWAND2	101 //  shoots off of ice bolts
+#define BLT_BATSHOT		102 // 
+
+#define BLT_WIND		103
+#define BLT_EARTHSPIKE2	104
+#define BLT_ICESHARD	105
+#define BLT_WATER		106
+#define BLT_FOUNTAIN	107
+#define BLT_FLAMESHOT	108
+#define BLT_SWAMPGAS2	109
+#define BLT_EVILFACE	110
+#define BLT_BIGSHOT		111
+
+#define BLT_BLAST		112
+#define BLT_BUZZSAW		113
+#define BLT_SPEEDY		114
+#define BLT_SHOCKER		115
+#define BLT_ICEBOLT		116
+#define BLT_PLAGUE		117
+#define BLT_PLAGUEGAS	118
+#define BLT_KABOOM		119
+
+#define BLT_WOLFSHOT	120
+#define BLT_WOLFSHOCK	121
+
+#define BLT_CLAW		122
+#define BLT_BOMBIEBOOM	123
+#define BLT_CROAKERGAS	124
+#define BLT_HOTDOGFIRE	125
+#define BLT_ICEWOLFICE	126
+#define BLT_FARLEYGAS	127
+*/
+
 // Operation SCARE
 #define BLT_BADLUNA			84
 #define BLT_BADFBALL		85
 #define BLT_BADLIGHTNING	86
 
-// the special hammer flags for different powerups
+// the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1
 #define HMR_REFLECT 2
-#define HMR_WATERWALK 4		// not really a hammer powerup, it's a cheat code, but this is a good spot for it
-#define HMR_SHIELD	8		// also cheat code
-#define HMR_SPEED	16		// another cheat
-#define HMR_OXYGEN	32		// another cheat
-#define HMR_NOSKID	64		// another cheat
-#define HMR_LIGHT	128		// another cheat
+#define HMR_HOMING	4
+#define HMR_ATTRACT	8
+
+#define BFL_GRAVITY 1
+#define BFL_HOMING 	2
+#define BFL_ATTRACT 4
+#define BFL_AURA 	8
+
+#define CHT_ULTRA 	1
+#define CHT_JESUS 	2
+#define CHT_SHIELD	4
+#define CHT_SPEED	8
+#define CHT_OXYGEN	16
+#define CHT_NOSKID	32
+#define CHT_LIGHT	64
 
 typedef struct bullet_t
 {
@@ -124,6 +190,7 @@ typedef struct bullet_t
 	byte type;
 	char bright;
 	byte friendly;
+	byte flags;
 } bullet_t;
 
 void InitBullets(void);
@@ -156,6 +223,7 @@ void RemoveOrbiters(int n,byte f,byte t);
 void FireScanShots(Guy *victim);
 void MakeRadar(int rx,int ry,byte w);
 byte GetBulletAttackType(void);
+byte HasGravity(bullet_t* me);
 
 int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets

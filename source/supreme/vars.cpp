@@ -85,8 +85,20 @@ int PlayerSpecialVars(char c)
 			return player.brains;
 		case 'K':
 			return player.candles;
+		case 'M': // current combo
+			return player.combo;
+		case 'O': // oxygen level
+			return player.oxygen;
+		case 'T': // best combo
+			return player.bestCombo;
+		case 'D': // # of kills
+			return player.kills;
+		case 'S': // current weapon slot
+			return player.curSlot;
 		case 'P':
 			return player.worldProg->percentage;
+		case 'W':
+			return NumFilledPockets();
 	}
 	return 0;
 }
@@ -106,6 +118,8 @@ int TaggedSpecialVars(char c)
 			return TaggedMonster()->mapy;
 		case 'L':
 			return TaggedMonster()->hp;
+		case 'M': // max hp
+			return TaggedMonster()->maxHP;
 	}
 	return 0;
 }

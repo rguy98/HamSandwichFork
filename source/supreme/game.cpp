@@ -192,7 +192,13 @@ void ExitLevel(void)
 	ExitParticles();
 
 	player.vehicle=0;
-	player.weapon=0;
+	
+	for (int i = 0; i < 4; i++) {
+		player.wpns[i].ammo = WPN_NONE;
+		player.wpns[i].used = 0;
+		player.wpns[i].ammo = 0;
+	}
+	
 	player.hammers=0;
 
 	delete curMap;
@@ -299,7 +305,7 @@ TASK(byte) LunaticRun(int *lastTime)
 			if(!editing && !player.cheated && verified)
 			{
 				profile.progress.totalTime++;
-				if((curMap->flags&(MAP_UNDERWATER|MAP_LAVA)) && player.weapon!=WPN_MINISUB)
+				if((curMap->flags&(MAP_UNDERWATER|MAP_LAVA)) && player.wpns[player.curSlot].wpn!=WPN_MINISUB)
 					profile.progress.underwaterTime++;
 			}
 

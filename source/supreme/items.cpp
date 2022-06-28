@@ -904,12 +904,14 @@ void RenderItem(int x,int y,byte type,char bright,byte flags)
 		else
 			sprite = itmSpr->GetSprite(items[type].sprNum);
 
-		if(items[type].flags&IF_SHADOW && (items[type].effect!=IE_WEAPON || items[type].flags & IF_USERJSP))
+
+		if(items[type].flags&IF_SHADOW)
 		{
 			SprDraw(x+items[type].xofs,y,-items[type].yofs+1,0,bright+items[type].bright,
 				sprite,DISPLAY_DRAWME|DISPLAY_SHADOW);
 		}
-		else if (items[type].name[0] == '$' && !(items[type].flags & IF_USERJSP)) {// left-facing hammer sprite
+		
+		if (items[type].name[0] == '$' && !(items[type].flags & IF_USERJSP)) {// left-facing hammer sprite
 			switch (items[type].name[1]) {
 				case 'C':
 					RenderSimpleAnimatedItem(items[type].fromColor, items[type].toColor, items[type].bright, x * FIXAMT, y * FIXAMT, 10, 509, 8, 2); // little coin
@@ -1665,6 +1667,22 @@ byte TriggerItem(Guy *me,mapTile_t *m,int x,int y)
 			curMap->map[x+y*curMap->width].opaque=1;
 			return 0;
 			break;
+		case IE_MOVE2:
+			curMap->InstaTorch(x, y, 6);
+			curMap->map[x + y * curMap->width].opaque = 1;
+			return 0;
+			break;
+		case IE_POCKET:
+			if (items[m->item].effectAmt > 0) {
+				for(i=0;i<items[m->item].effectAmt;i++)
+					AddPocketSlot();
+			}
+			else {
+				for(i=0;i<items[m->item].effectAmt;i++)
+					RemovePocketSlot();
+			}
+			return 1;
+			break;
 	}
 	return 0;
 }
@@ -1698,6 +1716,11 @@ void MoveMovableItem(int x,int y,Map *map,world_t *world)
 		MakeCustomSound(items[type].sound,(x*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT,(y*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT,SND_CUTOFF,1000);
 		if(items[type].msg[0])
 			NewMessage(items[type].msg,75,0);
+	}
+	else if (items[type].effect == IE_MOVE2)
+	{
+		map->map[x + y * map->width].item = 0;
+		ExplodeParticlesColor(0, (x * TILE_WIDTH + TILE_WIDTH / 2) << FIXSHIFT, (y * TILE_HEIGHT + TILE_HEIGHT / 2) << FIXSHIFT, FIXAMT * 5, 10, 4);
 	}
 }
 

@@ -59,6 +59,11 @@
 #define VE_YUGO		3
 #define VE_LOG		4
 
+typedef struct pocket_t {
+	byte used, wpn;
+	int ammo;
+} pocket_t;
+
 typedef struct player_t
 {
 	// per-world value
@@ -69,10 +74,12 @@ typedef struct player_t
 	byte shield;
 	byte levelNum;
 	byte keys[4];
+	pocket_t wpns[4]; // new inventory system
+	byte curSlot; // how many weapon slots, current selected
 	int  boredom;
 	byte hammers;
 	byte hamSpeed;
-	byte weapon;
+	byte weapon; // todo: remove
 	byte lastWeapon;
 	int  ammo;
 	byte reload;
@@ -82,7 +89,7 @@ typedef struct player_t
 	int coins;
 	int candles;
 	byte pushPower;	// for pushing pushy blocks
-	byte hammerFlags;
+	byte hammerFlags, cheatFlags;
 	byte vehicle;
 	byte garlic;
 	byte speed;	// accelerated
@@ -113,7 +120,8 @@ typedef struct player_t
 	int enemiesSlain;
 	byte cheated;
 	dword score;
-	int var[8];	// local vars, cleared each new level
+	int var[8],
+		var2[8]; // local vars, cleared each new level
 	byte ability[6];
 	int brainX,brainY,candleX,candleY;
 	word brainTime,candleTime;
@@ -149,6 +157,15 @@ byte PlayerCanWaterwalk(void);
 void SetTportClock(byte tp);
 byte GetTportClock(void);
 byte StealWeapon(void);
+
+void WeaponRanOut(byte slot);
+byte AddPocketSlot(void);
+byte RemovePocketSlot(void);
+byte WeaponAddOrReplace(byte w);
+byte FindNextUnusedPocketSlot(void);
+byte FindNextUsedPocketSlot(void);
+void WipeSlot(byte slot,byte isUsed);
+int NumFilledPockets(void);
 
 int WeaponMaxAmmo(byte wpn);
 byte PlayerGetWeapon(byte wpn,int x,int y);

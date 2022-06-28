@@ -112,7 +112,7 @@ typedef struct profile_t
 {
 	char name[16];
 	// important stuff
-	byte control[2][6];	// key scancodes
+	byte control[2][8];	// key scancodes
 	byte joyCtrl[2];	// joystick 'codes' for the buttons
 	byte sound;			// sound volume
 	byte music;			// music volume

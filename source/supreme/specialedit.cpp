@@ -791,7 +791,7 @@ static void KeypressClick(int id)
 	curTrig=trgStart + id/100-1;
 
 	spcl.trigger[curTrig].value*=2;
-	if(spcl.trigger[curTrig].value>CONTROL_B2)
+	if(spcl.trigger[curTrig].value>CONTROL_B4)
 		spcl.trigger[curTrig].value=1;
 
 	MakeNormalSound(SND_MENUCLICK);
@@ -1762,6 +1762,10 @@ static void SetupTriggerButtons(int t,int y)
 			else if(trigger.value==CONTROL_B1)
 				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+1+100*t,0,213,y+17,80,14,"Fire",KeypressClick);
 			else if(trigger.value==CONTROL_B2)
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+1+100*t,0,213,y+17,80,14,"Weapon",KeypressClick);
+			else if(trigger.value==CONTROL_B3)
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+1+100*t,0,213,y+17,80,14,"Switch",KeypressClick);
+			else if(trigger.value==CONTROL_B4)
 				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+1+100*t,0,213,y+17,80,14,"Special",KeypressClick);
 			break;
 		case TRG_PLAYAS:

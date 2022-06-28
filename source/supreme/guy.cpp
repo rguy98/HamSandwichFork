@@ -340,22 +340,22 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 
 void Guy::SeqFinished(void)
 {
-	if((seq==ANIM_DIE) || (seq==ANIM_A3 && aiType==MONS_BOUAPHA && player.weapon!=WPN_PWRARMOR && player.weapon!=WPN_MINISUB))
+	if((seq==ANIM_DIE) || (seq==ANIM_A3 && aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn!=WPN_PWRARMOR && player.wpns[player.curSlot].wpn!=WPN_MINISUB))
 	{
 		if(aiType==MONS_BOUAPHA)
 		{
-			if(player.weapon==WPN_PWRARMOR)
+			if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 			{
-				player.weapon=0;
+				player.wpns[player.curSlot].wpn=0;
 				seq=ANIM_IDLE;
 				frm=0;
 				frmAdvance=128;
 				action=ACTION_IDLE;
 				return;
 			}
-			else if(player.weapon==WPN_MINISUB)
+			else if(player.wpns[player.curSlot].wpn==WPN_MINISUB)
 			{
-				player.weapon=0;
+				player.wpns[player.curSlot].wpn=0;
 				seq=ANIM_IDLE;
 				frm=0;
 				frmAdvance=128;
@@ -393,9 +393,9 @@ void Guy::NextFrame(void)
 
 	tp=type;
 
-	if(aiType==MONS_BOUAPHA && player.weapon==WPN_PWRARMOR)
+	if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 		anim=GetMonsterType(MONS_PWRBOUAPHA)->anim[seq];
-	else if(aiType==MONS_BOUAPHA && player.weapon==WPN_MINISUB)
+	else if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_MINISUB)
 		anim=GetMonsterType(MONS_MINISUB)->anim[seq];
 	else
 		anim=MonsterAnim(type,seq);
@@ -436,9 +436,9 @@ void Guy::CalculateRect(void)
 	}
 	else	// normal method
 	{
-		if(aiType==MONS_BOUAPHA && player.weapon==WPN_PWRARMOR)
+		if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 			s=MonsterSize(MONS_PWRBOUAPHA);
-		if(aiType==MONS_BOUAPHA && player.weapon==WPN_MINISUB)
+		if(aiType==MONS_BOUAPHA && player.wpns[player.curSlot].wpn==WPN_MINISUB)
 			s=MonsterSize(MONS_MINISUB);
 		else
 			s=MonsterSize(type);
@@ -744,14 +744,14 @@ void Guy::Update(Map *map,world_t *world)
 
 		// standing on water!!!!!!!  DROWN!!!!
 		if((hp>0) && (z==0) && (GetTerrain(world,map->GetTile(mapx,mapy)->floor)->flags&TF_WATER)
-			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_LOG)) && (!(player.weapon==WPN_MINISUB)) &&
+			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_LOG)) && (!(player.wpns[player.curSlot].wpn==WPN_MINISUB)) &&
 			(!(player.vehicle==VE_YUGO)) && ((MonsterFlags(goodguy->type,goodguy->aiType)&(MF_AQUATIC|MF_FLYING))==0))
 		{
 			// if there's a raft, hop on instead of dying
 			if(!RaftNearby()&&!LogNearby())
 			{
-				if(player.weapon==WPN_PWRARMOR)
-					player.weapon=0;
+				if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
+					player.wpns[player.curSlot].wpn=0;
 				facing=(4+facing)&7;
 				hp=0;
 				SetPlayerHP(hp);
@@ -774,7 +774,7 @@ void Guy::Update(Map *map,world_t *world)
 		}
 		// standing on lava, OW!
 		if((hp>0) && (z==0) && (GetTerrain(world,map->GetTile(mapx,mapy)->floor)->flags&TF_LAVA)
-			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_LOG)) && (!(player.weapon==WPN_MINISUB)) &&
+			&& (!PlayerCanWaterwalk()) && (!(player.vehicle==VE_RAFT)) && (!(player.vehicle==VE_LOG)) && (!(player.wpns[player.curSlot].wpn==WPN_MINISUB)) &&
 			(!(player.vehicle==VE_YUGO)) && ((MonsterFlags(goodguy->type,goodguy->aiType)&(MF_AQUATIC|MF_FLYING))==0))
 		{
 			if(!RaftNearby() && !LogNearby())
@@ -856,9 +856,9 @@ void Guy::Render(byte light)
 		else
 			t=MONS_BOUAPHA;
 
-		if(player.weapon==WPN_PWRARMOR)
+		if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
 			t=MONS_PWRBOUAPHA;
-		if(player.weapon==WPN_MINISUB)
+		if(player.wpns[player.curSlot].wpn==WPN_MINISUB)
 			t=MONS_MINISUB;
 	}
 	else
@@ -874,7 +874,7 @@ void Guy::Render(byte light)
 	}
 	oldBrt=GetMonsterType(t)->brtChg;
 	GetMonsterType(t)->brtChg=brtChange;
-	MonsterDraw(x,y,z,type,aiType,seq,frm,facing,bright*(light>0),ouch,poison,frozen,weak,strong,ignited,confuse,special,customSpr);
+	MonsterDraw(x,y,z,type,aiType,seq,frm,facing,bright*(light>0),this,customSpr);
 	if(recolor)
 	{
 		GetMonsterType(t)->fromCol=oldFrom;
@@ -1038,13 +1038,13 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		if(damage==0)
 			damage=1;
 	}
-	if(aiType==MONS_BOUAPHA && (player.weapon==WPN_PWRARMOR || player.weapon==WPN_MINISUB))
+	if(aiType==MONS_BOUAPHA && (player.wpns[player.curSlot].wpn==WPN_PWRARMOR || player.wpns[player.curSlot].wpn==WPN_MINISUB))
 	{
 		// damage is done to the armor instead
-		if(player.ammo>damage)
-			player.ammo-=damage;
+		if(player.wpns[player.curSlot].ammo>damage)
+			player.wpns[player.curSlot].ammo-=damage;
 		else
-			player.ammo=0;
+			player.wpns[player.curSlot].ammo=0;
 
 		ouch=4;	// still do the ouch so you can see it
 		return;
@@ -1161,7 +1161,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		}
 
 		ScoreEvent(SE_KILL,1);
-		if(player.rage<127*256-512 && player.rageClock==0 && (player.weapon!=WPN_PWRARMOR && player.weapon!=WPN_MINISUB) &&
+		if(player.rage<127*256-512 && player.rageClock==0 && (player.wpns[player.curSlot].wpn!=WPN_PWRARMOR && player.wpns[player.curSlot].wpn!=WPN_MINISUB) &&
 			player.ability[ABIL_RAGE])
 			player.rage+=512;	// and crank up the rage
 		if(!editing && !player.cheated && verified)
@@ -1280,7 +1280,7 @@ void UpdateGuys(Map *map,world_t *world)
 	{
 		if(player.oxygen)
 		{
-			if(!(player.hammerFlags&HMR_OXYGEN))
+			if(!(player.cheatFlags&CHT_OXYGEN))
 				player.oxygen-=32;
 			if(player.oxygen<0)
 				player.oxygen=0;
@@ -1308,7 +1308,7 @@ void UpdateGuys(Map *map,world_t *world)
 	}
 	if(map->flags&MAP_LAVA)
 	{
-		if(player.weapon!=WPN_MINISUB && player.weapon!=WPN_PWRARMOR && player.vehicle!=VE_YUGO)
+		if(player.wpns[player.curSlot].wpn!=WPN_MINISUB && player.wpns[player.curSlot].wpn!=WPN_PWRARMOR && player.vehicle!=VE_YUGO)
 		{
 			player.lavaTimer--;
 			if(!player.lavaTimer)
@@ -4081,12 +4081,6 @@ int CountMonstersInRect(int type,int x,int y,int x2,int y2)
 	{
 		for(i=0;i<maxGuys;i++)
 			if(TaggedMonster()!=NULL && guys[i]->type==TaggedMonster()->type && guys[i]->mapx>=x && guys[i]->mapy>=y && guys[i]->mapx<=x2 && guys[i]->mapy<=y2)
-				cnt++;
-	}
-	else if(type==MONS_HOSTILE)	// hostile to anyone besides themselves
-	{
-		for(i=0;i<maxGuys;i++)
-			if(guys[i]->type>0 && guys[i]->type!=MONS_NOBODY && guys[i]->hostile && guys[i]->mapx>=x && guys[i]->mapy>=y && guys[i]->mapx<=x2 && guys[i]->mapy<=y2)
 				cnt++;
 	}
 	return cnt;

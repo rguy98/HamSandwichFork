@@ -2213,8 +2213,8 @@ void AI_Yugo(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			y=me->y/FIXAMT;
 			BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
 			// drown player:
-			if(player.weapon==WPN_PWRARMOR)
-				player.weapon=0;
+			if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR)
+				player.wpns[player.curSlot].wpn=0;
 			goodguy->facing=(4+goodguy->facing)&7;
 			goodguy->hp=0;
 			SetPlayerHP(goodguy->hp);

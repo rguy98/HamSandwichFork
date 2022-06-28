@@ -2582,7 +2582,7 @@ void AI_SuperZombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		{
 			// can only do the pickup move on Bouapha
 			if(RangeToTarget(me,goodguy)<70*FIXAMT && goodguy->hp>0 && PlayerShield()==0 && goodguy->aiType==MONS_BOUAPHA &&
-				player.weapon!=WPN_PWRARMOR && player.weapon!=WPN_MINISUB)
+				player.wpns[player.curSlot].wpn!=WPN_PWRARMOR && player.wpns[player.curSlot].wpn!=WPN_MINISUB)
 			{
 				// got him
 				MakeSound(SND_SZGRAB,me->x,me->y,SND_CUTOFF,1500);
@@ -2613,7 +2613,7 @@ void AI_SuperZombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		}
 		if(me->seq==ANIM_A3 && goodguy)
 		{
-			if(player.weapon==WPN_PWRARMOR || player.weapon==WPN_MINISUB)
+			if(player.wpns[player.curSlot].wpn==WPN_PWRARMOR || player.wpns[player.curSlot].wpn==WPN_MINISUB)
 			{
 				// add an OOPH noise to fail to pick up, and maybe take damage
 				me->seq=ANIM_IDLE;

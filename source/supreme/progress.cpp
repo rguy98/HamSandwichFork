@@ -13,8 +13,8 @@ byte modeShopNum[10];
 
 void ApplyControlSettings()
 {
-	SetKeyboardBindings(0, 6, profile.control[0]);
-	SetKeyboardBindings(1, 6, profile.control[1]);
+	SetKeyboardBindings(0, 8, profile.control[0]);
+	SetKeyboardBindings(1, 8, profile.control[1]);
 	SetJoystickBindings(2, profile.joyCtrl);
 }
 
@@ -290,12 +290,16 @@ void DefaultControls(void)
 	profile.control[0][3]=SDL_SCANCODE_RIGHT;
 	profile.control[0][4]=SDL_SCANCODE_LCTRL;
 	profile.control[0][5]=SDL_SCANCODE_LSHIFT;
+	profile.control[0][6]=SDL_SCANCODE_A;
+	profile.control[0][7]=SDL_SCANCODE_D;
 	profile.control[1][0]=0;
 	profile.control[1][1]=0;
 	profile.control[1][2]=0;
 	profile.control[1][3]=0;
 	profile.control[1][4]=SDL_SCANCODE_Z;
 	profile.control[1][5]=SDL_SCANCODE_X;
+	profile.control[1][6]=0;
+	profile.control[1][7]=0;
 
 	profile.joyCtrl[0]=0;
 	profile.joyCtrl[1]=1;
@@ -383,7 +387,7 @@ void DefaultWorldProgress(worldData_t *me,const char *fname)
 	me->level=NULL;
 	me->levels=0;
 
-	for(i=0;i<8;i++)
+	for(i=0;i<16;i++)
 		me->var[i]=0;
 }
 

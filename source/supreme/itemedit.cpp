@@ -109,7 +109,8 @@ static itemEff_t itemEff[]={
 	{"Increment","Variable",0,15,IEBTN_VAR},
 	{"Decrement","Variable",0,15,IEBTN_VAR},
 	{"Move","Direction",0,3,IEBTN_DIR},
-	{"LightMove","Direction",0,3,IEBTN_DIR}
+	{"LightMove","Direction",0,3,IEBTN_DIR},
+	{"Give Pockets","Number",-4,3,IEBTN_NUM},
 };
 
 static char pwrUpName[MAX_POWERUP][32]={
