@@ -799,10 +799,10 @@ byte CheckForItem(byte item,int count,byte flags)
 					amt=player.shield;
 					break;
 				case PU_GARLIC:
-					amt=player.garlic;
+					amt=goodguy->garlic;
 					break;
 				case PU_SPEED:
-					amt=player.speed;
+					amt=goodguy->speedy;
 					break;
 				case PU_INVISO:
 					amt=player.invisibility;

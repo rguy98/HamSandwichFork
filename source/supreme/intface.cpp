@@ -530,33 +530,53 @@ void DrawPULightning(int x,int y,int height,byte color,MGLDraw *mgl)
 
 void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 {
-	byte height[7],th;
-	byte color[7],tc;
+	byte height[11],th;
+	byte color[11],tc;
 	int i,swap;
 
 	height[0]=player.shield*64/240;
 	color[0]=32*3+16;	// blue for shield
-	height[1]=player.garlic*64/255;
-	color[1]=32*0+20;	// light grey for garlic
-	height[2]=player.speed*64/255;
-	color[2]=32*7+16;	// aqua for speed
-	height[3]=player.invisibility*64/255;
-	color[3]=32*6+16;	// purple for invis
-	height[4]=player.ammoCrate*64/255;
-	color[4]=32*4+16;	// red for ammo
+	height[2]=player.invisibility*64/255;
+	color[2]=32*6+14;	// purple for invis
+	height[3]=player.ammoCrate*64/255;
+	color[3]=32*(player.clock/16&7)+20;	// rainbow for ammo!
+	color[4]=32*1+16;	// green for poison
+	height[5]=player.cheesePower*64/255;
+	color[5]=32*5+16;	// yellow for cheese
 	if(goodguy)
-		height[5]=goodguy->poison*64/255;
+	{
+		height[1]=goodguy->speedy*64/255;
+		height[4]=goodguy->poison*64/255;
+		height[6]=goodguy->garlic*64/255;
+		height[7]=goodguy->ignited*64/255;
+		height[8]=goodguy->weak*64/255;
+		height[9]=goodguy->strong*64/255;
+		height[10]=goodguy->frozen*64/255;
+	}
 	else
-		height[5]=0;
-	color[5]=32*1+16;	// green for poison
-	height[6]=player.cheesePower*64/255;
-	color[6]=32*5+16;	// yellow for cheese
+	{
+		height[1]=0;
+		height[4]=0;
+		height[6]=0;
+		height[7]=0;
+		height[8]=0;
+		height[9]=0;
+		height[10]=0;
+	}
+	color[1]=32*7+20;	// light aqua for speed
+	color[6]=32*0+20;	// light grey for garlic
+	color[7]=32*4+12;	// dark red for burning
+	color[8]=32*4+20;	// light red for weakness
+	color[9]=32*0+12;	// dark grey for steelskin
+	color[10]=32*7+16;	// aqua for frozen
+	//dark red for weakness (lower defense)
+	//dark grey for strength (higher defense)
 
 	swap=1;
 	while(swap)
 	{
 		swap=0;
-		for(i=0;i<6;i++)
+		for(i=0;i<10;i++)
 		{
 			if(height[i]<height[i+1])
 			{
@@ -571,7 +591,7 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 		}
 	}
 
-	for(i=0;i<6;i++)
+	for(i=0;i<10;i++)
 	{
 		if(height[i]>0)
 		{
@@ -625,8 +645,9 @@ void UpdateInterface(Map *map)
 
 	wpn = player.wpns[player.curSlot].wpn;
 
-	if(player.shield || player.garlic || player.speed || player.invisibility || player.ammoCrate || (goodguy && goodguy->poison) ||
-		player.cheesePower)
+	if(player.shield || (goodguy && goodguy->garlic) || (goodguy && goodguy->speedy) || player.invisibility || player.ammoCrate ||
+	  (goodguy && goodguy->poison) || (goodguy && goodguy->ignited) || (goodguy && goodguy->weak) || (goodguy && goodguy->strong) ||
+	  player.cheesePower || (goodguy && goodguy->frozen))
 	{
 		intf[INTF_POWERUP].tx=0;
 		intf[INTF_POWERUP].ty=50;
@@ -947,7 +968,7 @@ void RenderInterface(MGLDraw *mgl)
 	sprintf(combo,"Combo x%d",curCombo);
 	PrintGlow(240,comboY,combo,0,2);
 
-	sprintf(debuggy, "WPNS - %d,%d,%d,%d", player.wpns[0].wpn, player.wpns[1].wpn, player.wpns[2].wpn, player.wpns[3].wpn);
+	//sprintf(debuggy, "WPNS - %d,%d,%d,%d", player.wpns[0].wpn, player.wpns[1].wpn, player.wpns[2].wpn, player.wpns[3].wpn);
 	PrintGlow(240, 80, debuggy, 0, 2);
 }
 

@@ -72,6 +72,8 @@ class Guy
 		byte weak;		// weakness affliction - more damage taken (dark red)
 		byte strong;	// steelskin defense - increased resistance (dark grey)
 		byte confuse;	// confusion - inverted movement controls (light pink)
+		byte garlic;	// now applicable to more enemies - kills vampires quick!
+		byte speedy;	// now applicable to more enemies!
 		byte specialFlags;	// special flags (rainbow, white flash)
 
 		int aiType;

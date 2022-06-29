@@ -516,6 +516,12 @@ void Guy::Update(Map *map,world_t *world)
 	if(ouch>0)
 		ouch--;
 
+	if(garlic>0)
+	{
+		garlic--;
+		StinkySteam(x - FIXAMT * 20 + Random(FIXAMT * 40), y - FIXAMT * 20 + Random(FIXAMT * 40), z + FIXAMT * 40, FIXAMT * 2);
+	}
+
 	if(poison>0)
 	{
 		if(hp>0 && ((poison&7)==0))
@@ -1100,6 +1106,8 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 	{
 		hp=0;
 		GoalKilledSomebody(this,type,frozen);
+		garlic=0;
+		speedy=0;
 		ignited=0;
 		frozen=0;
 		confuse=0;
@@ -1342,48 +1350,40 @@ void UpdateGuys(Map *map,world_t *world)
 	for(i=0;i<maxGuys;i++)
 		if(guys[i]->type!=MONS_NONE)
 		{
-			if(guys[i]->aiType==MONS_BOUAPHA && player.speed>0)
+			if (!player.timeStop || guys[i]->aiType == MONS_BOUAPHA || guys[i]->hp == 0 ||
+				guys[i]->aiType == MONS_MINECART || guys[i]->aiType == MONS_RAFT || guys[i]->aiType == MONS_YUGO ||
+				guys[i]->aiType == MONS_LOG)
 			{
-				guys[i]->Update(map,world);
-				if(guys[i]->type)
-					guys[i]->Render(1);
-				guys[i]->Update(map,world);
-				player.speed--;
-			}
-			else
-			{
-				if(!player.timeStop || guys[i]->aiType==MONS_BOUAPHA || guys[i]->hp==0 ||
-					guys[i]->aiType==MONS_MINECART || guys[i]->aiType==MONS_RAFT || guys[i]->aiType==MONS_YUGO ||
-					guys[i]->aiType==MONS_LOG)
+				if (((speedClock & 3) == 0) && guys[i]->aiType != MONS_BOUAPHA &&
+					guys[i]->aiType != MONS_MINECART && guys[i]->aiType != MONS_RAFT && guys[i]->aiType != MONS_YUGO &&
+					guys[i]->aiType != MONS_LOG)
 				{
-					if(((speedClock&3)==0) && guys[i]->aiType!=MONS_BOUAPHA && guys[i]->aiType!=MONS_RAFT &&
-						guys[i]->aiType!=MONS_MINECART && guys[i]->aiType!=MONS_RAFT && guys[i]->aiType!=MONS_YUGO &&
-						guys[i]->aiType!=MONS_LOG)
+					if (profile.difficulty == 0)
 					{
-						if(profile.difficulty==0)
-						{
-							// skip the update!
-						}
-						else if(profile.difficulty==2)
-						{
-							// double update!
-							guys[i]->Update(map,world);
-							guys[i]->Update(map,world);
-						}
+						// skip the update!
 					}
-					else
-						guys[i]->Update(map,world);
+					else if (profile.difficulty == 2)
+					{
+						// ???
+					}
+				}
+				else
+					guys[i]->Update(map, world);
 
-					if(guys[i]->aiType==MONS_WOLF2 && guys[i]->type!=0 && guys[i]->mind3)
-					{
-						guys[i]->Render(1);
-						guys[i]->Update(map,world);
-					}
-					if((guys[i]->aiType==MONS_MUMBLE2||guys[i]->aiType==MONS_FSTZOMBIE) && guys[i]->type!=0)
-					{
-						guys[i]->Render(2);
-						guys[i]->Update(map,world);
-					}
+				if (guys[i]->type != 0 && guys[i]->speedy) {
+					guys[i]->speedy--;
+					guys[i]->Render(1);
+					guys[i]->Update(map, world);
+				}
+				else if (guys[i]->aiType == MONS_WOLF2 && guys[i]->type != 0 && guys[i]->mind3)
+				{
+					guys[i]->Render(1);
+					guys[i]->Update(map, world);
+				}
+				else if ((guys[i]->aiType == MONS_MUMBLE2 || guys[i]->aiType == MONS_FSTZOMBIE) && guys[i]->type != 0)
+				{
+					guys[i]->Render(2);
+					guys[i]->Update(map, world);
 				}
 			}
 		}
@@ -1572,6 +1572,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->weak = 0;
 			guys[i]->strong = 0;
 			guys[i]->confuse = 0;
+			guys[i]->garlic = 0;
+			guys[i]->speedy = 0;
 			guys[i]->mapx=(guys[i]->x>>FIXSHIFT)/TILE_WIDTH;
 			guys[i]->mapy=(guys[i]->y>>FIXSHIFT)/TILE_HEIGHT;
 			guys[i]->item=ITM_RANDOM;

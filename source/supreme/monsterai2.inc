@@ -427,7 +427,7 @@ void AI_Vampire(Guy *me,Map *map,world_t *world,Guy *goodguy)
 
 	if(me->mind==0)		// when mind=0, singlemindedly drift towards Bouapha
 	{
-		if(player.garlic && goodguy && RangeToTarget(me,goodguy)<500*FIXAMT)
+		if(goodguy && goodguy->garlic && RangeToTarget(me,goodguy)<500*FIXAMT)
 		{
 			MakeSound(SND_VAMPFEAR,me->x,me->y,SND_CUTOFF,1200);
 			me->mind=2;	// enter fear mode
@@ -493,7 +493,7 @@ void AI_Vampire(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 	else
 	{
-		if(player.garlic && goodguy)
+		if(goodguy && goodguy->garlic)
 		{
 			// run from the garlic
 			FaceGoodguy(me,goodguy);

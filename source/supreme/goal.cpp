@@ -245,7 +245,7 @@ void GoalKilledSomebody(Guy *g,byte type,byte frozen)
 
 	if(type==MONS_VAMPIRE || type==MONS_COUNTESS || type==MONS_DARKVAMP || type==MONS_SPIKEY)
 	{
-		if(player.garlic && GetBulletAttackType()==BLT_SPEAR)
+		if(goodguy->garlic && GetBulletAttackType()==BLT_SPEAR)
 			CompleteGoal(56);
 		totalKills=profile.progress.kills[MONS_VAMPIRE]+profile.progress.kills[MONS_DARKVAMP]+
 				profile.progress.kills[MONS_COUNTESS]+profile.progress.kills[MONS_SPIKEY];

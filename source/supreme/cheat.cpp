@@ -150,6 +150,7 @@ void DoCheat(byte w)
 			player.hammers=5;
 			player.hamSpeed=0;
 			player.cheesePower=255;
+			player.hammerFlags|=HMR_REVERSE|HMR_REFLECT;
 			player.cheatFlags^=CHT_ULTRA;
 			MakeNormalSound(SND_HAMMERUP);
 			NewMessage("ULTRA HAMMER UP!!",30,0);

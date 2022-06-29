@@ -81,9 +81,7 @@ void InitPlayer(byte level,const char *fname)
 	player.hammers=0;
 	player.curSlot=0; // first slot
 	player.hamSpeed=16;
-	player.wpns[player.curSlot].wpn=WPN_NONE;
 	player.lastWeapon=WPN_NONE;
-	player.wpns[player.curSlot].ammo=0;
 	player.reload=10;
 	player.wpnReload=10;
 	player.hammerFlags=0;
@@ -93,8 +91,8 @@ void InitPlayer(byte level,const char *fname)
 	playerGlow=0;
 	player.pushPower=0;
 	player.vehicle=0;
-	player.garlic=0;
-	player.speed=0;
+	player.garlic=0; // todo: remove!
+	player.speed=0; // todo: remove!
 	player.rageClock=0;
 	player.rage=0;
 	player.varbar=0;
@@ -220,7 +218,7 @@ void KeyChainAllCheck(void)
 int NumFilledPockets() {
 	int n=0;
 	for(int i = 0; i < 4; i++){
-		n += player.wpns[i].used;
+		n += player.wpns[i].wpn>0 ? 1 : 0;
 	}
 	return n;
 }
@@ -229,9 +227,9 @@ int GetAmmoFill(byte wpn)
 {
 	int ammo = maxAmmo[wpn],
 		pockets = NumFilledPockets();
-	float nerfs[5] = { 0,1,0.75,0.66,0.5 };
+	float nerfs[5] = { 0,1,0.85,0.70,0.50 };
 
-	return ammo * nerfs[pockets - 1];
+	return ammo * nerfs[pockets];
 }
 
 int WeaponMaxAmmo(byte wpn)
@@ -293,6 +291,10 @@ byte PlayerGetWeapon(byte wpn,int x,int y)
 	return 1;
 }
 
+void AddAffliction(byte &stat, byte amt) {
+	stat = stat + amt > 254 ? 255 : stat + amt;
+}
+
 byte PlayerPowerup(char powerup)
 {
 	byte curWpn = player.wpns[player.curSlot].wpn,
@@ -311,10 +313,10 @@ byte PlayerPowerup(char powerup)
 				player.shield=240;
 				break;
 			case PU_GARLIC:
-				player.garlic=255;
+				AddAffliction(goodguy->garlic,255);
 				break;
 			case PU_SPEED:
-				player.speed=255;
+				AddAffliction(goodguy->speedy,255);
 				break;
 			case PU_INVISO:
 				player.invisibility=255;
@@ -335,10 +337,22 @@ byte PlayerPowerup(char powerup)
 				player.cheesePower=255;
 				break;
 			case PU_POISON:
-				if(goodguy->poison+128<255)
-					goodguy->poison+=128;
-				else
-					goodguy->poison=255;
+				AddAffliction(goodguy->poison,128);
+				break;
+			case PU_FROZEN:
+				AddAffliction(goodguy->frozen,64);
+				break;
+			case PU_IGNITED:
+				AddAffliction(goodguy->ignited,64);
+				break;
+			case PU_WEAKNESS:
+				AddAffliction(goodguy->ignited,128);
+				break;
+			case PU_STRENGTH:
+				AddAffliction(goodguy->ignited,128);
+				break;
+			case PU_CONFUSION:
+				AddAffliction(goodguy->confuse,64);
 				break;
 		}
 	}
@@ -356,10 +370,10 @@ byte PlayerPowerup(char powerup)
 				player.shield=0;
 				break;
 			case PU_GARLIC:
-				player.garlic=0;
+				goodguy->garlic=0;
 				break;
 			case PU_SPEED:
-				player.speed=0;
+				goodguy->speedy=0;
 				break;
 			case PU_INVISO:
 				player.invisibility=0;
@@ -374,6 +388,21 @@ byte PlayerPowerup(char powerup)
 			case PU_POISON:
 				goodguy->poison=0;
 				break;
+			case PU_FROZEN:
+				goodguy->frozen=0;
+				break;
+			case PU_IGNITED:
+				goodguy->ignited=0;
+				break;
+			case PU_WEAKNESS:
+				goodguy->ignited=0;
+				break;
+			case PU_STRENGTH:
+				goodguy->ignited=0;
+				break;
+			case PU_CONFUSION:
+				goodguy->confuse=0;
+				break;
 		}
 	}
 	return 1;
@@ -387,7 +416,7 @@ void PlayerRadioactiveFood(void)
 		case 0:
 			NewMessage("Radioactive Energy!!",75,0);
 			PlayerHeal(30);
-			player.speed=255;
+			goodguy->speedy=255;
 			break;
 		case 1:
 			NewMessage("Szechwan Surprise!",75,0);
@@ -1280,8 +1309,8 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 
 	player.life=me->hp;
 
-	if(player.hammerFlags&CHT_SPEED)
-		player.speed=255;
+	if(player.cheatFlags&CHT_SPEED)
+		me->speedy=255;
 
 	if(player.rage)
 	{
@@ -1359,9 +1388,9 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(player.wpnReload)
 		player.wpnReload--;
 
-	if(player.garlic)
+	if(me->garlic)
 	{
-		player.garlic--;
+		me->garlic--;
 		StinkySteam(me->x-FIXAMT*20+Random(FIXAMT*40),me->y-FIXAMT*20+Random(FIXAMT*40),
 					me->z+FIXAMT*40,FIXAMT*2);
 	}
@@ -1879,13 +1908,6 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(player.wpnReload)
 		player.wpnReload--;
 
-	if(player.garlic)
-	{
-		player.garlic--;
-		StinkySteam(me->x-FIXAMT*20+Random(FIXAMT*40),me->y-FIXAMT*20+Random(FIXAMT*40),
-					me->z+FIXAMT*40,FIXAMT*2);
-	}
-
 	if(player.shield)
 		player.shield=0;
 
@@ -2057,13 +2079,6 @@ void PlayerControlMiniSub(Guy *me,mapTile_t *mapTile,world_t *world)
 		player.reload--;
 	if(player.wpnReload)
 		player.wpnReload--;
-
-	if(player.garlic)
-	{
-		player.garlic--;
-		StinkySteam(me->x-FIXAMT*20+Random(FIXAMT*40),me->y-FIXAMT*20+Random(FIXAMT*40),
-					me->z+FIXAMT*40,FIXAMT*2);
-	}
 
 	if(player.shield)
 		player.shield=0;
