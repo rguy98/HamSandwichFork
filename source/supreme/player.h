@@ -87,6 +87,7 @@ typedef struct player_t
 	int life;
 	int brains;
 	int coins;
+	int maxCoins;
 	int candles;
 	byte pushPower;	// for pushing pushy blocks
 	byte hammerFlags, cheatFlags;

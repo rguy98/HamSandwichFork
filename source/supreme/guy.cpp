@@ -573,15 +573,29 @@ void Guy::Update(Map *map,world_t *world)
 			(y / TILE_HEIGHT) >> FIXSHIFT, 8, 4);
 	}
 
+	if (weak > 0)
+		weak--;
+	if (strong > 0 && !weak)
+		strong--;
+	if (confuse > 0)
+		confuse--;
+
 	oldx=x;
 	oldy=y;
 
-	x+=dx;
+	int cf=1,rv=1;
+
+	cf *= !confuse ? 1 : -1;
+
+	if (profile.progress.purchase[modeShopNum[MODE_REVERSE]] & SIF_ACTIVE) 
+		rv*= -1;
+
+	x+=(dx+ax)*cf*rv;
 
 	b=0;
 	if(!CanWalk(x,y,map,world))
 	{
-		x-=dx;
+		x-=(dx+ax)*cf*rv;
 		if(aiType==MONS_MINECART)
 			x=(mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
 
@@ -599,11 +613,11 @@ void Guy::Update(Map *map,world_t *world)
 		b=1;
 	}
 
-	y+=dy;
+	y+=(dy+ay)*cf*rv;
 
 	if(!CanWalk(x,y,map,world))
 	{
-		y-=dy;
+		y-=(dy+ay)*cf*rv;
 		if(aiType==MONS_MINECART)
 			y=(mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
 		
@@ -764,6 +778,8 @@ void Guy::Update(Map *map,world_t *world)
 				seq=ANIM_A3;
 				dx=0;
 				dy=0;
+				ax=0;
+				ay=0;
 				frm=0;
 				frmAdvance=255;
 				frmTimer=0;
@@ -981,7 +997,7 @@ byte Guy::AttackCheck2(int xx, int yy, int xx2, int yy2, Guy* him)
 
 void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 {
-	int formerHP,newHP;
+	int formerHP,newHP,w,s;
 	byte t;
 
 	t=type;
@@ -998,14 +1014,11 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 	if(MonsterFlags(type,aiType)&MF_INVINCIBLE)
 		return;	// invincible
 
-	if(aiType==MONS_BOUAPHA && frozen)
-		frozen/=2;
-
 	if (aiType == MONS_LOOKEYLOO && !mind4)	// can only hit lookey-loo when its eye is open
 		return;
 
 	if (aiType == MONS_BOBBY) { // bobby shield attack
-		if((seq == ANIM_A1 && frm > 1 && frm < 11) || (seq == ANIM_A4))
+		if ((seq == ANIM_A1 && frm > 1 && frm < 11) || (seq == ANIM_A4))
 		{
 			if (seq == ANIM_A4)
 				return;	// just ignore it
@@ -1023,6 +1036,33 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 	if (aiType == MONS_INCATONGUE && !mind3)
 		return;
 
+	if(aiType==MONS_BOUAPHA && frozen)
+		frozen/=2;
+
+	if (weak > 0)
+	{
+		if (profile.difficulty == 0)
+			w = 1.25;
+		else if (profile.difficulty == 1)
+			w = 1.5;
+		else if (profile.difficulty == 2)
+			w = 1.75;
+	}
+	else
+		w = 1;
+
+	if (strong > 0)
+	{
+		if (profile.difficulty == 0)
+			s = 2.5;
+		else if (profile.difficulty == 1)
+			s = 2.25;
+		else if (profile.difficulty == 2)
+			s = 2;
+	}
+	else
+		s = 1;
+
 	if (aiType == MONS_GOAT1 && !mind3) // rammy gruff takes 1/4 damage unless dizzy
 		damage=damage/4;
 
@@ -1035,6 +1075,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		if(damage==0)
 			damage=1;
 	}
+
 	if(profile.difficulty==2 && damage>0)
 	{
 		if(friendly)
@@ -1044,6 +1085,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		if(damage==0)
 			damage=1;
 	}
+
 	if(aiType==MONS_BOUAPHA && (player.wpns[player.curSlot].wpn==WPN_PWRARMOR || player.wpns[player.curSlot].wpn==WPN_MINISUB))
 	{
 		// damage is done to the armor instead
@@ -1114,6 +1156,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		weak=0;
 		strong=0;
 		newHP=0;
+		specialFlags=0;
 		seq=ANIM_DIE;
 		if(aiType==MONS_BOUAPHA && parent && parent->aiType==MONS_SUPERZOMBIE)
 		{
@@ -1370,6 +1413,11 @@ void UpdateGuys(Map *map,world_t *world)
 				else
 					guys[i]->Update(map, world);
 
+				if(guys[i]->type != 0 && guys[i]->specialFlags & GSF_FASTFWD){
+					guys[i]->Render(1);
+					guys[i]->Update(map, world);
+				}
+
 				if (guys[i]->type != 0 && guys[i]->speedy) {
 					guys[i]->speedy--;
 					guys[i]->Render(1);
@@ -1558,6 +1606,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->dx=0;
 			guys[i]->dy=0;
 			guys[i]->dz=0;
+			guys[i]->ax=0;
+			guys[i]->ay=0;
 			guys[i]->bright=0;
 			guys[i]->mind=0;
 			guys[i]->mind1=0;
@@ -1574,6 +1624,7 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->confuse = 0;
 			guys[i]->garlic = 0;
 			guys[i]->speedy = 0;
+			guys[i]->specialFlags = 0;
 			guys[i]->mapx=(guys[i]->x>>FIXSHIFT)/TILE_WIDTH;
 			guys[i]->mapy=(guys[i]->y>>FIXSHIFT)/TILE_HEIGHT;
 			guys[i]->item=ITM_RANDOM;
@@ -3050,6 +3101,189 @@ void SetMonsterBright(byte fx,int x,int y,int type,int bright)
 	}
 }
 
+void AddAfflictionSpecial(byte& stat, byte amt, byte flag) {
+	if (flag & EF_CONTIGUOUS || (flag == 0 && !stat)) // Add
+		stat = stat + amt > 254 ? 255 : stat + amt;
+	else if(flag & EF_CONTIGUOUS || (flag == 0 && stat)) // 
+		stat = stat - amt < 1 ? 0 : stat - amt;
+}
+
+void SetMonsterSpecialFlags(byte fx, int x, int y, int type, int mflag)
+{
+	int i;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type != MONS_NONE && guys[i]->type != MONS_NOBODY && guys[i]->hp != 0 && (x == 255 || (guys[i]->mapx == x && guys[i]->mapy == y)))
+		{
+			switch (type)
+			{
+			case MONS_ANYBODY:
+				break;
+			case MONS_GOODGUY:
+				if (!guys[i]->friendly)
+					continue;
+				break;
+			case MONS_BADGUY:
+				if (guys[i]->friendly)
+					continue;
+				break;
+			case MONS_NONPLAYER:
+				if (guys[i]->aiType == MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_PLAYER:
+				if (guys[i]->aiType != MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_TAGGED:
+				if (guys[i] != TaggedMonster())
+					continue;
+				break;
+			default:
+				if (guys[i]->type != type)
+					continue;
+				break;
+			}
+
+			if (fx &EF_CONTIGUOUS) // Add
+				guys[i]->specialFlags |= mflag;
+			else if(fx&EF_ALL) // Remove
+				guys[i]->specialFlags &= mflag;
+			else // Toggle
+				guys[i]->specialFlags ^= mflag;
+		}
+	}
+}
+
+void SetMonsterTempCondition(byte fx, int x, int y, int type, int cond, int amt)
+{
+	int i, b=0;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type != MONS_NONE && guys[i]->type != MONS_NOBODY && guys[i]->hp != 0 && (x == 255 || (guys[i]->mapx == x && guys[i]->mapy == y)))
+		{
+			switch (type)
+			{
+			case MONS_ANYBODY:
+				break;
+			case MONS_GOODGUY:
+				if (!guys[i]->friendly)
+					continue;
+				break;
+			case MONS_BADGUY:
+				if (guys[i]->friendly)
+					continue;
+				break;
+			case MONS_NONPLAYER:
+				if (guys[i]->aiType == MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_PLAYER:
+				if (guys[i]->aiType != MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_TAGGED:
+				if (guys[i] != TaggedMonster())
+					continue;
+				break;
+			default:
+				if (guys[i]->type != type)
+					continue;
+				break;
+			}
+
+			switch (cond) {
+			case 0:
+				AddAfflictionSpecial(guys[i]->poison, amt, fx);
+				break;
+			case 1:
+				AddAfflictionSpecial(guys[i]->frozen, amt, fx);
+				break;
+			case 2:
+				AddAfflictionSpecial(guys[i]->ignited, amt, fx);
+				break;
+			case 3:
+				AddAfflictionSpecial(guys[i]->weak, amt, fx);
+				break;
+			case 4:
+				AddAfflictionSpecial(guys[i]->strong, amt, fx);
+				break;
+			case 5:
+				AddAfflictionSpecial(guys[i]->confuse, amt, fx);
+				break;
+			case 6:
+				AddAfflictionSpecial(guys[i]->garlic, amt, fx);
+				break;
+			case 7:
+				AddAfflictionSpecial(guys[i]->speedy, amt, fx);
+				break;
+			}
+		}
+	}
+}
+
+void SetMonsterPermCondition(byte fx, int x, int y, int type, int cond)
+{
+	int i, b = 0;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type != MONS_NONE && guys[i]->type != MONS_NOBODY && guys[i]->hp != 0 && (x == 255 || (guys[i]->mapx == x && guys[i]->mapy == y)))
+		{
+			switch (type)
+			{
+			case MONS_ANYBODY:
+				break;
+			case MONS_GOODGUY:
+				if (!guys[i]->friendly)
+					continue;
+				break;
+			case MONS_BADGUY:
+				if (guys[i]->friendly)
+					continue;
+				break;
+			case MONS_NONPLAYER:
+				if (guys[i]->aiType == MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_PLAYER:
+				if (guys[i]->aiType != MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_TAGGED:
+				if (guys[i] != TaggedMonster())
+					continue;
+				break;
+			default:
+				if (guys[i]->type != type)
+					continue;
+				break;
+			}
+
+			switch (cond) {
+			case 0:
+				b = GSF_NEWAI;
+				break;
+			case 1:
+				b = GSF_LOONY;
+				break;
+			case 2:
+				b = GSF_FASTFWD;
+				break;
+			}
+
+			if (fx & EF_CONTIGUOUS) // Add
+				guys[i]->specialFlags |= b;
+			else if (fx & EF_ALL) // Remove
+				guys[i]->specialFlags &= b;
+			else // Toggle
+				guys[i]->specialFlags ^= b;
+		}
+	}
+}
+
 byte EatHay(Guy* me, byte rad)
 {
 	int i, j;
@@ -3589,6 +3823,131 @@ byte CheckMonsterColor(int x,int y,int type,byte color)
 	return 0;
 }
 
+byte CheckMonsterTempCondition(int x, int y, int type, byte flags, byte trg, int amt)
+{
+	int i,b;
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type != MONS_NONE && guys[i]->type != MONS_NOBODY && (x == 255 || (guys[i]->mapx == x && guys[i]->mapy == y)))
+		{
+			switch (type)
+			{
+			case MONS_ANYBODY:
+				break;
+			case MONS_GOODGUY:
+				if (!guys[i]->friendly)
+					continue;
+				break;
+			case MONS_BADGUY:
+				if (guys[i]->friendly)
+					continue;
+				break;
+			case MONS_NONPLAYER:
+				if (guys[i]->aiType == MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_PLAYER:
+				if (guys[i]->aiType != MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_TAGGED:
+				if (guys[i] != TaggedMonster())
+					continue;
+				break;
+			default:
+				if (guys[i]->type != type)
+					continue;
+				break;
+			}
+
+			switch (trg) {
+			case 0:
+				b=guys[i]->poison;
+				break;
+			case 1:
+				b=guys[i]->frozen;
+				break;
+			case 2:
+				b=guys[i]->ignited;
+				break;
+			case 3:
+				b=guys[i]->weak;
+				break;
+			case 4:
+				b=guys[i]->strong;
+				break;
+			case 5:
+				b=guys[i]->confuse;
+				break;
+			case 6:
+				b=guys[i]->garlic;
+				break;
+			case 7:
+				b=guys[i]->speedy;
+				break;
+			}
+
+			if (flags == 0 && b == amt)
+				return 1;
+			else if ((flags & TF_MORE) && (b > amt))
+				return 1;
+			else if ((flags & TF_LESS) && (b < amt))
+				return 1;
+		}
+	}
+	return 0;
+}
+
+byte CheckMonsterPermCondition(int x, int y, int type, byte trg)
+{
+	int i;
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i]->type != MONS_NONE && guys[i]->type != MONS_NOBODY && (x == 255 || (guys[i]->mapx == x && guys[i]->mapy == y)))
+		{
+			switch (type)
+			{
+			case MONS_ANYBODY:
+				break;
+			case MONS_GOODGUY:
+				if (!guys[i]->friendly)
+					continue;
+				break;
+			case MONS_BADGUY:
+				if (guys[i]->friendly)
+					continue;
+				break;
+			case MONS_NONPLAYER:
+				if (guys[i]->aiType == MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_PLAYER:
+				if (guys[i]->aiType != MONS_BOUAPHA)
+					continue;
+				break;
+			case MONS_TAGGED:
+				if (guys[i] != TaggedMonster())
+					continue;
+				break;
+			default:
+				if (guys[i]->type != type)
+					continue;
+				break;
+			}
+
+			switch (trg) {
+				case 0:
+					return guys[i]->specialFlags&GSF_NEWAI;
+				case 1:
+					return guys[i]->specialFlags&GSF_LOONY;
+				case 2:
+					return guys[i]->specialFlags&GSF_FASTFWD;
+			}
+		}
+	}
+	return 0;
+}
+
 void ChangeMonsItem(byte fx,int x,int y,int type,int newItem)
 {
 	int i;
@@ -3762,6 +4121,8 @@ void ChangeMonsterAI(byte fx,int x,int y,int type,int newtype)
 			guys[i]->dx=0;
 			guys[i]->dy=0;
 			guys[i]->dz=0;
+			guys[i]->ax=0;
+			guys[i]->ay=0;
 			guys[i]->seq=ANIM_IDLE;
 			guys[i]->frm=0;
 			guys[i]->frmTimer=0;

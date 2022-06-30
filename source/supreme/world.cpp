@@ -218,6 +218,7 @@ static bool MustBeHamSandwichMap(const Map *map)
 				if (spcl.trigger[j].type)
 				{
 					YES_IF(j > 7);
+					YES_IF(spcl.trigger[j].value3 > 0); // Value3 is new!
 				}
 			}
 			for (int j = 0; j < NUM_EFFECTS; ++j)
@@ -225,6 +226,7 @@ static bool MustBeHamSandwichMap(const Map *map)
 				if (spcl.effect[j].type)
 				{
 					YES_IF(j > 31);
+					YES_IF(spcl.effect[j].value3 > 0); // Value3 is new!
 				}
 			}
 

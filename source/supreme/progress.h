@@ -145,6 +145,7 @@ worldData_t *GetWorldProgressNoCreate(const char *fname);
 levelData_t *GetLevelProgress(const char *fname,byte levelNum);
 byte LevelsPassed(worldData_t *world);
 byte LevelIsPassed(worldData_t *world,byte level);
+byte BonusGoalObtained(worldData_t *world,byte level);
 void ClearTestProgress(void);
 
 void StoreWorldResults(worldData_t *me,world_t *world);

@@ -43,7 +43,10 @@
 #define TRG_BULLETRECT  32  // true if there are any of bullet X in rect
 #define TRG_BONUSGOAL	33  // true if bonus goal is achieved
 #define TRG_GAMEMODE	34  // true if game mode X is activated (shop modes)
-#define MAX_TRIGGER		35
+#define TRG_HAVEWEAPON	35	// true if player has weapon [V1] at slot [V2]
+#define TRG_TEMPFLAGS	36	// true if monster of type N at X,Y has condition/flag M
+#define TRG_PERMFLAGS	37	// true if monster of type N at X,Y has condition/flag M
+#define MAX_TRIGGER		38
 
 // effects
 #define EFF_NONE		0
@@ -87,7 +90,10 @@
 #define EFF_BONUSGOAL	38	// give bonus goal
 #define EFF_DYNAMICCOL	39	// set color for dynamic water/lava
 #define EFF_DYNAMICSCRN	40	// set picture for dynamic water/lava
-#define EFF_MAX			41
+#define EFF_TEMPFLAGS	41	// give monster of type N at X,Y condition/flag Z (temporary)
+#define EFF_PERMFLAGS	42	// give monster of type N at X,Y condition/flag Z (temporary)
+#define EFF_COINLIMIT	43	// set coin limit to N
+#define EFF_MAX			44
 
 // trigger flags
 #define TF_NOT		1	// NOT this one
@@ -124,6 +130,7 @@ typedef struct trigger_t
 	byte x,y;	// coordinates of where it's triggered
 	int value;	// value of "N" in the trigger
 	int value2;	// another value for some triggers
+	int value3;	// another value for advanced triggers
 } trigger_t;
 
 typedef struct effect_t
@@ -133,6 +140,7 @@ typedef struct effect_t
 	byte x,y;
 	int value;
 	int value2;
+	int value3;
 	char  text[32];
 } effect_t;
 

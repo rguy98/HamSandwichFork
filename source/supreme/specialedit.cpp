@@ -48,6 +48,7 @@
 #define SMODE_PICKITEM3	24
 #define SMODE_HELP		25
 #define SMODE_PICKRECT3T 26
+#define SMODE_VALUE3	27
 
 #define ID_EXIT		1
 #define ID_USES		2
@@ -119,6 +120,9 @@ static char trigName[][16]={
 	"Bullet In Rect",
 	"Got Bonus Goal",
 	"Game Mode",
+	"Have Weapon",
+	"Mons. TempFlag",
+	"Mons. PermFlag",
 };
 
 static char effName[][16]={
@@ -163,6 +167,9 @@ static char effName[][16]={
 	"Get Bonus Goal",
 	"Dyn.Water Color",
 	"Dyn.Water Image",
+	"Mons. TempFlag",
+	"Mons. PermFlag",
+	"Set Coin Limit",
 };
 
 static char lvlFlagName[][16]={
@@ -179,6 +186,23 @@ static char lvlFlagName[][16]={
 	"Wavy",
 	"Oxygen Meter",
 	"Bonus Goal",
+};
+
+static char tempFlagName[][16] = {
+	"Poison",
+	"Freezing",
+	"Burning",
+	"Weakness",
+	"Strength",
+	"Confusion",
+	"Garlic",
+	"TempSpeed",
+};
+
+static char permFlagName[][16] = {
+	"Remix AI",
+	"Rainbow",
+	"PermaSpeed"
 };
 
 static char wpnName[][16]={
@@ -663,6 +687,34 @@ static void Number2Click(int id)
 	MakeNormalSound(SND_MENUCLICK);
 	mode=SMODE_VALUE2;
 	InitTextDialog("Enter a number!","",16);
+}
+
+static void Number3Click(int id)
+{
+	if (id < ID_EFF0)
+	{
+		effMode = 0;
+		curTrig = trgStart + (id / 100) - 1;
+	}
+	else
+	{
+		effMode = 1;
+		curEff = effStart + (id - ID_EFF0) / 100;
+	}
+	// enter a number for value
+	if (rightClick)
+	{
+		if (!effMode)
+			spcl.trigger[curTrig].value3 = 0;
+		else
+			spcl.effect[curEff].value3 = 0;
+		MakeNormalSound(SND_MENUCLICK);
+		return;
+	}
+
+	MakeNormalSound(SND_MENUCLICK);
+	mode=SMODE_VALUE3;
+	InitTextDialog("Enter a number!", "", 16);
 }
 
 static void XYClick(int id)
@@ -1236,6 +1288,92 @@ static void LevelFlagClick(int id)
 		spcl.effect[t].value=0;
 
 	SetupEffectButtons(t-effStart,(t-effStart)*38+264);
+}
+
+static void TempConditionClick(int id)
+{
+	int t;
+
+	MakeNormalSound(SND_MENUCLICK);
+
+	if (id < ID_EFF0)
+	{
+		effMode = 0;
+		t = trgStart + id / 100 - 1;
+
+		spcl.trigger[t].value2++;
+		if (spcl.trigger[t].value2 == NUM_CONDITIONS)
+			spcl.trigger[t].value2 = 0;
+	}
+	else
+	{
+		effMode = 1;
+		t = effStart + (id - ID_EFF0) / 100;
+
+		spcl.effect[t].value2++;
+		if (spcl.effect[t].value2 == NUM_CONDITIONS)
+			spcl.effect[t].value2 = 0;
+	}
+
+	if (!effMode)
+	{
+		SetupTriggerButtons(t - trgStart, (t - trgStart) * 38 + 30);
+	}
+	else	
+	{
+		SetupEffectButtons(t - effStart, (t - effStart) * 38 + 264);
+	}
+}
+
+static void PermConditionClick(int id)
+{
+	int t;
+
+	MakeNormalSound(SND_MENUCLICK);
+
+	if (id < ID_EFF0)
+	{
+		effMode = 0;
+		t = trgStart + id / 100 - 1;
+
+		spcl.trigger[t].value2++;
+		if (spcl.trigger[t].value2 == NUM_MONSFLAGS)
+			spcl.trigger[t].value2 = 0;
+	}
+	else
+	{
+		effMode = 1;
+		t = effStart + (id - ID_EFF0) / 100;
+
+		spcl.effect[t].value2++;
+		if (spcl.effect[t].value2 == NUM_MONSFLAGS)
+			spcl.effect[t].value2 = 0;
+	}
+
+	if (!effMode)
+	{
+		SetupTriggerButtons(t - trgStart, (t - trgStart) * 38 + 30);
+	}
+	else
+	{
+		SetupEffectButtons(t - effStart, (t - effStart) * 38 + 264);
+	}
+}
+
+static void ModeClick(int id)
+{
+	int t;
+
+	MakeNormalSound(SND_MENUCLICK);
+
+	effMode = 1;
+	t = effStart + (id - ID_EFF0) / 100;
+
+	spcl.effect[t].value2++;
+	if (spcl.effect[t].value2 == NUM_MODES)
+		spcl.effect[t].value2 = 0;
+
+	SetupEffectButtons(t - effStart, (t - effStart) * 38 + 264);
 }
 
 static void AndOrClick(int id)
@@ -1837,7 +1975,53 @@ static void SetupTriggerButtons(int t,int y)
 			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+3+100*t,0,370,y+17,150,14,s,RectClick);
 			break;
 		case TRG_BONUSGOAL:
-			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If the bonus goal is achieved", NULL);
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If the bonus goal is achieved for level ", NULL);
+			sprintf(s, "%s", EditorGetWorld()->map[trigger.value]->name);
+			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 1 + 100 * t, 0, 300, y + 17, 200, 14, s, LevelNameClick);
+			break;
+		case TRG_HAVEWEAPON:
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"If player has",NULL);
+			sprintf(s,"%d",trigger.value2);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+3+100*t,0,150,y+17,140,14,GetItem(trigger.value)->name,ItemClick);
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+2+100*t,0,255,y+17,1,1,"at slot",NULL);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+1+100*t,0,400,y+17,40,14,s,Number2Click);
+			if(trigger.flags&TF_LESS)
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+4+100*t,0,404,y+17,80,14,"Or Less",LessMoreClick);
+			else if(trigger.flags&TF_MORE)
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+4+100*t,0,404,y+17,80,14,"Or More",LessMoreClick);
+			else
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+4+100*t,0,404,y+17,80,14,"Exactly",LessMoreClick);
+			break;
+		case TRG_TEMPFLAGS:
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"If",NULL);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+1+100*t,0,80,y+17,96,14,MonsterName(trigger.value),MonsterClick);
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+2+100*t,0,179,y+17,1,1,"at",NULL);
+			if(trigger.x==255)
+				strcpy(s,"Anywhere");
+			else
+				sprintf(s,"%d, %d", trigger.x, trigger.y);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+3+100*t,0,197,y+17,70,14,s,XY3Click);
+			sprintf(s, "%d", trigger.value3);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+4+100*t,0,272,y+17,36,14,s, Number3Click);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+5+100*t,0,315,y+17,96,14,tempFlagName[trigger.value2],TempConditionClick);
+			if(trigger.flags&TF_LESS)
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+6+100*t,0,480,y+17,80,14,"Or Less",LessMoreClick);
+			else if(trigger.flags&TF_MORE)
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+6+100*t,0,480,y+17,80,14,"Or More",LessMoreClick);
+			else
+				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+6+100*t,0,480,y+17,80,14,"Exactly",LessMoreClick);
+			break;
+		case TRG_PERMFLAGS:
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If", NULL);
+			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 1 + 100 * t, 0, 60, y + 17, 140, 14, MonsterName(trigger.value), MonsterClick);
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 2 + 100 * t, 0, 204, y + 17, 1, 1, "at", NULL);
+			if (trigger.x == 255)
+				sprintf(s, "Anywhere");
+			else
+				sprintf(s, "%d, %d", trigger.x, trigger.y);
+			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 3 + 100 * t, 0, 230, y + 17, 70, 14, s, XY3Click);
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 4 + 100 * t, 0, 304, y + 17, 1, 1, "has", NULL);
+			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 5 + 100 * t, 0, 335, y + 17, 140, 14, permFlagName[trigger.value2], PermConditionClick);
 			break;
 	}
 }
@@ -1888,7 +2072,11 @@ static void SetupEffectButtons(int t,int y)
 			else
 				sprintf(s,"%d, %d",effect.x,effect.y);
 			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,422,y+17,70,14,s,XY2Click);
-			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+4+100*t,0,520,y+17,65,14,"Jump to",LevelGotoClick);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+4+100*t,0,520,y+17,50,14,"Jump to",LevelGotoClick);
+			if(effect.flags&EF_NOFX)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+8+100*t,0,520,y+17,65,14,"No FX",NoFXClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+8+100*t,0,520,y+17,65,14,"Play FX",NoFXClick);
 			break;
 		case EFF_GOTOMAP:
 			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Go to",NULL);
@@ -1900,7 +2088,11 @@ static void SetupEffectButtons(int t,int y)
 			else
 				sprintf(s,"%d, %d",effect.x,effect.y);
 			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,322,y+17,70,14,s,XY2Click);
-			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+4+100*t,0,520,y+17,65,14,"Jump to",LevelGotoClick);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+4+100*t,0,520,y+17,50,14,"Jump to",LevelGotoClick);
+			if(effect.flags&EF_NOFX)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+8+100*t,0,520,y+17,65,14,"No FX",NoFXClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+8+100*t,0,520,y+17,65,14,"Play FX",NoFXClick);
 			break;
 		case EFF_TELEPORT:
 			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Teleport",NULL);
@@ -2471,6 +2663,48 @@ static void SetupEffectButtons(int t,int y)
 			else
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+8+100*t,0,395,y+17,65,14,"water",NoFXClick);
 			break;
+		case EFF_TEMPFLAGS:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Give",NULL);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,80,y+17,96,14,MonsterName(effect.value),MonsterClick);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+2+100*t,0,179,y+17,1,1,"at",NULL);
+			if(effect.x==255)
+				strcpy(s,"Anywhere");
+			else
+				sprintf(s,"%d, %d",effect.x,effect.y);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,197,y+17,70,14,s,XY3Click);
+			sprintf(s, "%d", effect.value3);
+			MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 4 + 100 * t, 0, 272, y + 17, 36, 14, s, Number3Click);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+5+100*t,0,315,y+17,96,14, tempFlagName[effect.value2],TempConditionClick);
+			if(effect.flags&EF_CONTIGUOUS)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,520,y+17,65,14,"Add",ContiguousClick);
+			else if(effect.flags&EF_ALL)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,520,y+17,65,14,"Remove",ContiguousClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,520,y+17,65,14,"Toggle",ContiguousClick);
+			break;
+		case EFF_PERMFLAGS:
+			MakeButton(BTN_STATIC, ID_EFF0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "Give", NULL);
+			MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 1 + 100 * t, 0, 104, y + 17, 140, 14, MonsterName(effect.value), MonsterClick);
+			MakeButton(BTN_STATIC, ID_EFF0 + OFS_CUSTOM + 2 + 100 * t, 0, 248, y + 17, 1, 1, "at", NULL);
+			if (effect.x == 255)
+				strcpy(s, "Anywhere");
+			else
+				sprintf(s, "%d, %d", effect.x, effect.y);
+			MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 3 + 100 * t, 0, 268, y + 17, 70, 14, s, XY3Click);
+			MakeButton(BTN_STATIC, ID_EFF0 + OFS_CUSTOM + 4 + 100 * t, 0, 342, y + 17, 1, 1, "to", NULL);
+			MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 5 + 100 * t, 0, 360, y + 17, 140, 14, permFlagName[effect.value2], PermConditionClick);
+			if (effect.flags & EF_CONTIGUOUS)
+				MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 1 + 100 * t, 0, 520, y + 17, 65, 14, "Add", ContiguousClick);
+			else if (effect.flags & EF_ALL)
+				MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 1 + 100 * t, 0, 520, y + 17, 65, 14, "Remove", ContiguousClick);
+			else
+				MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 1 + 100 * t, 0, 520, y + 17, 65, 14, "Toggle", ContiguousClick);
+			break;
+		case EFF_COINLIMIT:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Set coin limit to",NULL);
+			sprintf(s, "%d", effect.value);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,200,y+17,40,14,s,NumberClick);
+			break;
 	}
 }
 
@@ -2579,6 +2813,7 @@ void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 		case SMODE_FVALUE2:
 		case SMODE_FVALUE3:
 		case SMODE_VALUE2:
+		case SMODE_VALUE3:
 		case SMODE_MESSAGE:
 			if(mgl->MouseTap())
 			{
@@ -2618,6 +2853,19 @@ void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 						else
 						{
 							spcl.trigger[curTrig].value2=atoi(GetText());
+							SetupTriggerButtons(curTrig-trgStart,(curTrig-trgStart)*38+30);
+						}
+					}
+					else if(mode==SMODE_VALUE3)
+					{
+						if(effMode)
+						{
+							spcl.effect[curEff].value3=atoi(GetText());
+							SetupEffectButtons(curEff-effStart,(curEff-effStart)*38+264);
+						}
+						else
+						{
+							spcl.trigger[curTrig].value3=atoi(GetText());
 							SetupTriggerButtons(curTrig-trgStart,(curTrig-trgStart)*38+30);
 						}
 					}
@@ -2806,6 +3054,7 @@ void SpecialEdit_Key(char k)
 		case SMODE_FVALUE2:
 		case SMODE_FVALUE3:
 		case SMODE_VALUE2:
+		case SMODE_VALUE3:
 		case SMODE_MESSAGE:
 			TextDialogKey(k);
 			break;
@@ -2911,6 +3160,7 @@ void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 		case SMODE_USES:
 		case SMODE_VALUE:
 		case SMODE_VALUE2:
+		case SMODE_VALUE3:
 		case SMODE_FVALUE:
 		case SMODE_FVALUE2:
 		case SMODE_FVALUE3:

@@ -466,6 +466,20 @@ byte LevelIsPassed(worldData_t *world,byte level)
 	return 0;
 }
 
+byte BonusGoalObtained(worldData_t* world, byte level)
+{
+	int i;
+
+	if (world == NULL)
+		return 0;
+
+	for (i = 0; i < world->levels; i++)
+		if (world->level[i].levelNum == level && (world->level[i].flags & LF_BONUS))
+			return 1;
+
+	return 0;
+}
+
 void StoreWorldResults(worldData_t *me,world_t *world)
 {
 	float newpct;

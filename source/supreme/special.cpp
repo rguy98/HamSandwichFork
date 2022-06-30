@@ -220,6 +220,12 @@ void DefaultTrigger(trigger_t *trig,int x,int y)
 			trig->value=BLT_HAMMER;
 			trig->value2=0;
 			break;
+		case TRG_TEMPFLAGS:
+			trig->value3 = 0;
+		case TRG_PERMFLAGS:
+			trig->value = MONS_BOUAPHA;
+			trig->value2 = 0;
+			break;
 	}
 }
 
@@ -334,6 +340,9 @@ void DefaultEffect(effect_t *eff,int x,int y,byte savetext)
 			eff->text[0]='\0';
 			break;
 		case EFF_COLOR:
+		case EFF_TEMPFLAGS:
+			eff->value3 = 0;
+		case EFF_PERMFLAGS:
 			eff->value=MONS_ANYBODY;
 			eff->value2=0;
 			eff->x=255;
@@ -714,6 +723,19 @@ void EventOccur(byte type,int value,int x,int y,Guy *victim)
 		events[nextEvent].victim=NULL;
 	}
 	nextEvent++;
+}
+
+byte CheckForWeapon(byte wpn,byte slot){
+	if(slot>3)
+		return 0;
+	if(!player.wpns[slot].used)
+		return 0;
+	if(!player.wpns[slot].ammo)
+		return 0;
+	if (player.wpns[slot].wpn == wpn)
+		return 1;
+	else
+		return 0;
 }
 
 byte CheckForItem(byte item,int count,byte flags)
@@ -1361,7 +1383,16 @@ byte TriggerYes(special_t *me,trigger_t *t,Map *map)
 				answer=0;
 			break;
 		case TRG_BONUSGOAL:
-			answer = (curMap->flags & LF_BONUS) ? 1 : 0;
+			answer=BonusGoalObtained(player.worldProg,t->value);
+			break;
+		case TRG_HAVEWEAPON:
+			answer=CheckForWeapon(t->value,t->value2);
+			break;
+		case TRG_TEMPFLAGS:
+			answer=CheckMonsterTempCondition(t->x,t->y,t->value,t->flags,(byte)t->value2,(byte)t->value3);
+			break;
+		case TRG_PERMFLAGS:
+			answer=CheckMonsterPermCondition(t->x,t->y,t->value,(byte)t->value2);
 			break;
 	}
 
@@ -1449,13 +1480,15 @@ void SpecialEffect(special_t *me,Map *map)
 				{
 					if(map->flags&MAP_HUB)
 					{
-						MakeNormalSound(SND_GOTOMAP);
+						if(me->effect[i].flags&EF_NOFX)
+							MakeNormalSound(SND_GOTOMAP);
 						SendMessageToGame(MSG_GOTOMAP,me->effect[i].value);
 					}
 					else
 					{
-						SendMessageToGame(MSG_WINLEVEL,me->effect[i].value);
-						MakeNormalSound(SND_WINLEVEL);
+						if(me->effect[i].flags&EF_NOFX)
+							MakeNormalSound(SND_WINLEVEL);
+						SendMessageToGame(MSG_WINLEVEL, me->effect[i].value);
 					}
 					if(me->effect[i].x==255)
 						SetPlayerStart(-1,-1);
@@ -1466,7 +1499,13 @@ void SpecialEffect(special_t *me,Map *map)
 					return;	// to avoid doing anything more or using up any uses
 				break;
 			case EFF_GOTOMAP:
-				MakeNormalSound(SND_GOTOMAP);
+				if (me->effect[i].flags & EF_NOFX)
+				{
+					if (curWorld.map[me->effect[i].value]->flags & MAP_SECRET)
+						MakeNormalSound(SND_SEKRIT);
+					else
+						MakeNormalSound(SND_GOTOMAP);
+				}
 				if(me->effect[i].x==255)
 					SetPlayerStart(-1,-1);
 				else
@@ -1778,10 +1817,20 @@ void SpecialEffect(special_t *me,Map *map)
 					player.waterDyn = me->effect[i].value2;
 				else
 					player.lavaDyn = me->effect[i].value2;
+				break;
 			case EFF_DYNAMICSCRN:
 				if (me->effect[i].text[0] != '\0')
 					ChangeWater(me->effect[i].text);
 				//NoRepeatNewMessage(me->effect[i].text,120,90);
+				break;
+			case EFF_TEMPFLAGS:
+				SetMonsterTempCondition(!(me->effect[i].flags & EF_NOFX), me->effect[i].x, me->effect[i].y, me->effect[i].value, me->effect[i].value2, me->effect[i].value3);
+				break;
+			case EFF_PERMFLAGS:
+				SetMonsterPermCondition(!(me->effect[i].flags&EF_NOFX),me->effect[i].x,me->effect[i].y,me->effect[i].value,me->effect[i].value2);
+				break;
+			case EFF_COINLIMIT:
+				player.maxCoins=me->effect[i].value;
 				break;
 		}
 	}
@@ -2184,6 +2233,14 @@ void AdjustSpecialEffectCoords(special_t *me,int dx,int dy)
 				{
 					me->effect[i].x+=dx;
 					me->effect[i].y+=dy;
+				}
+				break;
+			case EFF_TEMPFLAGS:
+			case EFF_PERMFLAGS:
+				if (me->effect[i].x != 255)
+				{
+					me->effect[i].x += dx;
+					me->effect[i].y += dy;
 				}
 				break;
 		}

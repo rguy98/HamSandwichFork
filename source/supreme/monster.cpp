@@ -409,7 +409,7 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME);
 		else if(g->specialFlags&GSF_LOONY) {// Imitated loony color effect - switches between all eight colors
 			b=abs(16-(player.clock&31));
-			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,player.clock/32,bright+monsType[type].brtChg+b,curSpr, flgs);
+			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,player.clock/32,bright+monsType[type].brtChg+b,curSpr,DISPLAY_DRAWME);
 		}
 		else if(!(monsType[type].flags&(MF_GHOST|MF_GLOW)))
 		{

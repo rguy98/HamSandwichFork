@@ -154,8 +154,8 @@ intface_t defaultSetup[NUM_INTF]={
 	 0},
 	{639,520,639,479,	// coins
 	 SPR_COINBOX,
-	 IV_NUMBER,2,
-	 -18,-14,
+	 IV_NUMBER,3,
+	 -27,-14,
 	 0,0,
 	 0},
 };
@@ -530,8 +530,8 @@ void DrawPULightning(int x,int y,int height,byte color,MGLDraw *mgl)
 
 void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 {
-	byte height[11],th;
-	byte color[11],tc;
+	byte height[12],th;
+	byte color[12],tc;
 	int i,swap;
 
 	height[0]=player.shield*64/240;
@@ -552,6 +552,7 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 		height[8]=goodguy->weak*64/255;
 		height[9]=goodguy->strong*64/255;
 		height[10]=goodguy->frozen*64/255;
+		height[11]=goodguy->confuse*64/255;
 	}
 	else
 	{
@@ -562,6 +563,7 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 		height[8]=0;
 		height[9]=0;
 		height[10]=0;
+		height[11]=0;
 	}
 	color[1]=32*7+20;	// light aqua for speed
 	color[6]=32*0+20;	// light grey for garlic
@@ -569,8 +571,7 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 	color[8]=32*4+20;	// light red for weakness
 	color[9]=32*0+12;	// dark grey for steelskin
 	color[10]=32*7+16;	// aqua for frozen
-	//dark red for weakness (lower defense)
-	//dark grey for strength (higher defense)
+	color[10]=32*6+16;	// pink for confuse
 
 	swap=1;
 	while(swap)

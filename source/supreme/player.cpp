@@ -76,6 +76,7 @@ void InitPlayer(byte level,const char *fname)
 	player.lavaTimer=15;
 	player.brains=0;
 	player.coins=0;
+	player.maxCoins=99; // can be adjusted
 	player.candles=0;
 	player.boredom=0;
 	player.hammers=0;
@@ -346,10 +347,10 @@ byte PlayerPowerup(char powerup)
 				AddAffliction(goodguy->ignited,64);
 				break;
 			case PU_WEAKNESS:
-				AddAffliction(goodguy->ignited,128);
+				AddAffliction(goodguy->weak,128);
 				break;
 			case PU_STRENGTH:
-				AddAffliction(goodguy->ignited,128);
+				AddAffliction(goodguy->strong,128);
 				break;
 			case PU_CONFUSION:
 				AddAffliction(goodguy->confuse,64);
@@ -585,8 +586,8 @@ void PlayerGetCoin(int amt)
 	player.coins+=amt;
 	if(player.coins<0)
 		player.coins=0;
-	if(player.coins>99)
-		player.coins=99;
+	if(player.coins>player.maxCoins)
+		player.coins=player.maxCoins;
 	if(player.coins>=20)
 		CompleteGoal(80);
 }

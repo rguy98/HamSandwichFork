@@ -84,9 +84,12 @@ class Guy
 		sprite_set_t* customSpr; // custom sprites
 };
 
-#define GSF_NEWAI	1	// New AI
-#define GSF_LOONY	2	// Rainbow
-#define GSF_FASTFWD	4	// 2x speed
+#define GSF_NEWAI		1	// New AI - avoids pre-mod conflict
+#define GSF_LOONY		2	// Rainbow - like a loonykey!
+#define GSF_FASTFWD		4	// 2x speed (stacks with speedy - BEWARE!)
+
+#define NUM_MONSFLAGS	3
+#define NUM_CONDITIONS	8
 
 extern Guy *goodguy;
 
@@ -143,7 +146,12 @@ void SetMonsterName(byte fx,int x,int y,int type,char *name);
 void SetMonsterGraphics(byte fx,int x,int y,int type,char *name);
 void SetMonsterColor(byte fx,int x,int y,int type,int colCode);
 void SetMonsterBright(byte fx,int x,int y,int type,int bright);
+void SetMonsterTempCondition(byte fx,int x,int y,int type,int cond, int amt);
+void SetMonsterPermCondition(byte fx,int x,int y,int type,int cond);
+void SetMonsterSpecialFlags(byte fx,int x,int y,int type,int mflags);
 byte CheckMonsterColor(int x,int y,int type,byte color);
+byte CheckMonsterTempCondition(int x,int y,int type,byte flags, byte trg, int amt);
+byte CheckMonsterPermCondition(int x,int y,int type,byte trg);
 Guy *GetGuyOfAIType(int type);
 
 // Kid Mystic stuff
