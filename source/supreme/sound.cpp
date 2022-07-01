@@ -609,6 +609,7 @@ soundDesc_t soundInfo[MAX_SOUNDS] = {
 	{SND_LARRYHOWL,"Larry Howl",ST_MONSTER},
 	{SND_LARRYNORMAL,"Larry Die",ST_MONSTER | ST_VOCAL},
 	{SND_HOTPANTS,"Larry Ouch",ST_EFFECT },
+	{SND_SDZLSUMMON,"SDZL Summon",ST_MONSTER},
 };
 
 byte soundAvailable = 0;

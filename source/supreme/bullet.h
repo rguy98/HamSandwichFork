@@ -191,6 +191,7 @@ typedef struct bullet_t
 	char bright;
 	byte friendly;
 	byte flags;
+	byte fromColor,toColor;
 } bullet_t;
 
 void InitBullets(void);
@@ -228,6 +229,7 @@ byte HasGravity(bullet_t* me);
 int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets
 void ChangeBullet(byte fx,int x,int y,int type,int newtype); // for specials to change bullets
+void ChangeBulletColor(byte fx,int x,int y,int type,int colCode); // for specials to change bullet color
 byte BulletFacingType(byte type); // To check if a type of bullet uses none, 0-7, or 0-255 facings
 void RenderMysticalHammerItem(byte col1, byte col2, char brt, int x, int y);
 void RenderSimpleAnimatedItem(byte col1, byte col2, char brt, int x, int y, int z, int a, int b, int c);

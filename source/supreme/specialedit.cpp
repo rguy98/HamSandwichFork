@@ -48,7 +48,8 @@
 #define SMODE_PICKITEM3	24
 #define SMODE_HELP		25
 #define SMODE_PICKRECT3T 26
-#define SMODE_VALUE3	27
+#define SMODE_VALUE3A	27
+#define SMODE_VALUE3B	28
 
 #define ID_EXIT		1
 #define ID_USES		2
@@ -170,6 +171,8 @@ static char effName[][16]={
 	"Mons. TempFlag",
 	"Mons. PermFlag",
 	"Set Coin Limit",
+	"Color Bullet",
+	"Camera @ Mons."
 };
 
 static char lvlFlagName[][16]={
@@ -186,6 +189,17 @@ static char lvlFlagName[][16]={
 	"Wavy",
 	"Oxygen Meter",
 	"Bonus Goal",
+};
+
+static char modeName[][16] = {
+	"Disco",
+	"TV",
+	"Ludicrous",
+	"Subliminal",
+	"Splatter",
+	"Manic",
+	"Handheld",
+	"Virtual"
 };
 
 static char tempFlagName[][16] = {
@@ -689,7 +703,36 @@ static void Number2Click(int id)
 	InitTextDialog("Enter a number!","",16);
 }
 
-static void Number3Click(int id)
+static void Number3AClick(int id) // Not currently used
+{
+	if (id < ID_EFF0)
+	{
+		effMode = 0;
+		curTrig = trgStart + (id / 100) - 1;
+	}
+	else
+	{
+		effMode = 1;
+		curEff = effStart + (id - ID_EFF0) / 100;
+	}
+	// enter a number for value
+	if (rightClick)
+	{
+		/*
+		if (!effMode)
+			spcl.trigger[curTrig].value3 = 0;
+		else
+			spcl.effect[curEff].value3 = 0;*/
+		MakeNormalSound(SND_MENUCLICK);
+		return;
+	}
+
+	MakeNormalSound(SND_MENUCLICK);
+	mode=SMODE_VALUE3A;
+	InitTextDialog("Enter a number (1-99)!", "", 2);
+}
+
+static void Number3BClick(int id)
 {
 	if (id < ID_EFF0)
 	{
@@ -705,16 +748,16 @@ static void Number3Click(int id)
 	if (rightClick)
 	{
 		if (!effMode)
-			spcl.trigger[curTrig].value3 = 0;
+			SetNumber3B(spcl.trigger[curTrig].value2, 0);
 		else
-			spcl.effect[curEff].value3 = 0;
+			SetNumber3B(spcl.effect[curEff].value2, 0);
 		MakeNormalSound(SND_MENUCLICK);
 		return;
 	}
 
 	MakeNormalSound(SND_MENUCLICK);
-	mode=SMODE_VALUE3;
-	InitTextDialog("Enter a number!", "", 16);
+	mode=SMODE_VALUE3B;
+	InitTextDialog("Enter a number (0-255)!", "", 3);
 }
 
 static void XYClick(int id)
@@ -1292,7 +1335,7 @@ static void LevelFlagClick(int id)
 
 static void TempConditionClick(int id)
 {
-	int t;
+	int t,val2;
 
 	MakeNormalSound(SND_MENUCLICK);
 
@@ -1300,19 +1343,21 @@ static void TempConditionClick(int id)
 	{
 		effMode = 0;
 		t = trgStart + id / 100 - 1;
+		val2 = GetNumber3A(spcl.trigger[t].value2);
 
-		spcl.trigger[t].value2++;
-		if (spcl.trigger[t].value2 == NUM_CONDITIONS)
-			spcl.trigger[t].value2 = 0;
+		SetNumber3A(spcl.trigger[t].value2,val2+1);
+		if (val2+1 >= NUM_CONDITIONS)
+			SetNumber3A(spcl.trigger[t].value2,0);
 	}
 	else
 	{
 		effMode = 1;
 		t = effStart + (id - ID_EFF0) / 100;
+		val2 = GetNumber3A(spcl.effect[t].value2);
 
-		spcl.effect[t].value2++;
-		if (spcl.effect[t].value2 == NUM_CONDITIONS)
-			spcl.effect[t].value2 = 0;
+		SetNumber3A(spcl.effect[t].value2,val2+1);
+		if (val2+1 >= NUM_CONDITIONS)
+			SetNumber3A(spcl.effect[t].value2, 0);
 	}
 
 	if (!effMode)
@@ -1323,6 +1368,22 @@ static void TempConditionClick(int id)
 	{
 		SetupEffectButtons(t - effStart, (t - effStart) * 38 + 264);
 	}
+}
+
+static void GameModeClick(int id)
+{
+	int t;
+
+	MakeNormalSound(SND_MENUCLICK);
+
+	effMode = 0;
+	t = trgStart + id / 100 - 1;
+
+	spcl.trigger[t].value2++;
+	if (spcl.trigger[t].value2 == NUM_MODES)
+		spcl.trigger[t].value2 = 0;
+
+	SetupTriggerButtons(t - trgStart, (t - trgStart) * 38 + 30);
 }
 
 static void PermConditionClick(int id)
@@ -1589,6 +1650,10 @@ static void Bullet1Click(int id)
 		}
 		SetupEffectButtons(curEff-effStart,(curEff-effStart)*38+264);
 	}
+}
+
+int MaxList(int n, int max) {
+	return n > max - 1 ? max - 1 : n;
 }
 
 static void SetupTriggerButtons(int t,int y)
@@ -1975,9 +2040,13 @@ static void SetupTriggerButtons(int t,int y)
 			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+3+100*t,0,370,y+17,150,14,s,RectClick);
 			break;
 		case TRG_BONUSGOAL:
-			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If the bonus goal is achieved for level ", NULL);
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If player got bonus from level", NULL);
 			sprintf(s, "%s", EditorGetWorld()->map[trigger.value]->name);
 			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 1 + 100 * t, 0, 300, y + 17, 200, 14, s, LevelNameClick);
+			break;
+		case TRG_GAMEMODE:
+			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "If player is using mode", NULL);
+			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 1 + 100 * t, 0, 300,y+17,96,14,modeName[trigger.value2],GameModeClick);
 			break;
 		case TRG_HAVEWEAPON:
 			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"If player has",NULL);
@@ -2001,9 +2070,9 @@ static void SetupTriggerButtons(int t,int y)
 			else
 				sprintf(s,"%d, %d", trigger.x, trigger.y);
 			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+3+100*t,0,197,y+17,70,14,s,XY3Click);
-			sprintf(s, "%d", trigger.value3);
-			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+4+100*t,0,272,y+17,36,14,s, Number3Click);
-			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+5+100*t,0,315,y+17,96,14,tempFlagName[trigger.value2],TempConditionClick);
+			sprintf(s, "%d", GetNumber3B(trigger.value2));
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+4+100*t,0,272,y+17,36,14,s, Number3BClick);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+5+100*t,0,315,y+17,96,14,tempFlagName[MaxList(GetNumber3A(trigger.value2),NUM_CONDITIONS)],TempConditionClick);
 			if(trigger.flags&TF_LESS)
 				MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+6+100*t,0,480,y+17,80,14,"Or Less",LessMoreClick);
 			else if(trigger.flags&TF_MORE)
@@ -2672,15 +2741,17 @@ static void SetupEffectButtons(int t,int y)
 			else
 				sprintf(s,"%d, %d",effect.x,effect.y);
 			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,197,y+17,70,14,s,XY3Click);
-			sprintf(s, "%d", effect.value3);
-			MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 4 + 100 * t, 0, 272, y + 17, 36, 14, s, Number3Click);
-			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+5+100*t,0,315,y+17,96,14, tempFlagName[effect.value2],TempConditionClick);
+			sprintf(s, "%d", GetNumber3B(effect.value2));
+			MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 4 + 100 * t, 0, 272, y + 17, 36, 14, s, Number3BClick);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+5+100*t,0,315,y+17,96,14, tempFlagName[MaxList(GetNumber3A(effect.value2),NUM_CONDITIONS)],TempConditionClick);
 			if(effect.flags&EF_CONTIGUOUS)
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,520,y+17,65,14,"Add",ContiguousClick);
 			else if(effect.flags&EF_ALL)
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,520,y+17,65,14,"Remove",ContiguousClick);
 			else
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,520,y+17,65,14,"Toggle",ContiguousClick);
+			sprintf(s, "%d", effect.value2);
+			MakeButton(BTN_STATIC, ID_EFF0 + OFS_CUSTOM + 6 + 100 * t, 0, 248, y + 3, 1, 1, s, NULL);
 			break;
 		case EFF_PERMFLAGS:
 			MakeButton(BTN_STATIC, ID_EFF0 + OFS_CUSTOM + 0 + 100 * t, 0, 40, y + 17, 1, 1, "Give", NULL);
@@ -2700,10 +2771,37 @@ static void SetupEffectButtons(int t,int y)
 			else
 				MakeButton(BTN_NORMAL, ID_EFF0 + OFS_CUSTOM + 1 + 100 * t, 0, 520, y + 17, 65, 14, "Toggle", ContiguousClick);
 			break;
+		case EFF_COLORBULLET:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Change",NULL);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,104,y+17,140,14,bulletName[effect.value],Bullet1Click);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+2+100*t,0,248,y+17,1,1,"at",NULL);
+			if(effect.x==255)
+				strcpy(s,"Anywhere");
+			else
+				sprintf(s,"%d, %d",effect.x,effect.y);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,268,y+17,70,14,s,XY3Click);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+4+100*t,0,338,y+17,1,1,"to Color Swap",NULL);
+			s[1]='\0';
+			s[0]=effect.value2%256;
+			MakeButton(BTN_COLOR,ID_EFF0+OFS_CUSTOM+5+100*t,0,446,y+17,14,14,s,ColorClick1);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+4+100*t,0,462,y+17,1,1,"->",NULL);
+			s[0]=effect.value2/256;
+			MakeButton(BTN_COLOR,ID_EFF0+OFS_CUSTOM+5+100*t,0,491,y+17,14,14,s,ColorClick2);
+			break;
 		case EFF_COINLIMIT:
 			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Set coin limit to",NULL);
 			sprintf(s, "%d", effect.value);
 			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,200,y+17,40,14,s,NumberClick);
+			break;
+		case EFF_CAMERAMONS:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,60,14,"Focus camera on",NULL);;
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,94,y+17,140,14,MonsterName(effect.value),MonsterClick);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+2+100*t,0,238,y+17,1,1,"at",NULL);
+			if(effect.x==255)
+				strcpy(s,"Anywhere");
+			else
+				sprintf(s,"%d, %d",effect.x,effect.y);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,258,y+17,70,14,s,XY3Click);
 			break;
 	}
 }
@@ -2748,6 +2846,7 @@ void SpecialEdit_Exit(void)
 
 void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 {
+	int j;
 	switch(mode)
 	{
 		case SMODE_NORMAL:
@@ -2813,7 +2912,8 @@ void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 		case SMODE_FVALUE2:
 		case SMODE_FVALUE3:
 		case SMODE_VALUE2:
-		case SMODE_VALUE3:
+		case SMODE_VALUE3A:
+		case SMODE_VALUE3B:
 		case SMODE_MESSAGE:
 			if(mgl->MouseTap())
 			{
@@ -2856,16 +2956,18 @@ void SpecialEdit_Update(int mouseX,int mouseY,int scroll,MGLDraw *mgl)
 							SetupTriggerButtons(curTrig-trgStart,(curTrig-trgStart)*38+30);
 						}
 					}
-					else if(mode==SMODE_VALUE3)
+					else if(mode==SMODE_VALUE3B)
 					{
 						if(effMode)
 						{
-							spcl.effect[curEff].value3=atoi(GetText());
+							j = atoi(GetText());
+							SetNumber3B(spcl.effect[curEff].value2,j);
 							SetupEffectButtons(curEff-effStart,(curEff-effStart)*38+264);
 						}
 						else
 						{
-							spcl.trigger[curTrig].value3=atoi(GetText());
+							j = atoi(GetText());
+							SetNumber3B(spcl.trigger[curTrig].value2,j);
 							SetupTriggerButtons(curTrig-trgStart,(curTrig-trgStart)*38+30);
 						}
 					}
@@ -3054,7 +3156,8 @@ void SpecialEdit_Key(char k)
 		case SMODE_FVALUE2:
 		case SMODE_FVALUE3:
 		case SMODE_VALUE2:
-		case SMODE_VALUE3:
+		case SMODE_VALUE3A:
+		case SMODE_VALUE3B:
 		case SMODE_MESSAGE:
 			TextDialogKey(k);
 			break;
@@ -3160,7 +3263,8 @@ void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 		case SMODE_USES:
 		case SMODE_VALUE:
 		case SMODE_VALUE2:
-		case SMODE_VALUE3:
+		case SMODE_VALUE3A:
+		case SMODE_VALUE3B:
 		case SMODE_FVALUE:
 		case SMODE_FVALUE2:
 		case SMODE_FVALUE3:

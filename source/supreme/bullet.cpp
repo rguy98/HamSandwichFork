@@ -2453,6 +2453,18 @@ void RenderSimpleAnimatedItem(byte col1, byte col2, char brt, int x, int y, int 
 		DISPLAY_DRAWME | DISPLAY_OFFCOLOR);
 }
 
+void SprDrawBullet(bullet_t *me,sprite_t *curSpr,word flags,char brt){
+
+	if(flags&DISPLAY_SHADOW)
+		SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright+brt,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
+
+	flags&=~DISPLAY_SHADOW;
+	if (me->fromColor == 255) // Display sprite minus w/o shadow flag
+		SprDrawOff(me->x >>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,255,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
+	else // Ditto, but w/ off-color
+		SprDrawOff(me->x >>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,me->fromColor,me->toColor,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
+}
+
 void RenderBullet(bullet_t *me)
 {
 	int v,x,y,z;
@@ -2462,46 +2474,38 @@ void RenderBullet(bullet_t *me)
 	{
 		case BLT_COMET:
 			curSpr=bulletSpr->GetSprite(SPR_COMET+me->anim);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,0,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_COMETBOOM:
 			curSpr=bulletSpr->GetSprite(SPR_COMETBOOM+me->anim/2);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,0,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_SLIME:
 			curSpr=bulletSpr->GetSprite(SPR_SLIME+(me->anim/16));
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright-4,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,-4);
 			break;
 		case BLT_ICECLOUD:
 			// invisible... it just gives off steam
 			break;
 		case BLT_ICEBEAM:
 			curSpr=bulletSpr->GetSprite(((me->facing/32)&3)+SPR_ICEBEAM+1);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_ICEBEAM2:
 			curSpr=bulletSpr->GetSprite(SPR_ICEBEAM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_DEATHBEAM:
 			curSpr=bulletSpr->GetSprite(((me->facing/32)&3)+SPR_ICEBEAM+1);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,4,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_DEATHBEAM2:
 			curSpr=bulletSpr->GetSprite(SPR_ICEBEAM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,4,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_LIQUIFY:
 			curSpr=bulletSpr->GetSprite(231+me->anim/2);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_COIN:
 		case BLT_BIGCOIN:
@@ -2511,100 +2515,69 @@ void RenderBullet(bullet_t *me)
 				curSpr=bulletSpr->GetSprite(SPR_COIN+me->anim/2);
 			else
 				curSpr=bulletSpr->GetSprite(SPR_BIGCOIN+me->anim/2);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_HAMMER:
 		case BLT_HAMMER2:
 			v=me->facing*16+(me->anim)+SPR_HAMMER;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
 			v = me->facing * 5 + (me->anim) + SPR_FIREBALL;
 			curSpr = bulletSpr->GetSprite(v);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 0, 255, me->bright, curSpr,
-				DISPLAY_DRAWME | DISPLAY_SHADOW);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 255, me->bright, curSpr,
-				DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_BADFBALL:
 			v = me->facing * 5 + (me->anim) + SPR_FIREBALL;
 			curSpr = bulletSpr->GetSprite(v);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 0, 255, me->bright, curSpr,
-				DISPLAY_DRAWME | DISPLAY_SHADOW);
-			SprDrawOff(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 5, 0, me->bright, curSpr,
-				DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_CHEESEHAMMER:
 			v=(((me->facing/32)+me->anim)&7)*16+SPR_HAMMER;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,4,5,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_EVILHAMMER:
 			v=me->facing*16+(me->anim)+SPR_HAMMER;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,0,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_ACID:
 			v=me->facing*7+me->anim+SPR_ACID;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_SHARK:
 			v=me->facing*7+me->anim+SPR_ACID;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,1,3,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_FREEZE:
 		case BLT_FREEZE2:
 			v=me->facing*7+me->anim+SPR_ACID;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,1,7,me->bright+6,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,0,0);
 			break;
 		case BLT_MISSILE:
 			v=me->facing+SPR_MISSILE;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_MAGICMISSILE:
 			v = me->facing + SPR_MAGICMISSILE;
 			curSpr = bulletSpr->GetSprite(v);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 255, me->bright, curSpr,
-				DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_SKULL:
 			curSpr = bulletSpr->GetSprite(SPR_SKULL + me->facing);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 255, me->bright - 2, curSpr,
-				DISPLAY_DRAWME | DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_TORPEDO:
 			v=(me->facing)+SPR_MISSILE;
 			curSpr=bulletSpr->GetSprite(v);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,0,4,me->bright+3,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,0,0);
 			break;
 		case BLT_FLAME:
 		case BLT_FLAME2:
@@ -2612,15 +2585,13 @@ void RenderBullet(bullet_t *me)
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
 			curSpr = bulletSpr->GetSprite(me->anim + SPR_FLAME);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 255, 0, curSpr,
-				DISPLAY_DRAWME | DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_LASER:
 			curSpr=bulletSpr->GetSprite(me->facing+SPR_LASER);
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
 					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_LASERBEAM:
 			curSpr = bulletSpr->GetSprite(((me->facing + 8) / 16) + SPR_LASER);
@@ -2629,132 +2600,91 @@ void RenderBullet(bullet_t *me)
 				z = me->z;//+Random(FIXAMT*8);
 				x = me->x - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
 				y = me->y - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
-
-				SprDraw(x >> FIXSHIFT, y >> FIXSHIFT, z >> FIXSHIFT, 255, me->bright, curSpr,
-					DISPLAY_DRAWME | DISPLAY_GLOW);
+				
+				SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			}
 			break;
 		case BLT_PAPER:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_PAPER);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_BUBBLE:
 			curSpr=bulletSpr->GetSprite(me->anim/4+SPR_BUBBLE);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW|DISPLAY_GLOW,0);
 			break;
 		case BLT_BUBBLEPOP:
 			curSpr=bulletSpr->GetSprite(me->anim+SPR_BUBBLE+5);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW|DISPLAY_GLOW,0);
 			break;
 		case BLT_BOMB:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_BOMB);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_BOOM:
 			curSpr=bulletSpr->GetSprite(7-me->timer+SPR_BOOM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_ENERGY:
 			curSpr=bulletSpr->GetSprite(me->anim+SPR_ENERGY);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_MEGABEAM:
 			curSpr=bulletSpr->GetSprite((me->anim>>2)+SPR_MEGABEAM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright-8,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_MEGABEAM1:
 			curSpr=bulletSpr->GetSprite(6+SPR_MEGABEAM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright-8,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_MEGABEAM2:
 			curSpr=bulletSpr->GetSprite(7+SPR_MEGABEAM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright-8,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_SPORE:
 			curSpr=bulletSpr->GetSprite(me->anim/4+SPR_SPORE);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,0,0);
 			break;
 		case BLT_SHROOM:
 			curSpr=bulletSpr->GetSprite(me->facing+SPR_SHROOM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_GRENADE:
 		case BLT_BIGYELLOW:
 			curSpr=bulletSpr->GetSprite(me->anim+SPR_GRENADE);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW|DISPLAY_GLOW,0);
 			break;
 		case BLT_HOLESHOT:
 			curSpr=bulletSpr->GetSprite(me->anim+SPR_GRENADE);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,5,0,2,me->bright-12,curSpr,
-					DISPLAY_DRAWME|DISPLAY_OFFCOLOR);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,-12);
 			break;
 		case BLT_YELBOOM:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_YELBOOM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_SHOCKWAVE:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_SHOCKWAVE);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_LILBOOM:
 		case BLT_LILBOOM2:
 			curSpr=bulletSpr->GetSprite(4-(me->timer/2)+SPR_LILBOOM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_SNOWBALL:
 			curSpr=bulletSpr->GetSprite(SPR_SNOWBALL);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_BIGSNOW:
 			curSpr=bulletSpr->GetSprite(SPR_BIGSNOW+(me->anim/2));
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_ICESPIKE:
 			curSpr=bulletSpr->GetSprite(SPR_ICESPIKE+(me->anim));
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_DIRTSPIKE:
 			curSpr=bulletSpr->GetSprite(SPR_ICESPIKE+(me->anim));
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,0,2,me->bright-12,curSpr,
-					DISPLAY_DRAWME|DISPLAY_OFFCOLOR);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_ROCK:
 			if((me->timer<8) && (me->timer&1))
@@ -2767,102 +2697,64 @@ void RenderBullet(bullet_t *me)
 			break;
 		case BLT_SPINE:
 			curSpr=bulletSpr->GetSprite(SPR_SPINE+(me->facing));
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_MINIFBALL:
 			curSpr = bulletSpr->GetSprite(SPR_SPINE + (me->facing));
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 0, 255, me->bright, curSpr,
-				DISPLAY_DRAWME | DISPLAY_SHADOW);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 255, me->bright, curSpr,
-				DISPLAY_DRAWME);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_YELWAVE:
 			curSpr = bulletSpr->GetSprite(SPR_WAVE + (me->facing));
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, me->z >> FIXSHIFT, 255, me->bright, curSpr,
-				DISPLAY_DRAWME | DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_BIGSHELL:
 			curSpr=bulletSpr->GetSprite(SPR_BOOM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_BIGAXE:
 			curSpr=bulletSpr->GetSprite(SPR_BIGAXE+me->anim);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_SPEAR:
 		case BLT_BADSPEAR:
 		case BLT_HARPOON:
 			curSpr=bulletSpr->GetSprite(SPR_SPEAR+me->facing);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_SLASH:
 			if(me->anim>0)
 			{
 				curSpr=bulletSpr->GetSprite(SPR_SLASH+me->facing*3+me->anim-1);
-				SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GHOST);
+				SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			}
 			break;
 		case BLT_MINE:
 			curSpr=bulletSpr->GetSprite(SPR_MINE+me->anim/4);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			if(curMap->flags&MAP_UNDERWATER)	// underwater, it has a shadow, since it floats
-				SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,curMap->flags&MAP_UNDERWATER?DISPLAY_SHADOW:0,0);
 			break;
 		case BLT_ORBITER:
 			curSpr=bulletSpr->GetSprite(SPR_ORBITER+me->facing);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+				SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_ORBITER2:
 			curSpr=bulletSpr->GetSprite(SPR_ORBITER+me->facing);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,1,4,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+				SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_GREEN:
-			curSpr=bulletSpr->GetSprite(SPR_GREEN);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
-			break;
 		case BLT_BADGREEN:
 			curSpr = bulletSpr->GetSprite(SPR_GREEN);
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,4,1,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 0, 255, me->bright, curSpr,
-				DISPLAY_DRAWME | DISPLAY_SHADOW);
+				SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_SCANSHOT:
 		case BLT_SCANNER:
 			curSpr=bulletSpr->GetSprite(SPR_SCANSHOT+me->anim);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me, curSpr, DISPLAY_GLOW, 0);
 			break;
 		case BLT_SCANLOCK:
 			if(me->timer>10 || (me->timer&1))
 			{
 				curSpr=bulletSpr->GetSprite(SPR_SCANLOCK);
-				SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-						DISPLAY_DRAWME|DISPLAY_GLOW);
+				SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			}
 			break;
 		case BLT_BALLLIGHTNING:
@@ -2870,32 +2762,21 @@ void RenderBullet(bullet_t *me)
 			break;
 		case BLT_MINDWIPE:
 			curSpr=bulletSpr->GetSprite(SPR_BOOM+me->anim);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_REFLECT:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_YELBOOM);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_GLOW);
+			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_SWAP:
 			int x,y;
-
 			curSpr=bulletSpr->GetSprite(SPR_GREEN);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			for(v=0;v<4;v++)
 			{
 				x=me->x+Cosine((me->anim+v*64)&255)*6;
 				y=me->y+Sine((me->anim+v*64)&255)*6;
-				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
-					DISPLAY_DRAWME);
-				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,me->bright,curSpr,
-					DISPLAY_DRAWME|DISPLAY_SHADOW);
+				SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			}
 			break;
 	}
@@ -2930,9 +2811,94 @@ byte HasHoming(bullet_t* me) {
 	return (me->type == BLT_PAPER);
 }
 
+#define BD_NONE		0
+#define BD_EIGHT	1
+#define BD_SIXTEEN	2
+
+// Easy way to set initial bullet variables
+void SetBulletVars(bullet_t *me, int dx, int dy, int dz, int z, int timer, byte type) {
+	byte f;
+	switch(type){
+		default:
+			f=me->facing;
+			break;
+		case BD_EIGHT:
+			f=me->facing*32;
+			break;
+		case BD_SIXTEEN:
+			f=me->facing*16;
+			break;
+	}
+
+	me->dx = Cosine(f)*dx;
+	me->dy = Sine(f)*dy;
+	me->dz = dz;
+	me->z = z;
+	me->timer=timer;
+}
+
+void UncolorBullet(bullet_t* me) {
+	me->fromColor = 255;
+	me->toColor = 0;
+}
+
+void RecolorBullet(bullet_t *me, byte from, byte to){
+	me->fromColor=from;
+	me->toColor=to;
+}
+
+void CheckRecolor(bullet_t *me){
+	switch(me->type){
+		case BLT_CHEESEHAMMER:
+			RecolorBullet(me, 4, 5);
+			break;
+		default:
+			UncolorBullet(me);
+			break;
+	}
+}
+
+void SetMissileFacing(byte &facing){
+	byte f;
+	f = facing*2;
+	f += Random(5) - 2;
+	if (f < 0)
+		f += 16;
+	facing = (byte)(f & 15);
+}
+
+void SetTorpedoFacing(byte &facing, word &target){
+	byte f;
+	f=facing*32*16;
+	f+=Random(33)-16;
+	if(f<0)
+		f+=256*16;
+	target=f%(256*16);
+	facing=target/256;
+}
+
+void SetSplatFacing(byte &facing){
+	facing=((facing+16)&255)/32;
+}
+
+void SetMissileOffset(int &x, int &y){
+	x += ((Random(17) - 8) << FIXSHIFT);
+	y += ((Random(17) - 8) << FIXSHIFT);
+}
+
+void SetFlameOffset(int &x, int &y, byte facing){
+	x += ((Random(3) - 1) << FIXSHIFT) + Cosine(facing * 32) * 5;
+	y += ((Random(3) - 1) << FIXSHIFT) + Sine(facing * 32) * 5;
+}
+
+void SetLaserOffset(int &x, int &y){
+	x+=((Random(3)-1)<<FIXSHIFT)+FIXAMT/2-Random(FIXAMT);
+	y+=((Random(3)-1)<<FIXSHIFT)+FIXAMT/2-Random(FIXAMT);
+}
+
 void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 {
-	int f;
+	int f,x2,y2,z;
 
 	me->friendly=friendly;
 	me->type=type;
@@ -2940,6 +2906,8 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 	me->y=y;
 	me->facing=facing;
 	me->bright=0;
+	me->fromColor=255;
+	me->toColor=0;
 	
 	if(HasGravity(me))
 		me->flags |= BFL_GRAVITY;
@@ -2950,310 +2918,155 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 	switch(me->type)
 	{
 		case BLT_HOLESHOT:
-			me->z=FIXAMT*20;
-			me->dx=Cosine(facing)*8;
-			me->dy=Sine(facing)*8;
-			me->dz=0;
-			me->anim=0;
-			me->timer=60;
+			SetBulletVars(me,8,8,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_COMET:
 			me->anim=(byte)Random(8);
-			me->timer=255;
-			me->z=400*FIXAMT+ Random(300*FIXAMT);
-			me->dx=0;
-			me->dy=0;
-			me->dz=-FIXAMT*50;
+			SetBulletVars(me,0,0,-FIXAMT*50,400*FIXAMT+Random(300*FIXAMT),255,BD_NONE);
 			break;
 		case BLT_SLIME:
-			me->anim=0;
-			me->timer=12*16;
-			me->z=0;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,0,12*16,BD_NONE);
 			break;
 		case BLT_LIQUIFY:
-			me->anim=0;
-			me->timer=6;
-			me->z=0;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,0,6,BD_NONE);
 			break;
 		case BLT_ICEBEAM:
-			me->anim=0;
-			me->timer=5;
-			me->z=FIXAMT*20;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,FIXAMT*20,5,BD_NONE);
 			break;
 		case BLT_DEATHBEAM:
-			me->anim=0;
-			me->timer=5;
-			me->z=FIXAMT*45;
+			z=FIXAMT*45;
 			if(me->facing==32*0 || me->facing==32*4)
-				me->z=FIXAMT*50;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+				z=FIXAMT*50;
+			SetBulletVars(me,0,0,0,z,5,BD_NONE);
 			break;
 		case BLT_DEATHBEAM2:
-			me->anim=0;
-			me->timer=8;
-			me->z=FIXAMT*40;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,FIXAMT*40,8,BD_NONE);
 			break;
 		case BLT_BIGYELLOW:
-			me->anim = 0;
-			me->timer = 30 * 10;
-			me->z = FIXAMT * 30;
-			me->dz = 0;
-			me->dx = Cosine(me->facing) * 4;
-			me->dy = Sine(me->facing) * 4;
+			SetBulletVars(me,4,4,0,FIXAMT*30,30*10,BD_NONE);
 			break;
 		case BLT_YELWAVE:
-			me->anim = 0;
-			me->timer = 15;
-			me->z = FIXAMT * 2;
-			me->dz = 0;
-			me->dx = Cosine(me->facing * 32) * 10;
-			me->dy = Sine(me->facing * 32) * 10;
+			SetBulletVars(me,10,10,0,FIXAMT*2,15,BD_NONE);
 			break;
 		case BLT_COIN:
 		case BLT_BIGCOIN:
 			me->facing = (byte)Random(256);
+			// Random dx/dy/dz
 			f = Random(3) + 1;
-			me->dx = -FIXAMT * 4 + Random(FIXAMT * 8);
-			me->dy = -FIXAMT * 4 + Random(FIXAMT * 8);
-			me->dz = Random(FIXAMT * 6) + FIXAMT * 4;
-			me->z = FIXAMT / 2;
-			me->timer = 30 * 9 + Random(30 * 4);
+			x = -FIXAMT * 4 + Random(FIXAMT * 8);
+			y = -FIXAMT * 4 + Random(FIXAMT * 8);
+			z = Random(FIXAMT * 6) + FIXAMT * 4;
+			SetBulletVars(me,x2,y2,z,FIXAMT/2,270+Random(120),BD_NONE);
 			break;
 		case BLT_SCANSHOT:
 			me->facing=Random(256);
-			me->dx=Cosine(me->facing)*4;
-			me->dy=Sine(me->facing)*4;
-			me->dz=0;
-			me->anim=0;
-			me->timer=60;
+			SetBulletVars(me,4,4,0,me->z,60,BD_NONE);
 			break;
 		case BLT_SCANNER:
-			me->dx=Cosine(facing*32)*16;
-			me->dy=Sine(facing*32)*16;
-			me->dz=0;
-			me->anim=0;
-			me->timer=60;
+			//me->dx=Cosine(facing*32)*16;
+			//me->dy=Sine(facing*32)*16;
 			me->facing=facing*32;
+			SetBulletVars(me,16,16,0,me->z,60,BD_NONE);
 			break;
 		case BLT_SWAP:
-			me->dx=Cosine(facing*32)*10;
-			me->dy=Sine(facing*32)*10;
-			me->dz=0;
-			me->anim=0;
-			me->timer=120;
 			me->facing=facing*32;
+			SetBulletVars(me,10,10,0,me->z,120,BD_NONE);
 			break;
 		case BLT_REFLECT:
-			me->dx=0;
-			me->dy=0;
-			me->z=0;
-			me->anim=0;
-			me->timer=9;
+			SetBulletVars(me,0,0,0,0,9,BD_NONE);
 			break;
 		case BLT_BOOM:
-			me->dx=0;
-			me->dy=0;
-			me->z=0;
-			me->anim=0;
-			me->timer=7;
+			SetBulletVars(me,0,0,0,0,7,BD_NONE);
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,1800);
 			break;
 		case BLT_BALLLIGHTNING:
-			me->timer=30;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*11;
-			me->dy=Sine(me->facing*32)*11;
-			me->dz=0;
-			break;
 		case BLT_BADLIGHTNING:
-			me->timer=30;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*11;
-			me->dy=Sine(me->facing*32)*11;
-			me->dz=0;
+			SetBulletVars(me,11,11,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_HAMMER:
 		case BLT_HAMMER2:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*12;
-			me->dy=Sine(me->facing*32)*12;
+			SetBulletVars(me,12,12,me->dz,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_LUNA:
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*12;
-			me->dy=Sine(me->facing*32)*12;
-			me->dz=0;
+			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_CHEESEHAMMER:
-			me->anim=0;
-			me->timer=50;
-			me->z=FIXAMT*15;
-			me->dx=Cosine(me->facing*32)*14;
-			me->dy=Sine(me->facing*32)*14;
-			me->dz=0;
+			RecolorBullet(me,4,5);
+			SetBulletVars(me,14,14,0,FIXAMT*15,50,BD_EIGHT);
 			break;
 		case BLT_EVILHAMMER:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*12;
-			me->dy=Sine(me->facing*32)*12;
-			me->dz=FIXAMT*10;
+			RecolorBullet(me,4,0);
+			SetBulletVars(me,12,12,FIXAMT*10,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BADLUNA:
+			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
+			break;
 		case BLT_BADFBALL:
-			me->anim = 0;
-			me->timer = 30;
-			me->z = FIXAMT * 20;
-			me->dx = Cosine(me->facing * 32) * 12;
-			me->dy = Sine(me->facing * 32) * 12;
+			RecolorBullet(me,5,0);
+			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BOMB:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
-			me->dz=FIXAMT*5;
+			SetBulletVars(me,8,8,FIXAMT*5,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_IGNITE:
-			me->anim = 0;
-			me->timer = 60;
-			me->z = FIXAMT * 20;
-			me->dx = Cosine(me->facing) * 12;
-			me->dy = Sine(me->facing) * 12;
-			me->dz = 0;
+			SetBulletVars(me,12,12,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_MISSILE:
 		case BLT_MAGICMISSILE:
 		case BLT_SKULL:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*20;
-			me->dz=0;
-			me->facing=facing*2;
 			me->target=65535;
-			f=me->facing;
-			f+=Random(5)-2;
-			if(f<0)
-				f+=16;
-			me->facing=(byte)(f&15);
-			me->x+=((Random(17)-8)<<FIXSHIFT);
-			me->y+=((Random(17)-8)<<FIXSHIFT);
-			me->dx=Cosine(me->facing*16)*4;
-			me->dy=Sine(me->facing*16)*4;
+			SetMissileFacing(me->facing);
+			SetMissileOffset(me->x,me->y);
+			SetBulletVars(me,4,4,0,FIXAMT*20,60,BD_SIXTEEN);
 			MakeSound(SND_MISSILELAUNCH,me->x,me->y,SND_CUTOFF,1100);
 			break;
 		case BLT_TORPEDO:
 			me->anim=Random(8);
-			me->timer=60;
-			me->z=FIXAMT*20;
-			me->dz=-6+Random(13);
-			f=facing*32*16;
-			f+=Random(33)-16;
-			if(f<0)
-				f+=256*16;
-			me->target=f%(256*16);
-			me->facing=me->target/256;
-			me->x+=((Random(17)-8)<<FIXSHIFT);
-			me->y+=((Random(17)-8)<<FIXSHIFT);
-			me->dx=0;
-			me->dy=0;
+			SetTorpedoFacing(me->facing,me->target);
+			SetMissileOffset(me->x, me->y);
+			SetBulletVars(me,0,0,-6+Random(13),FIXAMT*20,60,BD_SIXTEEN);
 			break;
 		case BLT_ACID:
 		case BLT_SHARK:
 		case BLT_FREEZE2:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*10;
-			me->dz=FIXAMT*4;
-			me->dx=Cosine(me->facing)*10;
-			me->dy=Sine(me->facing)*10;
-			me->facing=((me->facing+16)&255)/32;
+			SetBulletVars(me,10,10,FIXAMT*4,FIXAMT*10,30,BD_NONE);
+			SetSplatFacing(me->facing);
 			break;
 		case BLT_FREEZE:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*10;
-			me->dz=0;
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
-			me->facing=((me->facing+16)&255)/32;
+			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*10,30,BD_NONE);
+			SetSplatFacing(me->facing);
 			break;
 		case BLT_FLAME:
 		case BLT_FLAME2:
-			me->anim=0;
-			me->timer=24-Random(4);
-			me->z=FIXAMT*20;
-			me->x+=((Random(3)-1)<<FIXSHIFT)+Cosine(me->facing*32)*5;
-			me->y+=((Random(3)-1)<<FIXSHIFT)+Sine(me->facing*32)*5;
-			me->dx=Cosine(me->facing*32)*10;
-			me->dy=Sine(me->facing*32)*10;
-			me->dz=-FIXAMT/2;
+			SetFlameOffset(me->x,me->y,me->facing);
+			SetBulletVars(me,10,10,-FIXAMT/2,FIXAMT*20,24-Random(4),BD_EIGHT);
 			if(Random(5)==0)
 				MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,1100);
 			break;
 		case BLT_FLAME3:
 			me->anim = 4;
-			me->timer = 24 - Random(4);
-			me->z = FIXAMT * 20;
 			me->facing = Random(256);
-			me->x += ((Random(3) - 1) << FIXSHIFT) + Cosine(me->facing) * 5;
-			me->y += ((Random(3) - 1) << FIXSHIFT) + Sine(me->facing) * 5;
-			me->dx = Cosine(me->facing);
-			me->dy = Sine(me->facing);
-			me->dz = FIXAMT / 2;
+			SetFlameOffset(me->x,me->y,me->facing);
+			SetBulletVars(me,1,1,FIXAMT/2,FIXAMT*20,24-Random(4),BD_NONE);
 			break;
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
-			me->anim = 0;
-			me->timer = 30 + Random(30 * 15);
-			me->z = FIXAMT * 20;
 			me->facing = Random(256);
-			me->x += ((Random(3) - 1) << FIXSHIFT) + Cosine(me->facing) * 5;
-			me->y += ((Random(3) - 1) << FIXSHIFT) + Sine(me->facing) * 5;
-			f = Random(FIXAMT * 6) + FIXAMT;
-			me->dx = Cosine(me->facing) * f / FIXAMT;
-			me->dy = Sine(me->facing) * f / FIXAMT;
-			me->dz = Random(FIXAMT * 4) + FIXAMT;
+			SetFlameOffset(me->x,me->y,me->facing);
+			f=Random(FIXAMT*6)+FIXAMT;
+			SetBulletVars(me,f/FIXAMT,f/FIXAMT,Random(FIXAMT*4)+FIXAMT,FIXAMT*20,30+Random(30*15),BD_NONE);
 			MakeSound(SND_FLAMEGO, me->x, me->y, SND_CUTOFF, 1100);
 			break;
 		case BLT_LASER:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20-Random(FIXAMT);
-			me->x+=((Random(3)-1)<<FIXSHIFT);
-			me->y+=((Random(3)-1)<<FIXSHIFT);
-			me->x+=FIXAMT/2-Random(FIXAMT);
-			me->y+=FIXAMT/2-Random(FIXAMT);
 			me->facing=me->facing*32+4-Random(9);
-			me->dx=Cosine(me->facing)*24;
-			me->dy=Sine(me->facing)*24;
 			me->facing/=16;
-			me->dz=0;
+			SetLaserOffset(me->x, me->y);
+			SetBulletVars(me, 24, 24, 0, FIXAMT * 20 - Random(FIXAMT), 30, BD_NONE);
 			MakeSound(SND_BULLETFIRE,me->x,me->y,SND_CUTOFF,1050);
 			break;
-		case BLT_LASERBEAM:
+		case BLT_LASERBEAM: // man i don't know what to do here
 			me->anim = 0;
 			me->timer = 30 * 10;
 			me->facing = me->facing * 32;
@@ -3265,14 +3078,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->target = 255 + 255 * 256;
 			break;
 		case BLT_ENERGY:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			// this thing receives full 0-255 facings
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
-			me->dz=0;
-			//MakeSound(SND_ENERGYFIRE,me->x,me->y,SND_CUTOFF,950);
+			SetBulletVars(me,8,8,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_MEGABEAM:
 			me->anim=0;
@@ -3292,120 +3098,49 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->dz=0;
 			break;
 		case BLT_SPORE:
-			me->anim=0;
-			me->timer=16;
-			me->z=FIXAMT*16;
-			me->dx=Cosine(me->facing)*4;
-			me->dy=Sine(me->facing)*4;
-			me->dz=0;
+			SetBulletVars(me,4,4,0,FIXAMT*16,16,BD_NONE);
 			break;
 		case BLT_SHROOM:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*32;
-			me->dx=Cosine(me->facing*32)*8;
-			me->dy=Sine(me->facing*32)*8;
-			me->dz=0;
+			SetBulletVars(me,8,8,0,FIXAMT*32,60,BD_EIGHT);
 			break;
 		case BLT_GRENADE:
-			me->anim=0;
-			me->timer=255;
-			me->z=FIXAMT*80;
 			f=Random(12)+1;
-			me->dx=Cosine(me->facing)*f;
-			me->dy=Sine(me->facing)*f;
-			me->dz=FIXAMT*20;
+			SetBulletVars(me,f,f,FIXAMT*20,FIXAMT*80,255,BD_NONE);
 			break;
 		case BLT_SHOCKWAVE:
 		case BLT_GOODSHOCK:
-			me->anim=0;
-			me->timer=7;
-			me->z=0;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,0,7,BD_NONE);
 			break;
 		case BLT_SNOWBALL:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			// this thing receives full 0-255 facings
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
-			me->dz=FIXAMT*4;
-			//MakeSound(SND_ENERGYFIRE,me->x,me->y,SND_CUTOFF,950);
+			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
 			break;
 		case BLT_BIGSNOW:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			// this thing receives full 0-255 facings
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
-			me->dz=FIXAMT*4;
-			//MakeSound(SND_ENERGYFIRE,me->x,me->y,SND_CUTOFF,950);
+			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
 			break;
 		case BLT_ICESPIKE:
 		case BLT_DIRTSPIKE:
-			me->anim=0;
-			me->timer=9;
-			me->z=0;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,0,9,BD_NONE);
 			break;
 		case BLT_ROCK:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*6;
-			me->dy=Sine(me->facing*32)*6;
-			me->dz=FIXAMT*8;
-			//MakeSound(SND_ENERGYFIRE,me->x,me->y,SND_CUTOFF,950);
+			SetBulletVars(me,6,6,FIXAMT*8,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_SPINE:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*20;
-			// this takes 0-255 directional facings
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
+			SetBulletVars(me,8,8,0,FIXAMT*20,60,BD_NONE);
 			me->facing/=16;
-			me->dz=0;
 			break;
 		case BLT_BIGSHELL:
-			me->timer=30;
-			me->z=FIXAMT*50;
-			me->dx=Cosine(me->facing)*12;
-			me->dy=Sine(me->facing)*12;
-			me->dz=-FIXAMT*3;
+			SetBulletVars(me,12,12,-FIXAMT*3,FIXAMT*50,30,BD_NONE);
 			break;
 		case BLT_MINIFBALL:
-			me->anim = 0;
-			me->timer = 30;
-			me->z = FIXAMT * 20;
-			// this takes 0-255 directional facings
-			me->dx = Cosine(me->facing) * 12;
-			me->dy = Sine(me->facing) * 12;
-			me->facing /= 16;
-			me->dz = 0;
+			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_NONE);
+			me->facing/=16;
 			break;
 		case BLT_ICECLOUD:
-			me->anim = 0;
-			me->timer = 16;
-			me->z = FIXAMT * 10;
-			me->dx = Cosine(me->facing * 32);
-			me->dy = Sine(me->facing * 32);
-			me->dz = -FIXAMT / 2;
+			SetBulletVars(me,1,1,-FIXAMT/2,FIXAMT*10,16,BD_NONE);
 			MakeSound(SND_FLAMEGO, me->x, me->y, SND_CUTOFF, 1100);
 			break;
 		case BLT_BIGAXE:
-			me->anim=0;
-			me->timer=90;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*11;
-			me->dy=Sine(me->facing*32)*11;
-			me->dz=0;
+			SetBulletVars(me,11,11,0,FIXAMT*20,90,BD_EIGHT);
 			break;
 		case BLT_LIGHTNING:
 		case BLT_LIGHTNING2:
@@ -3413,90 +3148,52 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_SPEAR:
 		case BLT_BADSPEAR:
-			me->timer=60;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*9;
-			me->dy=Sine(me->facing*32)*9;
-			me->dz=FIXAMT*6;
+			SetBulletVars(me,9,9,FIXAMT*6,FIXAMT*20,60,BD_EIGHT);
 			break;
 		case BLT_HARPOON:
-			me->timer=90;
-			me->z=FIXAMT*10;
-			me->dx=Cosine(me->facing*32)*12;
-			me->dy=Sine(me->facing*32)*12;
-			me->dz=FIXAMT;
+			SetBulletVars(me,12,12,FIXAMT,FIXAMT*10,90,BD_EIGHT);
 			break;
 		case BLT_SLASH:
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
-			me->timer=10;
-			me->anim=0;
-			me->z=FIXAMT*20;
+			SetBulletVars(me,0,0,0,FIXAMT*20,10,BD_NONE);
 			break;
 		case BLT_MINE:
-			me->anim=0;
 			me->facing=2;
-			me->timer=50;
-			me->z=0;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,0,50,BD_NONE);
 			if(curMap->flags&MAP_UNDERWATER)
 				me->z=FIXAMT*10;
 			break;
 		case BLT_GREEN:
 		case BLT_BADGREEN:
-			me->anim=0;
-			me->timer=30;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing)*8;
-			me->dy=Sine(me->facing)*8;
-			me->dz=0;
+			SetBulletVars(me,8,8,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_ORBITER:
-		case BLT_ORBITER2:
 			me->anim=15;
-			me->timer=40;
-			if(me->type==BLT_ORBITER2)
-				me->timer=10;
-			me->z=FIXAMT*20;
+			SetBulletVars(me,0,0,0,FIXAMT*20,40,BD_EIGHT);
 			me->dx=Cosine(me->facing*32)*8+Sine(me->facing*32)*4;
 			me->dy=Sine(me->facing*32)*8+Cosine(me->facing*32)*4;
-			me->dz=0;
+			me->target=65535;
+			break;
+		case BLT_ORBITER2:
+			me->anim=15;
+			SetBulletVars(me,0,0,0,FIXAMT*20,10,BD_EIGHT);
+			me->dx=Cosine(me->facing*32)*8+Sine(me->facing*32)*4;
+			me->dy=Sine(me->facing*32)*8+Cosine(me->facing*32)*4;
 			me->target=65535;
 			break;
 		case BLT_MINDWIPE:
-			me->anim=0;
-			me->timer=40;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing*32)*10;
-			me->dy=Sine(me->facing*32)*10;
-			me->dz=0;
+			SetBulletVars(me,10,10,0,FIXAMT*20,40,BD_NONE);
 			break;
 		case BLT_PAPER:
-			me->anim=0;
-			me->timer=60;
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing)*9;
-			me->dy=Sine(me->facing)*9;
-			me->dz=0;
+			SetBulletVars(me,9,9,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_BUBBLE:
-			me->anim=0;
-			me->timer=40+Random(30);
-			me->z=FIXAMT*20;
-			me->dx=Cosine(me->facing)*5;
-			me->dy=Sine(me->facing)*5;
-			me->dz=FIXAMT*4;
+			SetBulletVars(me,5,5,FIXAMT*4,FIXAMT*20,40+Random(30),BD_NONE);
 			break;
-
 		case BLT_LILBOOM:
 		case BLT_LILBOOM2:
 			// Fix the little booms to show proper sprites when fired manually
 			me->timer=9;
 			break;
-
 		case BLT_BUBBLEPOP:
 			// Likewise with bubble pops
 			me->timer=10;
@@ -3667,6 +3364,7 @@ void FireExactBullet(int x,int y,int z,int dx,int dy,int dz,byte anim,byte timer
 			bullet[i].type=type;
 			bullet[i].target=65535;
 			bullet[i].flags=0;
+			CheckRecolor(&bullet[i]);
 
 			if(HasGravity(&bullet[i]))
 				bullet[i].flags|=BFL_GRAVITY;
@@ -3720,7 +3418,7 @@ void HammerLaunch(int x,int y,byte facing,byte count,byte flags)
 			type=BLT_LUNA2;
 		MakeSound(SND_LUNASHOOT,x,y,SND_CUTOFF,1200);
 	}
-	else if (player.playAs == PLAY_MYSTIC)
+	else if (player.playAs==PLAY_MYSTIC)
 	{
 		dz=0;
 		if (type == BLT_HAMMER)
@@ -4059,7 +3757,24 @@ void ChangeBullet(byte fx,int x,int y,int type,int newtype)
 				if (fx)
 					BlowSmoke(bullet[i].x, bullet[i].y, 0, FIXAMT/8);
 			}
+}
 
+void ChangeBulletColor(byte fx,int x,int y,int type,int colCode)
+{
+	byte fromCol, toCol;
+
+	fromCol = colCode % 256;
+	toCol = colCode / 256;
+
+	for(int i=0;i<config.numBullets;i++){
+		if( type==0 || bullet[i].type==0 || bullet[i].type!=type)
+			continue;
+		if (x == 255 || ((bullet[i].x >> FIXSHIFT)/TILE_WIDTH == x && (bullet[i].y >> FIXSHIFT)/TILE_HEIGHT == y))
+		{
+			bullet[i].fromColor = fromCol;
+			bullet[i].toColor = toCol;
+		}
+	}
 }
 
 // TORPEDO, LASER

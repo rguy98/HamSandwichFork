@@ -45,10 +45,12 @@ byte ControlCheck(byte c)
 	return 0;
 }
 
+void FocusCameraOnPlayer() {
+}
+
 void InitPlayer(byte level,const char *fname)
 {
 	int i;
-
 	strcpy(player.worldName,fname);
 	player.worldProg=GetWorldProgress(player.worldName);
 
@@ -125,6 +127,10 @@ void InitPlayer(byte level,const char *fname)
 	player.candleTime=30*30;
 	player.spotted=0;
 	player.playAs=profile.playAs;
+
+	player.camera.g=NULL;
+	player.camera.x=0;
+	player.camera.y=0;
 }
 
 void ExitPlayer(void)

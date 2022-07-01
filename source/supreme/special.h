@@ -93,7 +93,9 @@
 #define EFF_TEMPFLAGS	41	// give monster of type N at X,Y condition/flag Z (temporary)
 #define EFF_PERMFLAGS	42	// give monster of type N at X,Y condition/flag Z (temporary)
 #define EFF_COINLIMIT	43	// set coin limit to N
-#define EFF_MAX			44
+#define EFF_COLORBULLET	44	// change bullet of type N at X,Y (or any X,Y) coloration
+#define EFF_CAMERAMONS	45	// focus camera on monster (picks first one) - use invis monster for static cameras!
+#define EFF_MAX			46
 
 // trigger flags
 #define TF_NOT		1	// NOT this one
@@ -130,7 +132,7 @@ typedef struct trigger_t
 	byte x,y;	// coordinates of where it's triggered
 	int value;	// value of "N" in the trigger
 	int value2;	// another value for some triggers
-	int value3;	// another value for advanced triggers
+	//int value3;	// another value for advanced triggers
 } trigger_t;
 
 typedef struct effect_t
@@ -140,7 +142,7 @@ typedef struct effect_t
 	byte x,y;
 	int value;
 	int value2;
-	int value3;
+	//int value3;
 	char  text[32];
 } effect_t;
 
@@ -175,6 +177,11 @@ special_t *GetSpecial(int i);
 void SaveSpecials(FILE *f);
 void LoadSpecials(FILE *f,special_t *list);
 void DeleteSpecial(int i);
+
+int GetNumber3A(int value);
+int GetNumber3B(int value);
+void SetNumber3A(int &value, int nu);
+void SetNumber3B(int &value, int nu);
 
 class Map;
 

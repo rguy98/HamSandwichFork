@@ -64,6 +64,11 @@ typedef struct pocket_t {
 	int ammo;
 } pocket_t;
 
+typedef struct camera_t {
+	Guy *g; // Focus on guy
+	int x,y; // Focus on point
+}camera_t;
+
 typedef struct player_t
 {
 	// per-world value
@@ -71,6 +76,7 @@ typedef struct player_t
 	worldData_t *worldProg;
 	// values reset for each level
 	levelData_t *levelProg;
+	camera_t camera;
 	byte shield;
 	byte levelNum;
 	byte keys[4];
@@ -178,6 +184,7 @@ void PlayerGetBrain(int amt);
 void PlayerGetCandle(int amt);
 void PlayerGetCoin(int amt);
 void PlayerGetBonusGoal(char *text);
+void FocusCameraOnPlayer(void);
 
 void DoPlayerFacing(byte c, Guy* me);
 byte FakeGetControls(void);

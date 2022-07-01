@@ -339,7 +339,6 @@ void SpecialConvert(old_special_t *old,special_t *me,Map *map)
 		me->effect[i].flags=EFF_NONE;
 		me->effect[i].value=EFF_NONE;
 		me->effect[i].value2=EFF_NONE;
-		me->effect[i].value3=EFF_NONE;
 	}
 
 	me->uses=1;
@@ -363,7 +362,6 @@ void SpecialConvert(old_special_t *old,special_t *me,Map *map)
 	me->effect[0].type=EFF_NONE;
 	me->effect[0].value=0;
 	me->effect[0].value2=0;
-	me->effect[0].value3=0;
 	switch(old->effect)
 	{
 		case 1:	// summon

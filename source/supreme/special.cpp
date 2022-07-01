@@ -221,10 +221,11 @@ void DefaultTrigger(trigger_t *trig,int x,int y)
 			trig->value2=0;
 			break;
 		case TRG_TEMPFLAGS:
-			trig->value3 = 0;
 		case TRG_PERMFLAGS:
 			trig->value = MONS_BOUAPHA;
 			trig->value2 = 0;
+			trig->value = MONS_BOUAPHA;
+			trig->x = 255;
 			break;
 	}
 }
@@ -340,8 +341,11 @@ void DefaultEffect(effect_t *eff,int x,int y,byte savetext)
 			eff->text[0]='\0';
 			break;
 		case EFF_COLOR:
+			eff->value=MONS_ANYBODY;
+			eff->value2=0;
+			eff->x=255;
+			break;
 		case EFF_TEMPFLAGS:
-			eff->value3 = 0;
 		case EFF_PERMFLAGS:
 			eff->value=MONS_ANYBODY;
 			eff->value2=0;
@@ -371,6 +375,15 @@ void DefaultEffect(effect_t *eff,int x,int y,byte savetext)
 			break;
 		case EFF_DYNAMICSCRN:
 			strcpy(eff->text, "");
+			break;
+		case EFF_COLORBULLET:
+			eff->value=BLT_NONE;
+			eff->value2=0;
+			eff->x=255;
+			break;
+		case EFF_CAMERAMONS:
+			eff->value=MONS_ANYBODY;
+			eff->x=255;
 			break;
 		default:
 			break;
@@ -1385,11 +1398,14 @@ byte TriggerYes(special_t *me,trigger_t *t,Map *map)
 		case TRG_BONUSGOAL:
 			answer=BonusGoalObtained(player.worldProg,t->value);
 			break;
+		case TRG_GAMEMODE:
+			answer = profile.progress.purchase[modeShopNum[t->value]] & SIF_ACTIVE ? 1 : 0;
+			break;
 		case TRG_HAVEWEAPON:
 			answer=CheckForWeapon(t->value,t->value2);
 			break;
 		case TRG_TEMPFLAGS:
-			answer=CheckMonsterTempCondition(t->x,t->y,t->value,t->flags,(byte)t->value2,(byte)t->value3);
+			answer=CheckMonsterTempCondition(t->x,t->y,t->value,t->flags,(byte)GetNumber3A(t->value2),(byte)GetNumber3B(t->value2));
 			break;
 		case TRG_PERMFLAGS:
 			answer=CheckMonsterPermCondition(t->x,t->y,t->value,(byte)t->value2);
@@ -1449,6 +1465,7 @@ void SpecialEffect(special_t *me,Map *map)
 {
 	int i,v,v2;
 	byte fx;
+	Guy *m;
 
 	for(i=0;i<NUM_EFFECTS;i++)
 	{
@@ -1824,13 +1841,25 @@ void SpecialEffect(special_t *me,Map *map)
 				//NoRepeatNewMessage(me->effect[i].text,120,90);
 				break;
 			case EFF_TEMPFLAGS:
-				SetMonsterTempCondition(!(me->effect[i].flags & EF_NOFX), me->effect[i].x, me->effect[i].y, me->effect[i].value, me->effect[i].value2, me->effect[i].value3);
+				SetMonsterTempCondition(!(me->effect[i].flags & EF_NOFX), me->effect[i].x, me->effect[i].y, me->effect[i].value, GetNumber3A(me->effect[i].value2), GetNumber3B(me->effect[i].value2));
 				break;
 			case EFF_PERMFLAGS:
 				SetMonsterPermCondition(!(me->effect[i].flags&EF_NOFX),me->effect[i].x,me->effect[i].y,me->effect[i].value,me->effect[i].value2);
 				break;
 			case EFF_COINLIMIT:
 				player.maxCoins=me->effect[i].value;
+				break;
+			case EFF_COLORBULLET:
+				ChangeBulletColor(!(me->effect[i].flags&EF_NOFX),me->effect[i].x,me->effect[i].y,me->effect[i].value,me->effect[i].value2);
+				break;
+			case EFF_CAMERAMONS:
+				m = FindMonster(me->effect[i].x, me->effect[i].y, me->effect[i].value);
+				if (m){
+					player.camera.g = m;
+					player.camera.x = 0;
+					player.camera.y = 0;
+					UpdateCamera(player.camera.g->x>>FIXSHIFT,player.camera.g->y>>FIXSHIFT,player.camera.g->dx,player.camera.g->dy,map);
+				}
 				break;
 		}
 	}
@@ -2229,6 +2258,7 @@ void AdjustSpecialEffectCoords(special_t *me,int dx,int dy)
 				me->effect[i].y+=dy;
 				break;
 			case EFF_CHANGEBULLET:
+			case EFF_COLORBULLET:
 				if(me->effect[i].x!=255)
 				{
 					me->effect[i].x+=dx;
@@ -2281,4 +2311,20 @@ void PrintSpecialComment(int x,int y,int mx,int my)
 			}
 		}
 	}
+}
+
+int GetNumber3B(int value) {
+	return value % 1000;
+}
+int GetNumber3A(int value) {
+	return (value - GetNumber3B(value)) / 1000;
+}
+
+void SetNumber3B(int &value, int nu) {
+	value -= value % 1000;
+	value += nu < 255 ? nu : 255;
+}
+void SetNumber3A(int &value, int nu) {
+	value -= value - value % 1000;
+	value += nu * 1000;
 }
