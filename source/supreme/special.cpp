@@ -385,6 +385,9 @@ void DefaultEffect(effect_t *eff,int x,int y,byte savetext)
 			eff->value=MONS_ANYBODY;
 			eff->x=255;
 			break;
+		case EFF_COLORMSG:
+			eff->value2=0;
+			break;
 		default:
 			break;
 	}
@@ -683,8 +686,7 @@ byte TeleportGuy(Guy *victim,int x,int y,Map *map,byte noFX)
 	victim->dy=0;
 	if(victim->aiType==MONS_BOUAPHA)
 	{
-		PutCamera(victim->x,victim->y);
-		UpdateCamera(victim->x>>FIXSHIFT,victim->y>>FIXSHIFT,victim->dx,victim->dy,map);
+		CameraJump(player.camera.g->x, player.camera.g->y,map);
 		SetTportClock(15);
 		if(shopping)
 			SetTportClock(2);
@@ -1861,6 +1863,17 @@ void SpecialEffect(special_t *me,Map *map)
 					UpdateCamera(player.camera.g->x>>FIXSHIFT,player.camera.g->y>>FIXSHIFT,player.camera.g->dx,player.camera.g->dy,map);
 				}
 				break;
+			case EFF_COLORMSG:
+				if(me->effect[i].text[0]!='/' || me->effect[i].text[1]!='/')
+				{
+					if(me->effect[i].flags&EF_TOGGLE)
+					{
+						NewBigMessage(me->effect[i].text,100,me->effect[i].value2);
+						if (!(me->effect[i].flags&EF_NOFX)) MakeNormalSound(SND_MESSAGE);
+					}
+					else if(NoRepeatNewMessage(me->effect[i].text,120,90,me->effect[i].value2) && !(me->effect[i].flags&EF_NOFX))
+						MakeNormalSound(SND_MESSAGE);
+				}
 		}
 	}
 	if(me->uses>0)

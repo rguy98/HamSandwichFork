@@ -5,6 +5,7 @@
 #include "monster.h"
 #include "jamulspr.h"
 #include "display.h"
+#include "pathfinding.h"
 
 #define ACTION_IDLE	0
 #define ACTION_BUSY 1
@@ -33,7 +34,7 @@ class Guy
 		int x,y,z;
 		int oldx,oldy;
 		int dx,dy,dz;
-		int ax, ay; //acceleration provided by badguys
+		int ax, ay; // acceleration provided by badguys
 		byte mapx,mapy;
 		byte lastBumpX,lastBumpY;
 		byte facing;
@@ -82,6 +83,7 @@ class Guy
 		char name[32];
 
 		sprite_set_t* customSpr; // custom sprites
+		node_t node[1024];
 };
 
 #define GSF_NEWAI		1	// New AI - avoids pre-mod conflict
@@ -180,6 +182,7 @@ void PutSpook(void);
 // Helpful new functions
 byte IsZombie(Guy *g);
 byte IsSuperZombie(Guy *g);
+byte FocusOnGuy(Guy *g, Map *map);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

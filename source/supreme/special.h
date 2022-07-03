@@ -95,7 +95,8 @@
 #define EFF_COINLIMIT	43	// set coin limit to N
 #define EFF_COLORBULLET	44	// change bullet of type N at X,Y (or any X,Y) coloration
 #define EFF_CAMERAMONS	45	// focus camera on monster (picks first one) - use invis monster for static cameras!
-#define EFF_MAX			46
+#define EFF_COLORMSG	46	// show color message M
+#define EFF_MAX			47
 
 // trigger flags
 #define TF_NOT		1	// NOT this one

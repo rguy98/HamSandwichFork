@@ -88,7 +88,7 @@
 #define BLT_COMET		74	// Armageddon drops these
 #define BLT_COMETBOOM	75	// and they explode like this
 
-// Sleepless
+// Sleepless Hollow
 #define BLT_SITFLAME	76	// sits around for a while
 #define BLT_FLAME3		77	// floaty flame, drifts up
 #define BLT_IGNITE		78	// flamebringer shot that ignites the target hit
@@ -98,7 +98,7 @@
 #define BLT_BADSITFLAME	82
 #define BLT_LASERBEAM	83
 
-/*
+// Loonyland
 #define BLT_ENERGY2		84	// Redbone bullet
 #define BLT_FLAMEWALL	85	// Flame wall
 #define BLT_EARTHSPIKE	86	// more advanced than the regular
@@ -153,12 +153,12 @@
 #define BLT_HOTDOGFIRE	125
 #define BLT_ICEWOLFICE	126
 #define BLT_FARLEYGAS	127
-*/
 
 // Operation SCARE
-#define BLT_BADLUNA			84
-#define BLT_BADFBALL		85
-#define BLT_BADLIGHTNING	86
+#define BLT_BADLUNA			128
+#define BLT_BADFBALL		129
+#define BLT_BADLIGHTNING	130
+#define BLT_BADBOOMERANG	131
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1

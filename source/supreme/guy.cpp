@@ -6,6 +6,7 @@
 #include "hiscore.h"
 #include "shop.h"
 #include "goal.h"
+#include "pathfinding.h"
 
 Guy **guys;
 Guy *goodguy;
@@ -697,11 +698,8 @@ void Guy::Update(Map *map,world_t *world)
 	mapx=(x>>FIXSHIFT)/TILE_WIDTH;
 	mapy=(y>>FIXSHIFT)/TILE_HEIGHT;
 
-	if(player.camera.g){
-		UpdateCamera(player.camera.g->x >> FIXSHIFT, player.camera.g->y >> FIXSHIFT, player.camera.g->dx, player.camera.g->dy, map);
-	}
-	else if(!player.camera.x && !player.camera.y){
-		UpdateCamera(goodguy->x >> FIXSHIFT, goodguy->y >> FIXSHIFT, goodguy->dx, goodguy->dy, map);
+	if(!player.camera.g){
+		player.camera.g = goodguy;
 	}
 
 	if(aiType==MONS_BOUAPHA)	// special case, Bouapha is the player, follow him
@@ -711,31 +709,31 @@ void Guy::Update(Map *map,world_t *world)
 			profile.progress.footDistance+=abs(dx/FIXAMT)+abs(dy/FIXAMT);
 		}
 
-		if ((player.camera.g==goodguy || !player.camera.g) && aiType == MONS_LOG)//for when you're riding the log!
-		{
-			int tdx, tdy;
-			tdx = dx;
-			tdy = dy;
-			if (mind != 0)
-			{
-				tdx = dx / 2;
-				tdy = dy / 2;
-			}
-			UpdateCamera(x>>FIXSHIFT,y>>FIXSHIFT,tdx,tdy,map);
-		}
-		else if (player.camera.g == goodguy || !player.camera.g) {
+		if (player.camera.g == goodguy) {
 			int tdx,tdy;
 			tdx=dx;
 			tdy=dy;
-			if(player.vehicle==VE_YUGO || player.vehicle==VE_MINECART)
-			{
-				if(goodguy->parent)
-				{
-					tdx=goodguy->parent->dx;
-					tdy=goodguy->parent->dy;
-				}
+			switch(player.vehicle){
+				case VE_YUGO:
+				case VE_MINECART:
+					if(goodguy->parent)
+					{
+						tdx=goodguy->parent->dx;
+						tdy=goodguy->parent->dy;
+					}
+					break;
+				case VE_LOG:
+					if (mind != 0)
+					{
+						tdx = dx / 2;
+						tdy = dy / 2;
+					}
+					break;
 			}
 			UpdateCamera(x>>FIXSHIFT,y>>FIXSHIFT,tdx,tdy,map);
+		}
+		else if(!GetTportClock()){
+			FocusOnGuy(player.camera.g,map);
 		}
 		
 		if((map->flags&MAP_TORCHLIT) || player.spotted)
@@ -4837,4 +4835,11 @@ byte PeepAtKid(int x, int y, Map* map, byte face) //for peeping bomb
 	}
 
 	return 0;
+}
+
+byte FocusOnGuy(Guy *g,Map *map){
+	if(!g)
+		return 0;
+	UpdateCamera(g->x >> FIXSHIFT, g->y >> FIXSHIFT, g->dx, g->dy, map);
+		return 1;
 }

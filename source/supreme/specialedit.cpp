@@ -343,9 +343,55 @@ static char bulletName[][20]={
 	"Evil Green Bullet",
 	"Evil Sitting Flame",
 	"Laser Beam",
+	// Loonyland
+	"Redbone Bullet",
+	"Flame Wall",
+	"Earth Spike",
+	"Gas Blast",
+	"MEGA Explosion",
+	"Whoopee Gas",
+	"Potted Cactus",
+	"Boomerang",
+	"Ice Wand Blast",
+	"Big Bomb",
+	"Big Bomb Boom",
+	"Hot Pants Trail",
+	"Swamp Gas",
+	"Orb Grenade",
+	"Frankenrocket",
+	"Heat Seeker",
+	"Rocket Smoke",
+	"Adv. Ice Wand",
+	"Bat Shot",
+	"Wind Missile",
+	"Adv. Earth Spike",
+	"Ice Shard",
+	"Drippy Water",
+	"Fountain",
+	"Swamp Gas 2",
+	"Evil Face",
+	"Big Shot",
+	"Blast",
+	"Buzzsaw",
+	"Speedy Shot",
+	"Shocker Shot",
+	"Icy Bolt",
+	"Plague",
+	"Plague Gas",
+	"KABOOM!",
+	"Wolf Shot",
+	"Wolf Shock",
+	"Claw Bullet",
+	"Bombie Boom",
+	"Croaker Gas",
+	"Hot Dog Fire",
+	"Wolf Ice Shot",
+	"Farley Gas",
+	// New stuff!!
 	"Evil Lunachick Ray",
 	"Evil Fireball",
 	"Evil Lightning Ball",
+	"Evil Boomerang"
 };
 #define MAX_BULLETS (BLT_BADLIGHTNING + 1)
 
@@ -2802,6 +2848,22 @@ static void SetupEffectButtons(int t,int y)
 			else
 				sprintf(s,"%d, %d",effect.x,effect.y);
 			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,258,y+17,70,14,s,XY3Click);
+			break;
+		case EFF_COLORMSG:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Show message",NULL);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,160,y+17,250,14,effect.text,MessageClick);
+			s[0]=effect.value2%256;
+			MakeButton(BTN_COLOR,ID_EFF0+OFS_CUSTOM+4+100*t,0,446,y+17,14,14,s,ColorClick1);
+			sprintf(s,"%d",effect.value2);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+5+100*t,0,40,y+8,1,1,s,NULL);
+			if(effect.flags&EF_NOFX)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+2+100*t,0,520,y+17,65,14,"No Snd",NoFXClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+2+100*t,0,520,y+17,65,14,"Play Snd",NoFXClick);
+			if(effect.flags&EF_TOGGLE)
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,455,y+17,60,14,"Large",ToggleClick);
+			else
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,455,y+17,60,14,"Normal",ToggleClick);
 			break;
 	}
 }

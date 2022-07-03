@@ -147,7 +147,12 @@ byte InitLevel(byte map)
 	InitBullets();
 	InitPlayer(map,player.worldName);
 	InitMessage();
-	NewBigMessage(curMap->name,100);
+	if(shopping){
+		NewBigMessage(curMap->name,100,3);
+	}
+	else{
+		NewBigMessage(curMap->name,100,4);
+	}
 	InitParticles(config.numParticles);
 	lastKey=0;
 	curMap->Init(&curWorld);
@@ -475,7 +480,7 @@ TASK(byte) LunaticRun(int *lastTime)
 		else if(msgFromOtherModules==MSG_RESET)
 		{
 			GoalTimeDist();
-			NewBigMessage("Try Again!",30);
+			NewBigMessage("Try Again!",30,4);
 			windingDown=30;
 			windDownReason=LEVEL_RESET;
 			msgFromOtherModules=MSG_NONE;
@@ -825,4 +830,9 @@ TASK(void) TestLevel(world_t *world,byte level)
 	InitGuys(256);
 	GetSpecialsFromMap(EditorGetMap()->special);
 	editing=1;
+}
+
+int lerpi(int a, int b, float f) {
+	float f2 = a + f * (b - a);
+	return (int)f2;
 }

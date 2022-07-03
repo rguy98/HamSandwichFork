@@ -17,6 +17,7 @@ int scrx=320,scry=240,scrdx=0,scrdy=0;
 int rscrx=320<<FIXSHIFT,rscry=240<<FIXSHIFT;
 
 byte shakeTimer=0;
+byte shakePower=0;
 
 DisplayList *dispList;
 static byte gammaCorrection=0;
@@ -219,6 +220,26 @@ void PutCamera(int x,int y)
 	scry=(rscry>>FIXSHIFT);
 }
 
+void CameraJump(int x, int y,Map *map)
+{
+	rscrx = x;
+	rscry = y;
+	scrdx = 0;
+	scrdy = 0;
+
+	if(rscrx<320<<FIXSHIFT)
+		rscrx=320<<FIXSHIFT;
+	if(rscrx>((map->width*TILE_WIDTH-320)<<FIXSHIFT))
+		rscrx=(map->width*TILE_WIDTH-320)<<FIXSHIFT;
+	if(rscry<(240-TILE_HEIGHT)<<FIXSHIFT)
+		rscry=(240-TILE_HEIGHT)<<FIXSHIFT;
+	if(rscry>((map->height*TILE_HEIGHT-240)<<FIXSHIFT))
+		rscry=(map->height*TILE_HEIGHT-240)<<FIXSHIFT;
+
+	scrx=(rscrx>>FIXSHIFT);
+	scry=(rscry>>FIXSHIFT);
+}
+
 void UpdateCamera(int x,int y,int dx,int dy,Map *map)
 {
 	int desiredX,desiredY;
@@ -287,6 +308,11 @@ void Print(int x,int y,const char *s,char bright,byte font)
 		else
 			FontPrintStringSolid(x,y,s,gameFont[font],0);
 	}
+}
+
+void PrintColor(int x,int y,const char *s,byte color,char bright,byte font)
+{
+	FontPrintStringColor(x,y,s,gameFont[font],color,bright);
 }
 
 void PrintGlow(int x,int y,const char *s,char bright,byte font)
@@ -375,6 +401,13 @@ void DrawMouseCursor(int x,int y)
 void ShakeScreen(byte howlong)
 {
 	shakeTimer=howlong;
+	shakePower=5;
+}
+
+void ShakeScreen(byte howlong, byte howmuch)
+{
+	shakeTimer = howlong;
+	shakePower = howmuch;
 }
 
 void RenderItAll(world_t *world,Map *map,byte flags)
@@ -382,8 +415,11 @@ void RenderItAll(world_t *world,Map *map,byte flags)
 	if(shakeTimer)
 	{
 		shakeTimer--;
-		scrx+=-2+Random(5);
-		scry+=-2+Random(5);
+		scrx+=-(shakePower/2)+Random(shakePower);
+		scry+=-(shakePower/2)+Random(shakePower);
+	}
+	else if(shakePower){
+		shakePower = 0;
 	}
 	if(editing==1)
 	{

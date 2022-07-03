@@ -27,6 +27,7 @@
 #define SPR_RAGE		71
 #define SPR_COINBOX		76
 #define SPR_VARBAR		78
+#define SPR_BONUSCHK	79
 
 #define SPR_IFHAMMER	1
 #define SPR_MINIGAUGE	2
@@ -982,7 +983,7 @@ void RenderCollectedStuff(int x,int y,MGLDraw *mgl)
 	if((player.levelProg->flags&LF_CANDLES))
 		intfaceSpr->GetSprite(SPR_CANDLE)->Draw(x+181,y+20,mgl);
 	if((player.levelProg->flags&LF_BONUS))
-		intfaceSpr->GetSprite(SPR_CANDLE)->Draw(x+181,y+40,mgl);
+		intfaceSpr->GetSprite(SPR_BONUSCHK)->Draw(x+157,y+83,mgl);
 
 	if(PlayerBrains()>=curMap->numBrains)
 		intfaceSpr->GetSprite(SPR_BRAIN)->Draw(x+144,y+1,mgl);

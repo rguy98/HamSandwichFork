@@ -53,6 +53,27 @@
 #define SPR_COIN		509
 #define SPR_BIGCOIN		517
 
+// Loonyland additions
+#define SPR_FLAMEWALL	549
+#define SPR_GASCLOUD	553
+#define SPR_REDBONE		559
+#define SPR_EARTHSPIKE	561
+#define SPR_MEGABOOM	569
+#define SPR_MEGABOOM	569
+#define SPR_CACTUS		579
+#define SPR_BOOMERANG	595
+#define SPR_SLVRBULLET	611
+#define SPR_BIGBOMBBOOM	627
+#define SPR_BIGBOMB		638
+#define SPR_ROCKET		645
+#define SPR_BARREL		661
+#define SPR_CHAIR		669
+#define SPR_TABLE		677
+#define SPR_DROPLET		685
+#define SPR_DROPLET		685
+#define SPR_CLAW		692
+#define SPR_WHOOPEE		708
+
 bullet_t *bullet;
 sprite_set_t *bulletSpr;
 byte reflect=0;
@@ -434,6 +455,7 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 			me->type=0;
 			break;
 		case BLT_ENERGY:
+		case BLT_ENERGY2:
 			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
 			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,4);
 			me->type=0;
@@ -2830,6 +2852,7 @@ void SetBulletVars(bullet_t *me, int dx, int dy, int dz, int z, int timer, byte 
 			break;
 	}
 
+	me->anim=0;
 	me->dx = Cosine(f)*dx;
 	me->dy = Sine(f)*dy;
 	me->dz = dz;
@@ -2921,8 +2944,8 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetBulletVars(me,8,8,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_COMET:
-			me->anim=(byte)Random(8);
 			SetBulletVars(me,0,0,-FIXAMT*50,400*FIXAMT+Random(300*FIXAMT),255,BD_NONE);
+			me->anim=(byte)Random(8);
 			break;
 		case BLT_SLIME:
 			SetBulletVars(me,0,0,0,0,12*16,BD_NONE);
@@ -3023,10 +3046,10 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			MakeSound(SND_MISSILELAUNCH,me->x,me->y,SND_CUTOFF,1100);
 			break;
 		case BLT_TORPEDO:
-			me->anim=Random(8);
 			SetTorpedoFacing(me->facing,me->target);
 			SetMissileOffset(me->x, me->y);
 			SetBulletVars(me,0,0,-6+Random(13),FIXAMT*20,60,BD_SIXTEEN);
+			me->anim=Random(8);
 			break;
 		case BLT_ACID:
 		case BLT_SHARK:
@@ -3060,11 +3083,16 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			MakeSound(SND_FLAMEGO, me->x, me->y, SND_CUTOFF, 1100);
 			break;
 		case BLT_LASER:
-			me->facing=me->facing*32+4-Random(9);
-			me->facing/=16;
+			me->anim = 0;
+			me->timer = 30;
+			me->z = FIXAMT * 20 - Random(FIXAMT);
 			SetLaserOffset(me->x, me->y);
-			SetBulletVars(me, 24, 24, 0, FIXAMT * 20 - Random(FIXAMT), 30, BD_NONE);
-			MakeSound(SND_BULLETFIRE,me->x,me->y,SND_CUTOFF,1050);
+			me->facing = me->facing * 32 + 4 - Random(9);
+			me->dx = Cosine(me->facing) * 24;
+			me->dy = Sine(me->facing) * 24;
+			me->facing /= 16;
+			me->dz = 0;
+			MakeSound(SND_BULLETFIRE, me->x, me->y, SND_CUTOFF, 1050);
 			break;
 		case BLT_LASERBEAM: // man i don't know what to do here
 			me->anim = 0;
@@ -3167,15 +3195,15 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetBulletVars(me,8,8,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_ORBITER:
-			me->anim=15;
 			SetBulletVars(me,0,0,0,FIXAMT*20,40,BD_EIGHT);
+			me->anim=15;
 			me->dx=Cosine(me->facing*32)*8+Sine(me->facing*32)*4;
 			me->dy=Sine(me->facing*32)*8+Cosine(me->facing*32)*4;
 			me->target=65535;
 			break;
 		case BLT_ORBITER2:
-			me->anim=15;
 			SetBulletVars(me,0,0,0,FIXAMT*20,10,BD_EIGHT);
+			me->anim=15;
 			me->dx=Cosine(me->facing*32)*8+Sine(me->facing*32)*4;
 			me->dy=Sine(me->facing*32)*8+Cosine(me->facing*32)*4;
 			me->target=65535;

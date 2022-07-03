@@ -925,7 +925,7 @@ void AI_MattieBrain(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			BlowSmoke((x+me->rectx-40+Random(me->rectx2-me->rectx+80))<<FIXSHIFT,
 					  (y+me->recty-200+Random(me->recty2-me->recty+210))<<FIXSHIFT,
 					  me->z,FIXAMT);
-			ShakeScreen(2);
+			ShakeScreen(2,6);
 		}
 	}
 	// use the claws to cover your face when scared
@@ -2570,7 +2570,7 @@ void AI_SuperZombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			{
 				FireBullet(me->x,me->y-FIXAMT,0,BLT_SHOCKWAVE,me->friendly);
 				MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,1500);
-				ShakeScreen(10);
+				ShakeScreen(10,6);
 			}
 			else
 			{
@@ -4501,7 +4501,7 @@ void AI_SphinxArm(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			}
 
 			if(RangeToTarget(me,goodguy)<1000*FIXAMT)
-				ShakeScreen(6);
+				ShakeScreen(6,10);
 		}
 
 		if(me->seq==ANIM_DIE)

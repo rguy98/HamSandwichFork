@@ -95,4 +95,6 @@ void RestoreGameplayGfx(void);
 
 byte GetGameMode(void);
 
+int lerpi(int a,int b,float f);
+
 #endif

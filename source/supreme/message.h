@@ -9,6 +9,7 @@ typedef struct message_t
 	int dy;
 	int timer;
 	int bright;
+	int color;
 	char brightDir;
 	char msg[32];
 	byte priority;
@@ -21,5 +22,9 @@ void UpdateMessage(void);
 void RenderMessage(void);
 byte NoRepeatNewMessage(const char *txt,int time,byte priority);
 const char *VariableMsg(const char *txt);
+
+void NewMessage(const char *txt,int time,byte priority,byte color);
+void NewBigMessage(const char *txt,int time,byte color);
+byte NoRepeatNewMessage(const char *txt,int time,byte priority,byte color);
 
 #endif

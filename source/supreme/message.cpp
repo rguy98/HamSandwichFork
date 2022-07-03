@@ -92,6 +92,7 @@ void NewBigMessage(const char *txt,int time)
 	bigMessage.timer=time;
 	bigMessage.bright=-32;
 	bigMessage.brightDir=2;
+	bigMessage.color=4; // red!
 }
 
 void NewMessage(const char *txt,int time,byte priority)
@@ -106,6 +107,7 @@ void NewMessage(const char *txt,int time,byte priority)
 	message.bright=-32;
 	message.brightDir=2;
 	message.priority=priority;
+	message.color=4; // red!
 }
 
 byte NoRepeatNewMessage(const char *txt,int time,byte priority)
@@ -113,6 +115,42 @@ byte NoRepeatNewMessage(const char *txt,int time,byte priority)
 	if(message.timer>priority && !strncmp(message.msg,txt,32))
 		return 0;	// don't reset if showing the same message
 	NewMessage(txt,time,1);
+	return 1;
+}
+
+//Overload functions
+void NewBigMessage(const char *txt,int time,byte color)
+{
+	SDL_strlcpy(bigMessage.msg, VariableMsg(txt), sizeof(bigMessage.msg));
+	bigMessage.x=320-GetStrLength(bigMessage.msg,0)/2;
+	bigMessage.y=-100;
+	bigMessage.dy=0;
+	bigMessage.timer=time;
+	bigMessage.bright=-32;
+	bigMessage.brightDir=2;
+	bigMessage.color=color; // red!
+}
+
+void NewMessage(const char *txt,int time,byte priority,byte color)
+{
+	if(message.priority==1 && priority==0)
+		return;	// can't override it
+	SDL_strlcpy(message.msg, VariableMsg(txt), sizeof(message.msg));
+	message.x=2;
+	message.y=484;
+	message.dy=-13;
+	message.timer=time;
+	message.bright=-32;
+	message.brightDir=2;
+	message.priority=priority;
+	message.color=color; // red!
+}
+
+byte NoRepeatNewMessage(const char *txt,int time,byte priority,byte color)
+{
+	if(message.timer>priority && !strncmp(message.msg,txt,32))
+		return 0;	// don't reset if showing the same message
+	NewMessage(txt,time,1,color);
 	return 1;
 }
 
@@ -200,7 +238,7 @@ void RenderMessage(void)
 	char b;
 
 	b=message.bright/2;
-	Print(message.x,message.y,message.msg,b,0);
+	PrintColor(message.x,message.y,message.msg,message.color,b,0);
 	b=bigMessage.bright/2;
-	Print(bigMessage.x,bigMessage.y,bigMessage.msg,b,0);
+	PrintColor(bigMessage.x,bigMessage.y,bigMessage.msg,bigMessage.color,b,0);
 }

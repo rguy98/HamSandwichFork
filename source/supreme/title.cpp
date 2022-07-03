@@ -214,7 +214,7 @@ static int titleRuns;
 static int msx,msy,oldmsx,oldmsy;
 static byte cursor;
 static byte sliceOut[8];
-char menuTxt[][16]={"Play","Profile","Tutorial","Instructions","Exit","Internet","Shop","Editor"};
+char menuTxt[][16]={"Play","Profile","Tutorial","Instructions","Exit","Extras","Shop","Editor"};
 int igfX,igfY,igfDX,igfDY;
 
 void MainMenuDisplay(MGLDraw *mgl)
@@ -301,9 +301,9 @@ TASK(byte) MainMenuUpdate(int *lastTime,MGLDraw *mgl)
 		for(i=0;i<8;i++)
 		{
 			if(cursor!=i && sliceOut[i]>0)
-				sliceOut[i]--;
+				sliceOut[i]=lerpi(sliceOut[i],0,0.15);
 			else if(cursor==i && sliceOut[i]<20)
-				sliceOut[i]+=2;
+				sliceOut[i]=lerpi(sliceOut[i],20,0.15);
 		}
 		reptCounter++;
 

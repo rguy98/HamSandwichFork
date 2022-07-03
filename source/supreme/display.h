@@ -101,6 +101,11 @@ void RoofDraw(int x,int y,word roof,const char *light,word flags);
 void ParticleDraw(int x,int y,int z,byte type,byte size,word flags);
 void LightningDraw(int x,int y,int x2,int y2,byte bright,char range);
 
+// New
+void PrintColor(int x,int y,const char *s,byte color,char bright,byte font);
+void ShakeScreen(byte howlong,byte howmuch);
+void CameraJump(int x,int y,Map *map);
+
 void DrawBox(int x,int y,int x2,int y2,byte c);
 void DrawFillBox(int x,int y,int x2,int y2,byte c);
 void DrawDebugBox(int x,int y,int x2,int y2);

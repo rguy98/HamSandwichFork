@@ -184,6 +184,9 @@ void RenderPauseMenu(void)
 		RenderPauseButton(i,pauseX+20,pauseY+15+22*i,125,menu[i].text,GetDisplayMGL());
 	}
 
+	if (curMap->flags & MAP_BONUS)
+		pauseSpr->GetSprite(10)->Draw(pauseX+150,pauseY+76,GetDisplayMGL());
+
 	RenderCollectedStuff(pauseX,pauseY,GetDisplayMGL());
 
 	// mouse cursor
@@ -361,9 +364,9 @@ void ExitPauseMenu(void)
 void UpdateUnpaused(void)
 {
 	if(pauseX<640)
-		pauseX+=15;
+		pauseX=lerpi(pauseX,641,0.25);
 	if(pauseY<480)
-		pauseY+=20;
+		pauseY=lerpi(pauseY,481,0.25);
 }
 
 byte NextVolumeSpot(byte v)
@@ -410,19 +413,15 @@ byte UpdatePauseMenu(MGLDraw *mgl)
 
 	if(pauseX>427)
 	{
-		pauseX-=15;
+		pauseX=lerpi(pauseX,427,0.25);
 		mgl->SetMouse(msx-15,msy);
 		mgl->GetMouse(&msx,&msy);
-		if(pauseX<427)
-			pauseX=427;
 	}
 	if(pauseY>206)
 	{
-		pauseY-=20;
+		pauseY=lerpi(pauseY,206,0.25);
 		mgl->SetMouse(msx,msy-20);
 		mgl->GetMouse(&msx,&msy);
-		if(pauseY<206)
-			pauseY=206;
 	}
 
 
