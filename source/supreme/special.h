@@ -4,7 +4,7 @@
 #include "mgldraw.h"
 #include <stdio.h>
 
-#define MAX_SPECIAL	128
+#define MAX_SPECIAL	256
 #define MAX_EVENT   128
 
 //special triggers
@@ -46,6 +46,7 @@
 #define TRG_HAVEWEAPON	35	// true if player has weapon [V1] at slot [V2]
 #define TRG_TEMPFLAGS	36	// true if monster of type N at X,Y has condition/flag M
 #define TRG_PERMFLAGS	37	// true if monster of type N at X,Y has condition/flag M
+#define TRG_BEGINLEVEL	38	// activates exactly at beginning of level - no delay!
 #define MAX_TRIGGER		38
 
 // effects
@@ -206,6 +207,7 @@ void PrintSpecialComment(int x,int y,int mx,int my);
 // --- Gameplay
 void InitSpecialsForPlay(void);
 void CheckSpecials(Map *map);
+void CheckBOLSpecials(Map *map); // checks at exact start of level
 void EventOccur(byte type,int value,int x,int y,Guy *victim);
 void RenderSpecialXes(Map *map);
 void AdjustSpecialCoords(special_t *me,int dx,int dy);

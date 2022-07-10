@@ -1145,6 +1145,11 @@ void ItemEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 	// the sprite and its position
 	SetSpriteConstraints(481,201,637,357);
 	InstaRenderItem(560,280,curItem,0,mgl);
+
+	char s[32];
+	sprintf(s, "%d,%d", GetItem(curItem)->xofs, GetItem(curItem)->yofs);
+	Print(400, 128, s, 0, 1);
+
 	SetSpriteConstraints(0,0,639,479);
 	mgl->Box(560-TILE_WIDTH/2,280-TILE_HEIGHT/2,560+TILE_WIDTH/2-1,280+TILE_HEIGHT/2-1,32*backColor+18);
 

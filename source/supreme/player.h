@@ -115,7 +115,7 @@ typedef struct player_t
 	byte cheesePower;
 	byte gotRecords;
 	byte spotted;
-	byte waterDyn, lavaDyn;
+	byte waterDyn[2], lavaDyn[2]; //from,to
 	int oxygen;
 	int comboClock;
 	int clock;

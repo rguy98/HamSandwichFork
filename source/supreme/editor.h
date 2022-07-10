@@ -29,6 +29,8 @@
 #define EDITMODE_EXIT		18
 #define EDITMODE_EXITYES	19
 #define EDITMODE_LEVELMENU	20
+#define EDITMODE_MYSTIC		21
+#define EDITMODE_KMCONFIRM	22
 
 extern byte editing;
 
@@ -53,5 +55,7 @@ byte GetDisplayFlags(void);
 void ToggleDisplayFlag(byte f);
 void ViewMenuOn(void);
 void ViewMenuOff(void);
+
+byte ConvertKidMysticWorld(world_t* world);
 
 #endif

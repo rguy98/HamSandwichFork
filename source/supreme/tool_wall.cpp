@@ -42,8 +42,8 @@ void WallTool::Update(int msx,int msy)
 				active=i;
 				if(GetDisplayMGL()->RMouseDown())
 				{
-					tile[active][0]=800;
-					tile[active][1]=800;
+					tile[active][0]=1200;
+					tile[active][1]=1200;
 				}
 				MakeNormalSound(SND_MENUCLICK);
 			}
@@ -72,7 +72,7 @@ void WallTool::Update(int msx,int msy)
 				pickingTile=i;
 				active=i;
 				pickWallRoof=1;
-				if(tile[i][0]==800)
+				if(tile[i][0]==1200)
 				{
 					tile[i][0]=0;
 					tile[i][1]=0;
@@ -89,7 +89,7 @@ void WallTool::Update(int msx,int msy)
 				pickingTile=i;
 				active=i;
 				pickWallRoof=0;
-				if(tile[i][0]==800)
+				if(tile[i][0]==1200)
 				{
 					tile[i][0]=0;
 					tile[i][1]=0;
@@ -118,7 +118,7 @@ void WallTool::Render(int msx,int msy)
 
 	for(i=0;i<4;i++)
 	{
-		if(tile[i][0]<800 && tile[i][1]<800)
+		if(tile[i][0]<1200 && tile[i][1]<1200)
 		{
 			RenderFloorTile(496+i*(TILE_WIDTH+4),424+TILE_HEIGHT,tile[i][0],0);
 			RenderFloorTile(496+i*(TILE_WIDTH+4),424,tile[i][1],0);
@@ -182,7 +182,7 @@ void WallTool::PlopOne(int x,int y)
 
 	m=EditorGetMap();
 
-	if(x>=0 && y>=0 && x<m->width && y<m->height && m->map[x+y*m->width].select && tile[active][0]<800 && tile[active][1]<800)
+	if(x>=0 && y>=0 && x<m->width && y<m->height && m->map[x+y*m->width].select && tile[active][0]<1200 && tile[active][1]<1200)
 	{
 		m->map[x+y*m->width].floor=tile[active][1];
 		m->map[x+y*m->width].wall=tile[active][0];

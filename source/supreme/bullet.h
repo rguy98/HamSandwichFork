@@ -135,30 +135,21 @@
 #define BLT_EVILFACE	110
 #define BLT_BIGSHOT		111
 
-#define BLT_BLAST		112
-#define BLT_BUZZSAW		113
-#define BLT_SPEEDY		114
-#define BLT_SHOCKER		115
-#define BLT_ICEBOLT		116
-#define BLT_PLAGUE		117
-#define BLT_PLAGUEGAS	118
-#define BLT_KABOOM		119
+#define BLT_WOLFSHOT	112
+#define BLT_WOLFSHOCK	113
 
-#define BLT_WOLFSHOT	120
-#define BLT_WOLFSHOCK	121
-
-#define BLT_CLAW		122
-#define BLT_BOMBIEBOOM	123
-#define BLT_CROAKERGAS	124
-#define BLT_HOTDOGFIRE	125
-#define BLT_ICEWOLFICE	126
-#define BLT_FARLEYGAS	127
+#define BLT_CLAW		114
+#define BLT_BOMBIEBOOM	115
+#define BLT_CROAKERGAS	116
+#define BLT_HOTDOGFIRE	117
+#define BLT_ICEWOLFICE	118
+#define BLT_FARLEYGAS	119
 
 // Operation SCARE
-#define BLT_BADLUNA			128
-#define BLT_BADFBALL		129
-#define BLT_BADLIGHTNING	130
-#define BLT_BADBOOMERANG	131
+#define BLT_BADLUNA			120
+#define BLT_BADFBALL		121
+#define BLT_BADLIGHTNING	122
+#define BLT_BADBOOMERANG	123
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1
@@ -225,6 +216,10 @@ void FireScanShots(Guy *victim);
 void MakeRadar(int rx,int ry,byte w);
 byte GetBulletAttackType(void);
 byte HasGravity(bullet_t* me);
+
+void FireBullet(int x, int y, byte facing, byte type, byte friendly, word target);
+bullet_t *GetFireBullet(int x, int y, byte facing, byte type, byte friendly);
+void RecolorBullet(bullet_t *me, byte from, byte to);
 
 int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets

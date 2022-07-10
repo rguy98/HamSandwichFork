@@ -3089,6 +3089,7 @@ void AI_Isozoid(Guy *me,Map *map,world_t *world,Guy *goodguy)
 void AI_Snowguy(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	int x,y;
+	bullet_t *b;
 
 	if(me->reload)
 		me->reload--;
@@ -3118,7 +3119,11 @@ void AI_Snowguy(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			{
 				x=me->x+Cosine(me->facing*32)*32;
 				y=me->y+Sine(me->facing*32)*32;
-				FireBullet(x,y,me->facing*32,BLT_BIGSNOW,me->friendly);
+				b=GetFireBullet(x,y,me->facing*32,BLT_BIGSNOW,me->friendly);
+				if(b)
+				{
+					b->dz=FIXAMT*6;
+				}
 			}
 			me->reload=5;
 			me->mind1=1;

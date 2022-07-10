@@ -404,6 +404,58 @@ void Particle::Update(Map *map)
 				// get dimmer with each frame
 				color/=2;
 				break;
+			case PART_CIRCLE:
+				dz+=FIXAMT;
+				if(size>1)
+				{
+					size-=2;
+					if(size<0)
+					{
+						size=0;
+						life=0;
+					}
+				}
+				if(color>228)
+					color-=2;
+				break;
+			case PART_RING:
+				size+=8;
+				life-=7;
+				if(color>228)
+					color-=2;
+				break;
+			case PART_FIRE:
+				dz+=FIXAMT+Random(FIXAMT/4);
+				Dampen(&dx,FIXAMT/8);
+				Dampen(&dy,FIXAMT/8);
+				dx=dx-FIXAMT/8+Random(FIXAMT/4);
+				dy=dy-FIXAMT/8+Random(FIXAMT/4);
+				if(size>0)
+					size--;
+				else
+					life=0;
+				if(life>40)
+					color=191;
+				else if(life>20)
+					color=160+(life-20);
+				else
+					color=128+life;
+				break;
+			case PART_COLDFIRE:
+				dz+=FIXAMT+Random(FIXAMT/4);
+				Dampen(&dx,FIXAMT/8);
+				Dampen(&dy,FIXAMT/8);
+				dx=dx-FIXAMT/8+Random(FIXAMT/4);
+				dy=dy-FIXAMT/8+Random(FIXAMT/4);
+				if(size>0)
+					size--;
+				else
+					life=0;
+				if(color>0)
+					color--;
+				else
+					life=0;
+				break;
 		}
 
 
@@ -413,11 +465,21 @@ void Particle::Update(Map *map)
 			return;
 		}
 
-		if(type==PART_SMOKE || type==PART_BOOM || type==PART_STINKY || type==PART_BUBBLE || type==PART_MINDCONTROL)
+		switch(type)
 		{
-			mapx=(x/TILE_WIDTH)>>FIXSHIFT;
-			mapy=(y/TILE_HEIGHT)>>FIXSHIFT;
-			color=64+map->GetTile(mapx,mapy)->templight;
+			case PART_SMOKE:
+			case PART_BOOM:
+			case PART_STINKY:
+			case PART_BUBBLE:
+			case PART_MINDCONTROL:
+			case PART_CIRCLE:
+			case PART_RING:
+			case PART_FIRE:
+			case PART_COLDFIRE:
+				mapx=(x/TILE_WIDTH)>>FIXSHIFT;
+				mapy=(y/TILE_HEIGHT)>>FIXSHIFT;
+				color=64+map->GetTile(mapx, mapy)->templight;
+				break;
 		}
 	}
 }
@@ -778,6 +840,14 @@ void RenderParticles(void)
 						particleList[i]->z>>FIXSHIFT,
 						255,particleList[i]->life*4-8,
 						GetMonsterSprite(MONS_COUNTESS,ANIM_IDLE,0,0),DISPLAY_DRAWME|DISPLAY_GLOW);
+			else if(particleList[i]->type==PART_CIRCLE)
+				ParticleDraw(particleList[i]->x>>FIXSHIFT,particleList[i]->y>>FIXSHIFT,
+							 particleList[i]->z>>FIXSHIFT,particleList[i]->color,(byte)Random(particleList[i]->size+1),
+							 DISPLAY_DRAWME|DISPLAY_CIRCLEPART);
+			else if(particleList[i]->type==PART_FIRE || particleList[i]->type==PART_COLDFIRE)
+				ParticleDraw(particleList[i]->x>>FIXSHIFT,particleList[i]->y>>FIXSHIFT,
+						particleList[i]->z>>FIXSHIFT,particleList[i]->color,particleList[i]->size/4,
+						DISPLAY_DRAWME|DISPLAY_CIRCLEPART|DISPLAY_GLOW);
 			else
 				ParticleDraw(particleList[i]->x>>FIXSHIFT,particleList[i]->y>>FIXSHIFT,
 							 particleList[i]->z>>FIXSHIFT,particleList[i]->color,particleList[i]->size,
@@ -785,6 +855,131 @@ void RenderParticles(void)
 		}
 	}
 }
+
+void MakeCircleParticle(int x,int y, int z,byte size)
+{
+	int i;
+	for(i=0;i<maxParticles;i++)
+	{
+		if(!particleList[i]->Alive())
+		{
+			particleList[i]->x=x;
+			particleList[i]->y=y;
+			particleList[i]->z=z;
+			particleList[i]->dx=0;
+			particleList[i]->dy=0;
+			particleList[i]->dz=0;
+			particleList[i]->life=size/2;
+			particleList[i]->size=size;
+			particleList[i]->color=255;
+			particleList[i]->type=PART_CIRCLE;
+			break;
+		}
+	}
+}
+
+void MakeCircleParticle2(int x,int y, int z,byte size)
+{
+	int i;
+	for(i=0;i<maxParticles;i++)
+	{
+		if(!particleList[i]->Alive())
+		{
+			particleList[i]->x=x;
+			particleList[i]->y=y;
+			particleList[i]->z=z;
+			particleList[i]->dx=0;
+			particleList[i]->dy=0;
+			particleList[i]->dz=0;
+			particleList[i]->life=size/4+2;
+			particleList[i]->size=size;
+			particleList[i]->color=255;
+			particleList[i]->type=PART_CIRCLE;
+			break;
+		}
+	}
+}
+
+void MakeRingParticle(int x,int y, int z,byte size,byte cnt)
+{
+	int i;
+	byte ang;
+
+	for(i=0;i<maxParticles;i++)
+	{
+		if(!particleList[i]->Alive())
+		{
+			ang=(byte)Random(256);
+			particleList[i]->x=x+Cosine(ang)*size;
+			particleList[i]->y=y+Sine(ang)*size;
+			particleList[i]->z=z;
+			particleList[i]->dx=0;
+			particleList[i]->dy=0;
+			particleList[i]->dz=Random(FIXAMT*2);
+			particleList[i]->color=191;
+			particleList[i]->life=10+(byte)Random(30);
+			particleList[i]->size=8*4+(byte)Random(4*4);
+			particleList[i]->type=PART_FIRE;
+			cnt--;
+			if(!cnt)
+				break;
+		}
+	}
+}
+
+void MakeColdRingParticle(int x,int y, int z,byte size)
+{
+	int i;
+	byte ang;
+
+	ang=0;
+	for(i=0;i<maxParticles;i++)
+	{
+		if(!particleList[i]->Alive())
+		{
+			particleList[i]->x=x+Cosine(ang)*size;
+			particleList[i]->y=y+Sine(ang)*size;
+			particleList[i]->z=z;
+			particleList[i]->dx=0;
+			particleList[i]->dy=0;
+			particleList[i]->dz=Random(FIXAMT*2);
+			particleList[i]->color=31;
+			particleList[i]->life=10+Random(30);
+			particleList[i]->size=8*4+(byte)Random(4*4);
+			particleList[i]->type=PART_COLDFIRE;
+			ang++;
+			if(!ang)
+				break;
+		}
+	}
+}
+
+void Burn(int x,int y,int z)
+{
+	int i;
+	byte num;
+
+	num=(byte)Random(8)+1;
+	for(i=0;i<maxParticles;i++)
+	{
+		if(!particleList[i]->Alive())
+		{
+			particleList[i]->x=x-FIXAMT*2+Random(FIXAMT*4);
+			particleList[i]->y=y;
+			particleList[i]->z=z-FIXAMT*2+Random(FIXAMT*4);
+			particleList[i]->dx=-FIXAMT*2+Random(FIXAMT*4);
+			particleList[i]->dy=0;
+			particleList[i]->dz=Random(FIXAMT*2);
+			particleList[i]->color=191;
+			particleList[i]->life=10+Random(30);
+			particleList[i]->size=8*4+(byte)Random(4*4);
+			particleList[i]->type=PART_FIRE;
+			if(--num==0)
+				break;
+		}
+	}
+}
+
 
 int BlowSmoke(int x,int y,int z,int dz)
 {

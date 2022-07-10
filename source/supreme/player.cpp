@@ -110,8 +110,11 @@ void InitPlayer(byte level,const char *fname)
 	player.cheesePower=0;
 	
 	//For the dynamic water/lava colors
-	player.waterDyn = 3;
-	player.lavaDyn = 4;
+	for(int i = 0; i < 2; i++)
+	{
+		player.waterDyn[i] = 3;
+		player.lavaDyn[i] = 3;
+	}
 
 	for(i=1;i<6;i++)
 	{

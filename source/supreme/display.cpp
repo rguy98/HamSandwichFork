@@ -642,6 +642,15 @@ void DisplayList::Render(void)
 				//RenderParticle(dispObj[i].x-scrx,dispObj[i].y-scry-dispObj[i].z,mgl->GetScreen(),
 				//				(byte)dispObj[i].hue,dispObj[i].bright);
 			}
+			else if(dispObj[i].flags&DISPLAY_CIRCLEPART)
+			{
+				if(dispObj[i].flags&DISPLAY_GLOW)
+					RenderGlowCircleParticle(dispObj[i].x-scrx,dispObj[i].y-scry-dispObj[i].z,dispObj[i].bright,
+									(byte)dispObj[i].hue,mgl->GetScreen());
+				else
+					RenderCircleParticle(dispObj[i].x-scrx,dispObj[i].y-scry-dispObj[i].z,dispObj[i].bright,
+									(byte)dispObj[i].hue,mgl->GetScreen());
+			}
 			else if(dispObj[i].flags&DISPLAY_LIGHTNING)
 			{
 				RenderLightningParticle(dispObj[i].x-scrx,dispObj[i].y-scry,dispObj[i].z-scrx,

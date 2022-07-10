@@ -908,6 +908,11 @@ byte GlowCursorCallback(int x,int y,int cx,int cy,int value,Map *map)
 	return 1;
 }
 
+byte MapCheckCallback(int x,int y,int cx,int cy,int value,Map *map)
+{
+	return (x!=(value%1024) || y!=(value/1024));
+}
+
 byte Map::DropItem(int x,int y,byte itm)
 {
 	return LOS(x,y,10,itm,PlaceItemCallback);
@@ -952,6 +957,11 @@ void Map::LightSpecial(int x,int y,char brt,byte size)
 		LOS(x,y,size,brt,TorchCallback);
 	else
 		LOS(x,y,size,brt,DarkTorchCallback);
+}
+
+byte Map::CheckLOS(int x,int y,int radius,int x2,int y2)
+{
+	return LOS(x,y,radius,x2+y2*1024,MapCheckCallback);
 }
 
 byte Map::FindGuy(int x,int y,byte size,Guy *g)

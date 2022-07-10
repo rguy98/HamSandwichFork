@@ -368,17 +368,10 @@ static char bulletName[][20]={
 	"Ice Shard",
 	"Drippy Water",
 	"Fountain",
+	"Flame Shot",
 	"Swamp Gas 2",
 	"Evil Face",
 	"Big Shot",
-	"Blast",
-	"Buzzsaw",
-	"Speedy Shot",
-	"Shocker Shot",
-	"Icy Bolt",
-	"Plague",
-	"Plague Gas",
-	"KABOOM!",
 	"Wolf Shot",
 	"Wolf Shock",
 	"Claw Bullet",
@@ -2138,6 +2131,9 @@ static void SetupTriggerButtons(int t,int y)
 			MakeButton(BTN_STATIC, ID_TRIG0 + OFS_CUSTOM + 4 + 100 * t, 0, 304, y + 17, 1, 1, "has", NULL);
 			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 5 + 100 * t, 0, 335, y + 17, 140, 14, permFlagName[trigger.value2], PermConditionClick);
 			break;
+		case TRG_BEGINLEVEL:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"At the start of the level",NULL);
+			break;
 	}
 }
 
@@ -2760,13 +2756,16 @@ static void SetupEffectButtons(int t,int y)
 		case EFF_DYNAMICCOL:
 			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Change color of dynamic",NULL);
 			if(effect.flags&EF_NOFX)
-				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+6+100*t,0,226,y+17,65,14,"lava",NoFXClick);
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,226,y+17,65,14,"lava",NoFXClick);
 			else
-				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+6+100*t,0,226,y+17,65,14,"water",NoFXClick);
-			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,300,y+17,1,1,"to color ",NULL);
+				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,226,y+17,65,14,"water",NoFXClick);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+2+100*t,0,338,y+17,1,1,"to Color Swap",NULL);
 			s[1]='\0';
 			s[0]=effect.value2%256;
-			MakeButton(BTN_COLOR,ID_EFF0+OFS_CUSTOM+5+100*t,0,364,y+17,14,14,s,ColorClick1);
+			MakeButton(BTN_COLOR,ID_EFF0+OFS_CUSTOM+3+100*t,0,446,y+17,14,14,s,ColorClick1);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+4+100*t,0,462,y+17,1,1,"->",NULL);
+			s[0]=effect.value2/256;
+			MakeButton(BTN_COLOR,ID_EFF0+OFS_CUSTOM+5+100*t,0,491,y+17,14,14,s,ColorClick2);
 			break;
 		case EFF_DYNAMICSCRN:
 			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Use image",NULL);

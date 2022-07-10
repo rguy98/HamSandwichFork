@@ -12,7 +12,11 @@
 
 typedef struct node_t{
 	int x,y;
-	int g,h,f;
+	int gcost, // distance from starting node
+		hcost, // distance from end node
+		fcost; // g cost + h cost
 } node_t;
+
+void AStar(Guy* me, Guy* target, Map* map);
 
 #endif

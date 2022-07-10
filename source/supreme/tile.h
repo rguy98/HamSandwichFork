@@ -7,7 +7,7 @@
 
 #define TILE_WIDTH  32
 #define TILE_HEIGHT 24
-#define NUMTILES	800
+#define NUMTILES	1200
 
 typedef byte tile_t[TILE_WIDTH*TILE_HEIGHT];
 

@@ -147,9 +147,9 @@
 // unused items
 #define ITM_HAYBALE		134		// For Mad Cow
 #define ITM_BARREL4		135		// For Polterguy
-#define ITM_UNUSED4		136
-#define ITM_UNUSED5		137
-#define ITM_UNUSED6		138
+#define ITM_BLUCANDLE	136		// Replaces MYSTIC letters
+#define ITM_TARGET		137
+#define ITM_FAIRYBELL	138		// Replaces MYSTIC letters
 #define ITM_UNUSED7		139
 #define ITM_UNUSED8		140
 #define ITM_UNUSED9		141

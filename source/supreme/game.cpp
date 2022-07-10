@@ -307,6 +307,10 @@ TASK(byte) LunaticRun(int *lastTime)
 
 		if(gameMode==GAMEMODE_PLAY)
 		{
+			if (player.clock == 0)
+			{
+				CheckBOLSpecials(curMap);
+			}
 			if(!editing && !player.cheated && verified)
 			{
 				profile.progress.totalTime++;

@@ -688,10 +688,10 @@ inline void GouraudBoxWater(int x, int y, byte* src, char light0, char light1, c
 				{
 					b = *src;
 
-					if (curMap->flags & MAP_DYWATR && (b & (~31)) == player.waterDyn * 32)
-						b = WaterPixel(x + i, y + j, player.waterDyn);
-					if (curMap->flags & MAP_DYLAVA && (b & (~31)) == player.lavaDyn * 32)
-						b = WaterPixel(x + i, y + j, player.lavaDyn);
+					if (curMap->flags & MAP_DYWATR && (b & (~31)) == player.waterDyn[0] * 32)
+						b = WaterPixel(x + i, y + j, player.waterDyn[1]);
+					if (curMap->flags & MAP_DYLAVA && (b & (~31)) == player.lavaDyn[0] * 32)
+						b = WaterPixel(x + i, y + j, player.lavaDyn[1]);
 
 
 					tmp = (b & 31) + (curLight / FIXAMT);

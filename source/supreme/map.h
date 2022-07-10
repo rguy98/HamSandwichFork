@@ -10,7 +10,7 @@
 #define MIN_LIGHT -32
 
 // the maximum # of monsters you can put on the map
-#define MAX_MAPMONS 128
+#define MAX_MAPMONS 256
 
 // maximum width or height
 #define MAX_MAPSIZE	200
@@ -106,6 +106,7 @@ class Map
 		void DimTorch(int x,int y,byte size);
 		void InstaTorch(int x, int y, char brt);
 		void LightSpecial(int x,int y,char brt,byte size);
+		byte CheckLOS(int x,int y,int radius,int x2,int y2);
 		void LightRect(int x,int y,int x2,int y2,char brt,byte perm);
 		void Update(byte mode,world_t *world);
 		byte LOS(int x,int y,int radius,int value,byte (*DoIt)(int,int,int,int,int,Map *));
@@ -159,6 +160,7 @@ byte TempTorchCallback(int x,int y,int cx,int cy,int value,Map *map);
 byte GlowCursorCallback(int x,int y,int cx,int cy,int value,Map *map);
 byte TempBrightCallback(int x,int y,int cx,int cy,int value,Map *map);
 byte FindGuyCallback(int x,int y,int cx,int cy,int value,Map *map);
+byte MapCheckCallback(int x,int y,int cx,int cy,int value,Map *map);
 
 class Guy;
 void SpecialStepCheck(Map *map,int x,int y,Guy *me);

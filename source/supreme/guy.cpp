@@ -450,6 +450,68 @@ void Guy::CalculateRect(void)
 	}
 }
 
+byte DoesBouncing(int type)
+{
+	switch(type)
+	{
+		case MONS_ROLLER:
+		case MONS_ROLLER2:
+		case MONS_ROLLER3:
+		case MONS_ROLLER4:
+		case MONS_SNOWBALL:
+		case MONS_SNOWBALL2:
+		case MONS_ROLLSTONE:
+		case MONS_ROLLSTONE2:
+		case MONS_CENTIBODY:
+		case MONS_CENTIBBODY:
+		case MONS_CENTIHEAD:
+		case MONS_CENTIBHEAD:
+		case MONS_DRL:
+		case MONS_BOUAPHA:
+		case MONS_VAMPIRE:
+		case MONS_PKSTEIN:
+		case MONS_TRICEROID:
+		case MONS_BUNNY:
+		case MONS_LOONYSHIP:
+		case MONS_FRIENDLY:
+		case MONS_FRIENDLY2:
+		case MONS_CRAZYPANTS:
+		case MONS_AUTOZOID:
+		case MONS_YUGO:
+		case MONS_PATTY:
+		case MONS_PATROLLR:
+		case MONS_DPATROLLR:
+		case MONS_PATROLUD:
+		case MONS_DPATROLUD:
+		case MONS_MINIWACKO:
+		case MONS_JACKFROST:
+		case MONS_TOWER:
+		case MONS_TOWER2:
+		case MONS_INCAGOLD:
+		case MONS_INCAGOLD2:
+		case MONS_INCABOSS:
+		case MONS_BALL:
+		case MONS_SLUG:
+		case MONS_SNAIL:
+		case MONS_OCTOBOSS:
+		case MONS_GOAT1:
+		case MONS_SPARK:
+		case MONS_BIGHEAD2:
+		case MONS_SPOOKLEY:
+		case MONS_SPOOKLEY2:
+		case MONS_SPEEDY:
+		case MONS_BUBBLE:
+		case MONS_POLTERGUY:
+		case MONS_GHASTLY:
+		case MONS_LARRY:
+		case MONS_HUMANLARRY:
+		case MONS_BOMB:
+			return 1;
+		default:
+			return 0;
+	}
+}
+
 void Guy::Update(Map *map,world_t *world)
 {
 	int oldmapx,oldmapy;
@@ -574,6 +636,10 @@ void Guy::Update(Map *map,world_t *world)
 			(y / TILE_HEIGHT) >> FIXSHIFT, 8, 4);
 	}
 
+	/*if (player.clock % 20 == 0 && !editing) {
+		AStar(this, target, map);
+	}*/
+
 	if (weak > 0)
 		weak--;
 	if (strong > 0 && !weak)
@@ -600,16 +666,7 @@ void Guy::Update(Map *map,world_t *world)
 		if(aiType==MONS_MINECART)
 			x=(mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
 
-		if(aiType==MONS_ROLLER || aiType==MONS_ROLLER2 || aiType==MONS_CENTIHEAD || aiType==MONS_DRL ||
-			aiType==MONS_BOUAPHA || aiType==MONS_VAMPIRE || aiType==MONS_PKSTEIN || aiType==MONS_TRICEROID ||
-			aiType==MONS_BUNNY || aiType==MONS_LOONYSHIP || aiType==MONS_FRIENDLY || aiType==MONS_SNOWBALL ||
-			aiType==MONS_SNOWBALL2 || aiType==MONS_ROLLER3 || aiType==MONS_ROLLER4 || aiType==MONS_DARKVAMP ||
-			aiType==MONS_FRIENDLY2 || aiType==MONS_CRAZYPANTS || aiType==MONS_AUTOZOID || aiType==MONS_YUGO ||
-			aiType==MONS_PATTY || aiType==MONS_PATROLLR || aiType==MONS_PATROLUD || aiType==MONS_DPATROLLR || aiType==MONS_DPATROLUD ||
-			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST || aiType==MONS_INCAGOLD || aiType == MONS_INCAGOLD2 || aiType==MONS_INCABOSS || aiType==MONS_BALL ||
-			aiType==MONS_SLUG || aiType==MONS_SNAIL || aiType==MONS_OCTOBOSS || aiType ==MONS_GOAT1 || aiType==MONS_SPARK || aiType==MONS_BIGHEAD2 ||
-			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2||aiType==MONS_BOMB||
-			aiType == MONS_INCADARK || aiType == MONS_INCADARK2)
+		if(DoesBouncing(aiType))
 			mind1=1;	// tell it that it hit a wall
 		b=1;
 	}
@@ -622,16 +679,7 @@ void Guy::Update(Map *map,world_t *world)
 		if(aiType==MONS_MINECART)
 			y=(mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
 		
-		if(aiType==MONS_ROLLER || aiType==MONS_ROLLER2 || aiType==MONS_CENTIHEAD || aiType==MONS_DRL ||
-			aiType==MONS_BOUAPHA || aiType==MONS_VAMPIRE || aiType==MONS_PKSTEIN || aiType==MONS_TRICEROID ||
-			aiType==MONS_BUNNY || aiType==MONS_LOONYSHIP || aiType==MONS_FRIENDLY || aiType==MONS_SNOWBALL ||
-			aiType==MONS_SNOWBALL2 || aiType==MONS_ROLLER3 || aiType==MONS_ROLLER4 || aiType==MONS_DARKVAMP ||
-			aiType==MONS_FRIENDLY2 || aiType==MONS_CRAZYPANTS || aiType==MONS_AUTOZOID || aiType==MONS_YUGO ||
-			aiType==MONS_PATTY || aiType==MONS_PATROLLR || aiType==MONS_PATROLUD || aiType==MONS_DPATROLLR || aiType==MONS_DPATROLUD ||
-			aiType==MONS_MINIWACKO || aiType==MONS_JACKFROST || aiType==MONS_INCAGOLD || aiType == MONS_INCAGOLD2 || aiType==MONS_INCABOSS || aiType==MONS_BALL ||
-			aiType==MONS_SLUG || aiType==MONS_SNAIL || aiType==MONS_OCTOBOSS || aiType ==MONS_GOAT1 || aiType==MONS_SPARK || aiType==MONS_BIGHEAD2 ||
-			aiType==MONS_SPOOKLEY ||aiType==MONS_SPOOKLEY2 ||aiType==MONS_SPEEDY||aiType==MONS_ROLLSTONE||aiType==MONS_ROLLSTONE2||aiType==MONS_BOMB||
-			aiType == MONS_INCADARK || aiType == MONS_INCADARK2)
+		if(DoesBouncing(aiType))
 			mind1+=2;	// tell it that it hit a wall
 		b=1;
 	}
@@ -1957,6 +2005,27 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 				guys[i]->frmTimer = 0;
 				guys[i]->frmAdvance = 1;
 			}
+			if (type == MONS_LARRY || type == MONS_HUMANLARRY)
+			{
+				guys[1]->mind4 = (type==MONS_LARRY) ? 1 : 0;
+				guys[i]->mind = 30 * 8;
+			}
+			if(type==MONS_MINIMATTIE)	// Minitilda, need to add all the parts
+			{
+				guys[i]->z=16*FIXAMT;
+				g=AddGuy(x,y-16*FIXAMT,0,MONS_MINIMATBODY,friendly);
+				if(g)
+					g->parent=guys[i];
+				g=AddGuy(x-20*FIXAMT,y-1*FIXAMT,16*FIXAMT,MONS_MINIMATCLAW1,friendly);
+				if(g)
+					g->parent=guys[i];
+				g=AddGuy(x+20*FIXAMT,y-1*FIXAMT,16*FIXAMT,MONS_MINIMATCLAW2,friendly);
+				if(g)
+					g->parent=guys[i];
+				g=AddGuy(x,y-48*FIXAMT,16*FIXAMT,MONS_MINIMATTAIL,friendly);
+				if(g)
+					g->parent=guys[i];
+			}
 
 			return guys[i];
 		}
@@ -2181,6 +2250,23 @@ byte FindVictims2(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world
 	return result;
 }
 
+byte FindNewVictim(int x, int y, word* target, byte size, int dx, int dy, byte damage, Map* map, world_t* world, byte friendly)
+{
+	int i;
+	for (i = 0; i < maxGuys; i++)
+		if (guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) && i != *target)
+		{
+			if (CheckHit(size, x, y, guys[i]))
+			{
+				guys[i]->GetShot(dx, dy, damage, map, world);
+				*target = i;
+				return 1;
+			}
+		}
+
+	return 0;
+}
+
 word LockOnEvil(int x,int y)
 {
 	int i;
@@ -2224,6 +2310,30 @@ word LockOnEvil2(int x,int y)
 		}
 	}
 	return 65535;
+}
+
+word LockOn3(int x,int y,int maxRange, byte friendly)
+{
+	int i;
+	int bestRange,range;
+	word bestguy;
+
+	bestguy=65535;
+	bestRange=maxRange;
+
+	for(i=0;i<maxGuys;i++)
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) &&
+			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
+		{
+			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
+			if((range<bestRange) || (range<maxRange && Random(32)==0))
+			{
+				bestguy=i;
+				bestRange=range;
+			}
+		}
+
+	return bestguy;
 }
 
 word LockOnGood(int x,int y)
@@ -4842,4 +4952,352 @@ byte FocusOnGuy(Guy *g,Map *map){
 		return 0;
 	UpdateCamera(g->x >> FIXSHIFT, g->y >> FIXSHIFT, g->dx, g->dy, map);
 		return 1;
+}
+
+// Checks to see if a guy is in a group.
+// Groups contain low-level enemies capable of reviving.
+byte IsInGroup(Guy *g, int group){
+	switch(group)
+	{
+		case GRP_BAT:
+			switch(g->type)
+			{
+				case MONS_BAT:
+				case MONS_STAREYBAT:
+				case MONS_SCAREDYBAT:
+				case MONS_BAT2:
+				case MONS_BAT3:
+				case MONS_BAT4:
+					return 1;
+					break;
+				default:
+					return 0;
+			}
+		case GRP_GHOST:
+			switch (g->type)
+			{
+				case MONS_GHOST:
+				case MONS_GHOST2:
+				case MONS_GHOST3:
+				case MONS_SHOCKGHOST:
+				case MONS_DJINNI:
+					return 1;
+					break;
+				default:
+					return 0;
+			}
+		case GRP_MUMMY:
+			switch (g->type)
+			{
+				case MONS_MUMBLE:
+				case MONS_MUMBLE2:
+				case MONS_PATROLLR:
+				case MONS_PATROLUD:
+				case MONS_DPATROLLR:
+				case MONS_DPATROLUD:
+				case MONS_RAGMAN:
+				case MONS_PHARAOHF:
+					return 1;
+					break;
+				default:
+					return 0;
+			}
+		case GRP_PUMPKIN:
+			switch (g->type)
+			{
+				case MONS_PUMPKIN:
+				case MONS_PUMPKIN2:
+				case MONS_PUMPKINFLY:
+				case MONS_PUMPKINFLY2:
+				case MONS_BOOMKIN:
+				case MONS_SEAPUMPKN:
+				case MONS_WACKYPUMP:
+				case MONS_PUNKIN:
+				case MONS_PINKPUMPKN:
+				case MONS_SQUASH:
+				case MONS_JALAPENO:
+					return 1;
+					break;
+				default:
+					return 0;
+			}
+		case GRP_SKELETON:
+			switch (g->type)
+			{
+				case MONS_BONEHEAD:
+				case MONS_CRAZYBONE:
+				case MONS_LAZYBONE:
+				case MONS_SKELETON:
+				case MONS_GLASSJAW:
+				case MONS_MARSHMARROW:
+				case MONS_DEADHEAD:
+				case MONS_REDBONE:
+				case MONS_GANGRENE:
+				case MONS_SKULLY:
+					return 1;
+					break;
+				default:
+					return 0;
+			}
+		case GRP_SPIDER:
+			switch (g->type)
+			{
+			case MONS_SPIDER:
+			case MONS_SPIDER2:
+			case MONS_BIGSPDR:
+			case MONS_FIREBUG:
+			case MONS_FROSTBITER:
+				return 1;
+				break;
+			default:
+				return 0;
+			}
+		case GRP_VAMPIRE:
+			switch (g->type)
+			{
+			case MONS_VAMPIRE:
+			case MONS_VAMPIRE2:
+			case MONS_VAMPIRE3:
+			case MONS_VAMPIRE4:
+			case MONS_DARKVAMP:
+			case MONS_NIGHTVAMP:
+				return 1;
+				break;
+			default:
+				return 0;
+			}
+		case GRP_ZOMBIE:
+			switch (g->type)
+			{
+			case MONS_ZOMBIE:
+			case MONS_BOMBIE:
+			case MONS_ZOMBONI:
+			case MONS_MUTANT:
+			case MONS_FSTZOMBIE:
+			case MONS_FROZOMBIE:
+				return 1;
+				break;
+			default:
+				return 0;
+			}
+		default:
+			return 0;
+	}
+}
+
+void ResetGuy(Guy* g)
+{
+	// come to life
+	if (g->friendly == 0)
+	{
+		TeamChangeRing(4, g->x, g->y, 0, 16, 4);
+		MakeSound(SND_TURNEVIL, g->x, g->y, SND_CUTOFF, 10);
+	}
+	else
+	{
+		TeamChangeRing(3, g->x, g->y, 0, 16, 4);
+		MakeSound(SND_TURNGOOD, g->x, g->y, SND_CUTOFF, 10);
+	}
+	g->seq = ANIM_IDLE;
+	g->frm = 0;
+	g->frmTimer = 0;
+	g->frmAdvance = 128;
+	g->hp = MonsterHP(g->type);
+	g->ouch = 0;
+	g->mind = 0;
+	g->mind1 = 0;
+	g->mind2 = 0;
+	g->mind3 = 0;
+	g->reload = 0;
+	g->parent = NULL;
+	g->CalculateRect();
+}
+
+byte DyingBaddies(Guy* g, int group)
+{
+	int i;
+
+	for(i=0;i<maxGuys;i++)
+	{
+		if (guys[i] == g || g->friendly != guys[i]->friendly)
+			continue;
+		if (IsInGroup(guys[i], group) && guys[i]->hp == 0 && guys[i]->seq == ANIM_DIE)
+			return 1;
+	}
+	return 0;
+}
+
+void RaiseBaddies(Guy *g, int group)
+{
+	int i;
+
+	for (i = 0; i < maxGuys; i++)
+	{
+		if (guys[i] == g || g->friendly != guys[i]->friendly)
+			continue;
+		if (IsInGroup(guys[i], group) && guys[i]->hp == 0 && guys[i]->seq == ANIM_DIE)
+			ResetGuy(guys[i]);
+	}
+		
+}
+
+void KillAllMonsters(byte type)
+{
+	int i;
+
+	for(i=0;i<maxGuys;i++)
+		if(guys[i] && guys[i]->type==type && guys[i]->hp>0 && guys[i]->seq!=ANIM_DIE)
+		{
+			guys[i]->hp=0;
+			guys[i]->seq=ANIM_DIE;
+			guys[i]->dx=0;
+			guys[i]->dy=0;
+			guys[i]->frm=0;
+			guys[i]->frmAdvance=64;
+			guys[i]->frmTimer=0;
+			guys[i]->ouch=4;
+			guys[i]->action=ACTION_BUSY;
+		}
+}
+
+void LaunchJunk(Map *map,Guy *me)
+{
+	int i,t,x,y;
+	Guy *g;
+
+	t=0;
+	while(t++<256)	// 256 tries to find something throwable
+	{
+		i=Random(map->width*map->height);
+		if(map->map[i].item==ITM_BARREL4)
+		{
+			map->map[i].item=ITM_NONE;
+			y=i/map->width;
+			x=i-y*map->width;
+			x=((x*TILE_WIDTH)+TILE_WIDTH/2)<<FIXSHIFT;
+			y=((y*TILE_HEIGHT)+TILE_HEIGHT/2)<<FIXSHIFT;
+			g=AddGuy(x,y,2*FIXAMT,MONS_JUNK,me->friendly);
+			if(g)
+				g->parent=me;
+			break;
+		}
+	}
+}
+
+void Sneeze(Guy *me)
+{
+	int i;
+
+	for(i=0;i<maxGuys;i++)
+	{
+		if(guys[i]->type==MONS_JUNK && guys[i]->parent==me)
+		{
+			guys[i]->mind=1;
+			guys[i]->mind1=50;
+			guys[i]->dx=guys[i]->dx*2;
+			guys[i]->dy=guys[i]->dy*2;
+		}
+	}
+}
+
+byte GetBaseColor(Guy *me)
+{
+	// get the color that best represents the baddie
+	switch(me->type)
+	{
+		case MONS_BONEHEAD:
+		case MONS_ZOMBIE:
+		case MONS_EGGSAC:
+		case MONS_MATBRAIN:
+		case MONS_MATCLAW1:
+		case MONS_MATCLAW2:
+		case MONS_SUPERZOMBIE:
+		case MONS_BABYSEAL:
+		case MONS_SNOWGUY:
+		case MONS_PENGUIN:
+		case MONS_SVEN:
+		case MONS_BJORN:
+		case MONS_MUMBLE:
+		case MONS_MECHABOUAPHA:
+		case MONS_BURNER:
+		case MONS_TRICEROID:
+			return 0; // grey
+		case MONS_BOUAPHA:
+		case MONS_SPIDER2:
+		case MONS_SERPENT:
+		case MONS_BABYTHING:
+		case MONS_MOSS:
+		case MONS_MOSSGRANDE:
+		case MONS_MUSH:
+		case MONS_THING:
+		case MONS_THINGTENT:
+		case MONS_THINGTENTTIP:
+		case MONS_CACTUS:
+			return 1; // green
+		case MONS_BAT:
+		case MONS_GINGER:
+		case MONS_PUMPKIN:
+		case MONS_ISOZOID:
+		case MONS_GEOZOID:
+		case MONS_LAMP:
+		case MONS_ROLLER:
+		case MONS_ROLLER2:
+		case MONS_ROLLER3:
+		case MONS_ROLLER4:
+		case MONS_SPHINX:
+		case MONS_SPHXARM1:
+		case MONS_SPHXARM2:
+		case MONS_CENTIBODY:
+		case MONS_CENTIHEAD:
+		case MONS_BOILER:
+		case MONS_GREATPK:
+		case MONS_MINECART:
+		case MONS_RAFT:
+		case MONS_VAMPIRE:
+		case MONS_COFFIN:
+		case MONS_LEFTY:
+			return 2; // brown
+		case MONS_SPIDER:
+			return 3; // blue
+		case MONS_MATHEAD:
+		case MONS_MATSKULL:
+		case MONS_MATBODY:
+		case MONS_MATTAIL:
+		case MONS_MAGMAZOID:
+		case MONS_ZOMBONI:
+		case MONS_SANTA:
+		case MONS_PWRBOUAPHA:
+		case MONS_PYGMY3:
+			return 4; // red
+		case MONS_WACKO:
+		case MONS_PYGMY2:
+		case MONS_EYEGUY:
+			return 5; // yellow
+		case MONS_MAMASPDR:
+		case MONS_PYGMY:
+		case MONS_ULTRAZOID:
+		case MONS_DRL:
+		case MONS_SDZL:
+		case MONS_COUNTESS:
+		case MONS_EYEGUY2:
+			return 6; // fuschia
+		case MONS_STICKMAN:
+		case MONS_PKSTEIN:
+		case MONS_FROSTBITER:
+		case MONS_STKSHROOM:
+		case MONS_STKSPIDER:
+		case MONS_STKCORPSE:
+		case MONS_STKBAT:
+		case MONS_STICKTREE:
+		case MONS_STICKWITCH:
+		case MONS_STICKSUPREME:
+			return 7; // aqua
+		case MONS_DJINNI:
+		case MONS_LICH:
+		case MONS_DUSTDEVIL:
+		case MONS_GHOST:
+		case MONS_KNIGHT:
+			return 8; // see-through
+	}
+	return 255;
 }

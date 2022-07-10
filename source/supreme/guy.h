@@ -6,6 +6,7 @@
 #include "jamulspr.h"
 #include "display.h"
 #include "pathfinding.h"
+#include <vector>
 
 #define ACTION_IDLE	0
 #define ACTION_BUSY 1
@@ -83,7 +84,7 @@ class Guy
 		char name[32];
 
 		sprite_set_t* customSpr; // custom sprites
-		node_t node[1024];
+		//std::vector<node_t> nodes;
 };
 
 #define GSF_NEWAI		1	// New AI - avoids pre-mod conflict
@@ -108,10 +109,12 @@ void AddMapGuys(Map *map);
 byte FindVictim(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
 byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
 byte FindVictims2(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
+byte FindNewVictim(int x,int y,word* target,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
 word LockOnEvil(int x,int y);
 word LockOnEvil2(int x,int y);
 word LockOnGood(int x,int y);
 word LockOnGood2(int x,int y);
+word LockOn3(int x,int y,int maxRange, byte friendly);
 byte GetGuyPos(word guy,int *x,int *y);
 byte MonsterExists(int type);
 void HealGoodguy(byte amt);
@@ -156,6 +159,11 @@ byte CheckMonsterTempCondition(int x,int y,int type,byte flags, byte trg, int am
 byte CheckMonsterPermCondition(int x,int y,int type,byte trg);
 Guy *GetGuyOfAIType(int type);
 
+byte DyingBaddies(Guy *g,int group);
+void RaiseBaddies(Guy *g,int group);
+void KillAllMonsters(byte type);
+void ResetGuy(Guy *g);
+
 // Kid Mystic stuff
 byte PeepAtKid(int x,int y,Map *map,byte face);
 byte LogNearby(void);
@@ -179,10 +187,15 @@ void SpreadCharge(Guy* me);
 void GetSpook(void);
 void PutSpook(void);
 
+// LL stuff
+void LaunchJunk(Map* map, Guy* me);
+void Sneeze(Guy *me);
+
 // Helpful new functions
 byte IsZombie(Guy *g);
 byte IsSuperZombie(Guy *g);
 byte FocusOnGuy(Guy *g, Map *map);
+byte GetBaseColor(Guy *g);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

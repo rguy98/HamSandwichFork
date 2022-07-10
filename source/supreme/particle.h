@@ -25,14 +25,24 @@
 #define PART_LUNA		18
 #define PART_RADAR		19	// used for the radars
 #define PART_FX			20	// accelerates upward, shrinks as it dies, for effects
+
+// Kid Mystic
 #define PART_YELLOW		21
 #define PART_SHORTYELLOW 22
 #define PART_MANA		23
 #define PART_GHOST		24
 #define PART_COMPASS	25
+
+// Sleepless Hollow
 #define PART_FLOATER	26
 #define PART_RLHAMMER	27	// used by hammer, not always red
 #define PART_SUCK		28	// particles that get sucked in by black hole
+
+// Loonyland
+#define PART_CIRCLE		29	// circle, used for loony attack
+#define PART_FIRE		30	// particle fire for torches
+#define PART_RING		31	// an expanding ring for bonkula
+#define PART_COLDFIRE	32	// same as fire, but white
 
 class Particle
 {
@@ -100,6 +110,12 @@ void FloaterParticles(int x, int y, byte color, int radius, int spread, byte cou
 void SmokeTile(int x,int y);
 void JackFrostWeather(int x,int y);
 void SuckParticle(int x, int y, int z);
+
+void MakeCircleParticle(int x, int y, int z, byte size);
+void MakeCircleParticle2(int x, int y, int z, byte size);
+void MakeRingParticle(int x, int y, int z, byte size, byte cnt);
+void MakeColdRingParticle(int x, int y, int z, byte size);
+void Burn(int x, int y, int z);
 
 int CountParticles();
 

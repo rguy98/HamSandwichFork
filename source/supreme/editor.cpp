@@ -86,8 +86,6 @@ byte InitEditor(void)
 	strcpy(MonsterName(MONS_DPATROLUD),"Death Patrol Vert.");
 	strcpy(MonsterName(MONS_INCAGOLD), "Megablockhead:H");
 	strcpy(MonsterName(MONS_INCAGOLD2), "Megablockhead:V");
-	strcpy(MonsterName(MONS_INCADARK), "Hyperblockhead:H");
-	strcpy(MonsterName(MONS_INCADARK2), "Hyperblockhead:V");
 	strcpy(MonsterName(MONS_TURRETR),"Laser:Right");
 	strcpy(MonsterName(MONS_TURRETD),"Laser:Down");
 	strcpy(MonsterName(MONS_TURRETL),"Laser:Left");
@@ -164,8 +162,6 @@ void ExitEditor(void)
 	strcpy(MonsterName(MONS_DPATROLUD),"Death Patrol");
 	strcpy(MonsterName(MONS_INCAGOLD), "Megablockhead");
 	strcpy(MonsterName(MONS_INCAGOLD2), "Megablockhead");
-	strcpy(MonsterName(MONS_INCADARK), "Hyperblockhead");
-	strcpy(MonsterName(MONS_INCADARK2), "Hyperblockhead");
 	strcpy(MonsterName(MONS_TURRETR),"Laser");
 	strcpy(MonsterName(MONS_TURRETD),"Laser");
 	strcpy(MonsterName(MONS_TURRETL),"Laser");
@@ -189,6 +185,228 @@ void ExitEditor(void)
 	PurgeMonsterSprites();
 	editing=0;
 }
+
+// Converts enemies to their new IDs - do this for Kid Mystic worlds only!!
+dword FixBadguyId(dword oldType) {
+	dword newType = oldType;
+	if (!oldType)
+		return 0;
+	switch(oldType){
+		case 11:
+			newType = MONS_YERFDOG;
+			break;
+		case 12:
+			newType = MONS_PTERO;
+			break;
+		case 13:
+			newType = MONS_EYEGUY;
+			break;
+		case 14:
+			newType = MONS_PEEPER;
+			break;
+		case 15:
+			newType = MONS_TOWER;
+			break;
+		case 16:
+			newType = MONS_LOOKEYLOO;
+			break;
+		case 17:
+			newType = MONS_PINKEYE;
+			break;
+		case 18:
+			newType = MONS_SHROOMLORD;
+			break;
+		case 19:
+			newType = MONS_MICRO;
+			break;
+		case 20:
+			newType = MONS_GOLEM;
+			break;
+		case 29:
+			newType = MONS_HUGEBAT;
+			break;
+		case 30: // fairy
+			break;
+		case 31:
+			newType = MONS_BIGBAT;
+			break;
+		case 32:
+			newType = MONS_BOBBY;
+			break;
+		case 33: // fairy2
+			break;
+		case 34:
+			newType = MONS_CRAZYBUSH;
+			break;
+		case 35:
+			newType = MONS_OCTOPUS;
+			break;
+		case 36:
+			newType = MONS_INCABOT;
+			break;
+		case 37:
+			newType = MONS_INCAGEN;
+			break;
+		case 38:
+			newType = MONS_INCAGOLD;
+			break;
+		case 39:
+			newType = MONS_INCAGOLD2;
+			break;
+		case 40:
+			newType = MONS_LOG;
+			break;
+		case 41:
+			newType = MONS_INCABOSS;
+			break;
+		case 42: // inca tongue
+			break;
+		case 43:
+			newType = MONS_PEEPBOMB;
+			break;
+		case 45:
+			newType = MONS_TRAPAZOID;
+			break;
+		case 46:
+			newType = MONS_TRAPAZOID2;
+			break;
+		case 47:
+			newType = MONS_PEEPBOMB2;
+			break;
+		case 48:
+			newType = MONS_WHACKAZOID;
+			break;
+		case 49:
+			newType = MONS_SLUG;
+			break;
+		case 50:
+		case 51:
+			newType = MONS_SNAIL;
+			break;
+		case 52:
+			newType = MONS_BALL;
+			break;
+		case 53:
+			newType = MONS_OCTOBOSS;
+			break;
+		case 54:
+		case 55: // tentacles
+			break;
+		case 56:
+		case 57:
+			newType = MONS_GOAT1;
+			break;
+		case 58:
+		case 59:
+			newType = MONS_GOAT2;
+			break;
+		case 60:
+			newType = MONS_GOAT3;
+			break;
+		case 61:
+			newType = MONS_STKSHROOM;
+			break;
+		case 62:
+			newType = MONS_STKSPIDER;
+			break;
+		case 63:
+			newType = MONS_STKCORPSE;
+			break;
+		case 64:
+			newType = MONS_STKBAT;
+			break;
+		case 65:
+			newType = MONS_DANCER;
+			break;
+	}
+	return newType;
+}
+
+void CheckItemToConvert(mapTile_t &tile) {
+
+}
+
+/*
+	If your world hails from Kid Mystic, use this to fix it up a bit!
+	You probably won't need this, but I know I did
+*/
+byte ConvertKidMysticWorld(world_t *world) {
+
+	for (int i = 0; i < world->numMaps; i++) {
+		Map* map = world->map[i];
+		for (int j = 0; j < MAX_MAPMONS; j++) {
+			if(!map->badguy[j].type)
+				continue;
+			dword newType = FixBadguyId(map->badguy[j].type);
+			map->badguy[j].type = newType;
+		}
+
+		for(int j = 0; j < MAX_SPECIAL; j++) {
+			if(map->special[j].trigger) {
+				switch (map->special[j].trigger->type) {
+					case TRG_STEP:
+					case TRG_MONSTER:
+						map->special[j].trigger->value = FixBadguyId(map->special[j].trigger->value);
+						break;
+				}
+			}
+			if (map->special[j].effect) {
+				switch (map->special[j].effect->type) {
+					case EFF_SUMMON:
+					case EFF_KILLMONS:
+						map->special[j].effect->value = FixBadguyId(map->special[j].effect->value);
+						break;
+					case EFF_CHANGEMONS:
+						map->special[j].effect->value = FixBadguyId(map->special[j].effect->value);
+						map->special[j].effect->value2 = FixBadguyId(map->special[j].effect->value2);
+						break;
+				}
+			}
+		}
+
+		for (int j = 0; j < map->width*map->height; j++){
+			byte itm = map->map[j].item;
+			if(!itm)
+				continue;
+			switch(itm)
+			{
+				case 5:
+					map->map[j].item = ITM_TAKEOUT;
+					break;
+				case 7:
+					map->map[j].item = ITM_AMMOPAK;
+					break;
+				case 8:
+				case 9:
+					map->map[j].item = ITM_COIN;
+					break;
+				case 21:
+					map->map[j].item = ITM_FAIRYBELL;
+					break;
+				case 22:
+				case 23:
+				case 24:
+				case 25:
+				case 26:
+				case 27:
+					map->map[j].item = ITM_BLUCANDLE;
+					break;
+				case 28:
+					map->map[j].item = ITM_CANDLE;
+					break;
+				case 81:
+				case 82:
+					map->map[j].item = ITM_VILLAGE;
+					break;
+				case 83:
+					map->map[j].item = ITM_TARGET;
+					break;
+			}
+		}
+	}
+	return 1;
+}
+
 
 void Delete(int x,int y)
 {
@@ -521,6 +739,21 @@ TASK(void) UpdateMouse(void)
 				SetSpecialRect(rectX1,rectY1,rectX2,rectY2);
 			}
 			break;
+		case EDITMODE_MYSTIC:
+			if(editmgl->MouseTap())
+				YesNoDialogClick(mouseX,mouseY);
+			if(YesNoDialogCommand()==YNM_YES)
+			{
+				ConvertKidMysticWorld(&world);
+				editMode = EDITMODE_EDIT;
+				ExitYesNoDialog();
+			}
+			else if(YesNoDialogCommand()==YNM_NO)
+			{
+				editMode=EDITMODE_EDIT;
+				ExitYesNoDialog();
+			}
+			break;
 	}
 }
 
@@ -783,6 +1016,13 @@ void EditorDraw(void)
 			ShowSpecials();
 			RenderLevelDialog(mouseX,mouseY,editmgl);
 			break;
+		case EDITMODE_MYSTIC:
+			if(displayFlags&MAP_SHOWBADGUYS)
+				RenderGuys(displayFlags&MAP_SHOWLIGHTS);
+			RenderItAll(&world,editorMap,displayFlags);
+			ShowSpecials();
+			RenderYesNoDialog(mouseX,mouseY,editmgl);
+			break;
 	}
 
 	// draw the mouse cursor
@@ -873,6 +1113,10 @@ static TASK(void) HandleKeyPresses(void)
 			case 'M':
 				editMode=EDITMODE_FILE;
 				InitFileDialog("worlds",".dlw",FM_LOAD|FM_ASKLOAD|FM_MERGE,ToolGetFilename());
+				break;
+			case 'N':
+				InitYesNoDialog("Is this a Kid Mystic world?","Yes","No");
+				editMode=EDITMODE_MYSTIC;
 				break;
 			case 'l':
 			case 'L':

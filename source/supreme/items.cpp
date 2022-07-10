@@ -711,19 +711,31 @@ item_t baseItems[]={
 		IF_PICKUP,
 		IT_PICKUP|IT_WEAPON|IT_POWERUP,
 		ITR_GET,IE_POWERUP,PU_CHEESE,"Supreme Squeezy Cheese!",SND_WEAPON},
-	{"Hay Bale",0,0,170,0,0,0,
+	{"Hay Bale",0,0,170,0,0,0, // for sleepless hollow
 		0,
 		IF_SOLID|IF_SHADOW,
 		IT_DECOR|IT_OBSTACLE,
 		ITR_BURNT,IE_DESTROY,5,"",0 },
-	{"Wooden Barrel",0,0,169,0,0,0,
+	{"Wooden Barrel",0,0,169,0,0,0, // for polterguy
 		0,
 		IF_SOLID|IF_SHADOW,
 		IT_DECOR|IT_OBSTACLE,
 		ITR_NONE,IE_NONE,0,"",0 },
-	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused4
-	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused5
-	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused6
+	{"Blue Candle",-1,-6,91,5,3,0,
+		0,
+		IF_PICKUP,
+		IT_PICKUP|IT_COLLECT,
+		ITR_GET,IE_INCVAR,0,"",SND_CHLGCRYSTAL},
+	{"Target",0,0,158,0,0,0,
+		0,
+		IF_SOLID|IF_SHADOW|IF_BULLETPROOF,
+		IT_DECOR|IT_OBSTACLE,
+		ITR_NONE,IE_NONE,0,"",0 },
+	{"Pink Candle",-1,-6,91,5,6,8,
+		0,
+		IF_PICKUP,
+		IT_PICKUP|IT_COLLECT,
+		ITR_GET,IE_INCVAR,1,"",SND_CHLGCRYSTAL},
 	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused7
 	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused8
 	{"New Item",0,0,0,0,0,0,0,0,0,ITR_NONE,IE_NONE,0,"",0},	// unused9

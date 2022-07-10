@@ -63,7 +63,8 @@ Guy *monster;
 #define INTF_HAMMERS 9
 #define INTF_ENEMY	10
 #define INTF_COINS	11
-#define NUM_INTF	12
+#define INTF_POCKETS 12
+#define NUM_INTF	13
 
 #define IV_NONE		0
 #define IV_BIGMETER	1
@@ -157,6 +158,12 @@ intface_t defaultSetup[NUM_INTF]={
 	 SPR_COINBOX,
 	 IV_NUMBER,3,
 	 -27,-14,
+	 0,0,
+	 0},
+	{639,-70,639,9,	// other weapons
+	 SPR_WEAPONBOX,
+	 IV_ICONS,0,
+	 0,0,
 	 0,0,
 	 0},
 };
@@ -634,6 +641,27 @@ void DrawHammers(int x,int y,MGLDraw *mgl)
 		intfaceSpr->GetSprite(SPR_REVERSE)->Draw(x,y,mgl);
 }
 
+void DrawPockets(int x, int y, MGLDraw* mgl)
+{
+	int p =0 ;
+	int pockets[3] = { 0,0,0 };
+
+	for (int i = 0; i < NumFilledPockets(); i++)
+	{
+		if (i == player.curSlot || player.wpns[i].wpn == WPN_NONE || !player.wpns[i].used)
+			continue;
+		pockets[p] = player.wpns[i].wpn;
+		p++;
+	}
+
+	for(int i = 0; i < 3; i++)
+	{
+		if (pockets[i] == 0)
+			continue;
+		intfaceSpr->GetSprite(21+pockets[i])->Draw(x, y+i*24, mgl);
+	}
+}
+
 void UpdateInterface(Map *map)
 {
 	int i,j,wpn;
@@ -739,6 +767,15 @@ void UpdateInterface(Map *map)
 	{
 		intf[INTF_HAMMERS].tx=0;
 		intf[INTF_HAMMERS].ty=-1;
+	}
+
+	if (NumFilledPockets()>1){
+		intf[INTF_POCKETS].tx = 600;
+		intf[INTF_POCKETS].ty = 80;
+	}
+	else {
+		intf[INTF_POCKETS].tx = 639;
+		intf[INTF_POCKETS].ty = 80;
 	}
 
 	// now do the same stuff for the other side of the screen
@@ -953,7 +990,15 @@ void RenderInterface(MGLDraw *mgl)
 				DrawKeys(intf[i].x+intf[i].vOffX,intf[i].y+intf[i].vOffY,mgl);
 				break;
 			case IV_ICONS:
-				DrawHammers(intf[i].x+intf[i].vOffX,intf[i].y+intf[i].vOffY,mgl);
+				switch(i)
+				{
+					case INTF_HAMMERS:
+						DrawHammers(intf[i].x + intf[i].vOffX, intf[i].y + intf[i].vOffY, mgl);
+						break;
+					case INTF_POCKETS:
+						DrawPockets(intf[i].x + intf[i].vOffX, intf[i].y + intf[i].vOffY, mgl);
+						break;
+				}
 				break;
 			case IV_DIAL:
 				DrawDial(intf[i].x+intf[i].vOffX,intf[i].y+intf[i].vOffY,intf[i].value,intf[i].valueLength,mgl);

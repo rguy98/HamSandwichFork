@@ -1412,6 +1412,9 @@ byte TriggerYes(special_t *me,trigger_t *t,Map *map)
 		case TRG_PERMFLAGS:
 			answer=CheckMonsterPermCondition(t->x,t->y,t->value,(byte)t->value2);
 			break;
+		case TRG_BEGINLEVEL:
+			answer=player.clock==0;
+			break;
 	}
 
 	if(t->flags&TF_NOT)
@@ -1832,10 +1835,14 @@ void SpecialEffect(special_t *me,Map *map)
 				}
 				break;
 			case EFF_DYNAMICCOL:
-				if (!(me->effect[i].flags & EF_NOFX))
-					player.waterDyn = me->effect[i].value2;
-				else
-					player.lavaDyn = me->effect[i].value2;
+				if (!(me->effect[i].flags & EF_NOFX)) {
+					player.waterDyn[0] = me->effect[i].value2%256;
+					player.waterDyn[1] = me->effect[i].value2/256;
+				}
+				else {
+					player.lavaDyn[0] = me->effect[i].value2%256;
+					player.lavaDyn[1] = me->effect[i].value2/256;
+				}
 				break;
 			case EFF_DYNAMICSCRN:
 				if (me->effect[i].text[0] != '\0')
@@ -1902,6 +1909,41 @@ void CheckSpecials(Map *map)
 	for(i=0;i<numSpecials;i++)
 	{
 		if(spcl[i].x!=255 && IsTriggered(1,&spcl[i],map))
+		{
+			SpecialEffect(&spcl[i],map);
+		}
+	}
+
+	// all the specials that occurred now go off- their chains had to go off first
+	for(i=0;i<nextEvent;i++)
+	{
+		if(events[i].type==EVT_SPECIAL)
+		{
+			victim=events[i].victim;
+			SpecialEffect(&spcl[events[i].value],map);
+		}
+	}
+	ClearEvents();
+}
+
+void CheckBOLSpecials(Map *map)
+{
+	int i;
+
+	if(tagged && tagged->hp==0)
+		tagged=NULL;
+	// first do the non-chaining specials
+	for(i=0;i<numSpecials;i++)
+	{
+		if(spcl[i].trigger->type==TRG_BEGINLEVEL&&spcl[i].x!=255 && IsTriggered(0,&spcl[i],map))
+		{
+			EventOccur(EVT_SPECIAL,i,spcl[i].x,spcl[i].y,victim);
+		}
+	}
+	// now do the ones that may chain off of those
+	for(i=0;i<numSpecials;i++)
+	{
+		if(spcl[i].trigger->type==TRG_BEGINLEVEL&&spcl[i].x!=255 && IsTriggered(1,&spcl[i],map))
 		{
 			SpecialEffect(&spcl[i],map);
 		}
