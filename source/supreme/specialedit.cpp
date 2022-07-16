@@ -3341,6 +3341,7 @@ void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 	else
 		RenderButtons(-1,-1,mgl);
 
+	int x1,x2,y1,y2,r,c;
 	switch(mode)
 	{
 		case SMODE_PICKBMP:
@@ -3359,30 +3360,50 @@ void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 			RenderTextDialog(mouseX,mouseY,mgl);
 			break;
 		case SMODE_PICKTRIG:
-			DrawFillBox(40,selectY,40+floor(MAX_TRIGGER/TRG_L)*TRG_W+TRG_W,selectY+TRG_L*TRG_H+2,0);
-			DrawBox(40,selectY,40+floor(MAX_TRIGGER/TRG_L)*TRG_W+TRG_W,selectY+TRG_L*TRG_H+2,31);
+			r = 24;
+			c = MAX_TRIGGER/r;
+			x1 = 40,
+			y1 = selectY,
+			x2 = x1 + c*TRG_W,
+			y2 = y1 + r*TRG_H + 1;
+			DrawFillBox(x1,y1,x2,y2,0);
+			DrawBox(x1,y1,x2,y2,31);
 			for(j=0;j<floor(MAX_TRIGGER/TRG_L)+1;j++)
 			{
 				for(i=0;i<TRG_L;i++)
 				{
+					x1 = 40 + TRG_W * j + 1,
+					y1 = selectY + 1 + i * TRG_H,
+					x2 = 40 + TRG_W * (j + 1) - 1,
+					y2 = y1 + TRG_H;
 					if(spcl.trigger[curTrig].type==j*TRG_L+i)
-						DrawFillBox(40+TRG_W*j+1,selectY+1+i*TRG_H,40+TRG_W*(j+1)-1,selectY+1+i*TRG_H+TRG_H,32*1+8);
+						DrawFillBox(x1,y1,x2,y2,32*1+8);
 					if(j*TRG_L+i < MAX_TRIGGER)
-					Print(40+TRG_W*j+2,selectY+2+i*TRG_H,trigName[j*TRG_L+i],0,1);
+					Print(x1+1,selectY+2+i*TRG_H,trigName[j*TRG_L+i],0,1);
 				}
 			}
 			break;
 		case SMODE_PICKEFF:
-			DrawFillBox(40,selectY,40+floor(EFF_MAX/EFF_L)*EFF_W*2,selectY+EFF_L*EFF_H+2,0);
-			DrawBox(40,selectY,40+floor(EFF_MAX/EFF_L)*EFF_W*2,selectY+EFF_L*EFF_H+2,31);
+			r = 24;
+			c = EFF_MAX/r;
+			x1 = 40,
+			y1 = selectY,
+			x2 = x1 + c*EFF_W,
+			y2 = y1 + r*EFF_H + 1;
+			DrawFillBox(x1,y1,x2,y2,0);
+			DrawBox(x1,y1,x2,y2,31);
 			for(j=0;j<floor(EFF_MAX/EFF_L)+1;j++)
 			{
 				for(i=0;i<EFF_L;i++)
 				{
+					x1 = 40 + EFF_W * j + 1,
+					y1 = selectY + 1 + i * EFF_H,
+					x2 = 40 + EFF_W * (j + 1) - 1,
+					y2 = y1 + EFF_H - 1;
 					if(spcl.effect[curEff].type==j*EFF_L+i)
-						DrawFillBox(40+EFF_W*j+1,selectY+1+i*EFF_H,40+EFF_W*(j+1)-1,selectY+1+i*EFF_H+EFF_H,32*1+8);
+						DrawFillBox(x1, y1, x2, y2, 32 * 1 + 8);
 					if(j*EFF_L+i < EFF_MAX)
-					Print(40+EFF_W*j+2,selectY+2+i*EFF_H,effName[j*EFF_L+i],0,1);
+					Print(x1+1,selectY+2+i*EFF_H,effName[j*EFF_L+i],0,1);
 				}
 			}
 			break;

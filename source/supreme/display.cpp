@@ -270,7 +270,7 @@ void UpdateCamera(int x,int y,int dx,int dy,Map *map)
 
 	if(config.camera)
 	{
-		if(player.vehicle==VE_YUGO || player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_LOG)
+		if(player.vehicle==VE_YUGO || player.vehicle==VE_MINECART || player.vehicle==VE_LOG)
 		{
 			desiredX=((x<<FIXSHIFT)+dx*20)>>FIXSHIFT;
 			desiredY=((y<<FIXSHIFT)+dy*20)>>FIXSHIFT;

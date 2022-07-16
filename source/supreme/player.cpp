@@ -1649,7 +1649,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			}
 			return;
 		}
-		else if(me->parent->aiType==MONS_MINECART)
+		else if(me->parent->aiType==MONS_MINECART || me->parent->aiType==MONS_MINECARTSLOW)
 		{
 			me->dx=0;
 			me->dy=0;
@@ -1817,7 +1817,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			me->parent->mind3=120;
 	}
 	// if you are moving indeed
-	if((c&(CONTROL_UP|CONTROL_DN|CONTROL_LF|CONTROL_RT)) && (!player.jetting || me->z==0) && (player.vehicle!=VE_RAFT && player.vehicle!=VE_MINECART && player.vehicle!=VE_MINECART_SLOW))
+	if((c&(CONTROL_UP|CONTROL_DN|CONTROL_LF|CONTROL_RT)) && (!player.jetting || me->z==0) && (player.vehicle!=VE_RAFT && player.vehicle!=VE_MINECART))
 	{
 		if(!(GetTerrain(world,mapTile->floor)->flags&TF_ICE) || (player.cheatFlags&CHT_NOSKID))
 		{

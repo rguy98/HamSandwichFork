@@ -4023,7 +4023,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},
 			}},
 		{"Charge Coil",5,6,3,AI_LightSlide,
-		 10,8,3000,1,"!70",0,MF_NOMOVE|MF_ONEFACE|MF_INVINCIBLE,
+		 10,8,3000,1,"sleepless/graphics/lghtball.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_INVINCIBLE,
 		 MT_TRAP|MT_GOOD,
 			{
 				{5,255},	// idle
@@ -5072,19 +5072,19 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},
 				{0,255},
 			}},
-		{"Ice Scream",1,7,3,NULL, //good to go
-		 12,44,20,50,"graphics/babything.jsp",0,0,
-		 MT_EVIL|MT_THINGY|MT_ARCTIC,
+		{"Dedant",4,2,0,AI_Pumpkin, //good to go
+		 12,7,20,50,"graphics/ant.jsp",0,0,
+		 MT_EVIL|MT_ALIEN,
 			{
-				{12,255},	// idle
-				{1,2,3,4,5,6,7,8,9,10,11,255},	// move
-				{20,21,22,23,24,25,26,27,255},	// attack
-				{34,35,36,37,38,39,40,41,42,43,255},	// die
-				{13,14,15,16,17,16,15,16,17,16,15,16,17,16,15,255},	// fall asleep (A1)
-				{18,19,18,255},	// blink (A2)
-				{28,29,30,29,28,255}, // look right (A3)
-				{31,32,33,32,31,255}, // look left (A4)
-				{0,255},
+				{0,255},	// idle
+				{1,2,3,2,1,4,5,6,4,255},	// move
+				{0,1,2,3,4,5,6,255},	// attack
+				{0,0,255},	// die (just long enough to spew shrapnel)
+				{0,1,2,3,4,5,6,255},	// attack
+				{0,1,2,3,4,5,6,255},	// attack
+				{0,1,2,3,4,5,6,255},	// attack
+				{0,1,2,3,4,5,6,255},	// attack
+				{0,1,2,3,4,5,6,255},	// attack
 			}},
 		{"Iso-dope",0,1,2,AI_SuperZombie,
 		 36,38,250,2500,"graphics/suprzmbe.jsp",0,MF_NOMOVE,

@@ -1798,7 +1798,7 @@ byte InteractWithItem(Guy *me,mapTile_t *m,int x,int y)
 		}
 	}
 
-	if((me->aiType==MONS_MINECART || me->aiType==MONS_YUGO || me->aiType==MONS_AUTOZOID) && (items[type].trigger&ITR_MINECART))
+	if((me->aiType==MONS_MINECART || me->aiType==MONS_MINECARTSLOW || me->aiType==MONS_YUGO || me->aiType==MONS_AUTOZOID) && (items[type].trigger&ITR_MINECART))
 	{
 		if(TriggerItem(me,m,x,y))
 		{

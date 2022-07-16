@@ -99,9 +99,8 @@
 #define EFF_COLORBULLET	44	// change bullet of type N at X,Y (or any X,Y) coloration
 #define EFF_CAMERAMONS	45	// focus camera on monster (picks first one) - use invis monster for static cameras!
 #define EFF_COLORMSG	46	// show color message M
-#define EFF_AUTOSCROLL	47
-#define EFF_CONVEYOR	48
-#define EFF_MAX			49
+#define EFF_AUTOSCROLL	47	// set autoscroll
+#define EFF_MAX			48
 
 // trigger flags
 #define TF_NOT		1	// NOT this one

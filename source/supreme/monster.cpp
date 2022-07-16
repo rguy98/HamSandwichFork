@@ -1236,12 +1236,7 @@ void AI_MineCart(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			noiseLoop=0;
 			me->mind=1;
 			goodguy->parent=me;
-
-			if(me->aiType==MONS_MINECARTSLOW)
-				player.vehicle=VE_MINECART_SLOW;
-			else
-				player.vehicle=VE_MINECART;
-
+			player.vehicle=VE_MINECART;
 			goodguy->x=me->x;
 			goodguy->y=me->y+1;
 			goodguy->z=FIXAMT*8;

@@ -291,7 +291,7 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 	if(MonsterFlags(type,aiType)&MF_FREEWALK)
 		return result;	// can't have a guy collision
 
-	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO))
+	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO))
 	{
 		// be bigger, so you can smack into badguys better
 		rectx-=10;
@@ -306,8 +306,8 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 			{
 				if(guys[i]!=parent && guys[i]->parent!=this && CoconutBonk(xx,yy,guys[i]))
 				{
-					if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO)
-						&& parent && (((player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW) && parent->mind1>20) || player.vehicle==VE_YUGO))
+					if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO)
+						&& parent && ((player.vehicle==VE_MINECART && parent->mind1>20) || player.vehicle==VE_YUGO))
 					{
 						// if you hit someone while riding a minecart or yugo, they get hurt bad
 						guys[i]->GetShot(parent->dx,parent->dy,30,map,world);
@@ -316,7 +316,7 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 					}
 					else
 					{
-						if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO))
+						if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO))
 						{
 							// be bigger, so you can smack into badguys better
 							rectx+=10;
@@ -329,7 +329,7 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 				}
 			}
 
-	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO))
+	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO))
 	{
 		// be bigger, so you can smack into badguys better
 		rectx+=10;
@@ -780,7 +780,6 @@ void Guy::Update(Map *map,world_t *world)
 			switch(player.vehicle){
 				case VE_YUGO:
 				case VE_MINECART:
-				case VE_MINECART_SLOW:
 					if(goodguy->parent)
 					{
 						tdx=goodguy->parent->dx;
@@ -926,13 +925,12 @@ void Guy::Render(byte light)
 	if(type==MONS_NONE)
 		return;
 
-	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_YUGO || player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW))
+	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_YUGO || player.vehicle==VE_MINECART))
 		return;	// don't render him if he's in a car or minecart
 
 	switch(player.vehicle)
 	{
 		case VE_MINECART:
-		case VE_MINECART_SLOW:
 			if(goodguy->parent == this)
 			{
 				byte v=player.vehicle;
@@ -1481,11 +1479,11 @@ void UpdateGuys(Map *map,world_t *world)
 		if(guys[i]->type!=MONS_NONE)
 		{
 			if (!player.timeStop || guys[i]->aiType == MONS_BOUAPHA || guys[i]->hp == 0 ||
-				guys[i]->aiType == MONS_MINECART || guys[i]->aiType == MONS_RAFT || guys[i]->aiType == MONS_YUGO ||
+				guys[i]->aiType == MONS_MINECART || guys[i]->aiType == MONS_MINECARTSLOW || guys[i]->aiType == MONS_RAFT || guys[i]->aiType == MONS_YUGO ||
 				guys[i]->aiType == MONS_LOG)
 			{
 				if (((speedClock & 3) == 0) && guys[i]->aiType != MONS_BOUAPHA &&
-					guys[i]->aiType != MONS_MINECART && guys[i]->aiType != MONS_RAFT && guys[i]->aiType != MONS_YUGO &&
+					guys[i]->aiType != MONS_MINECART && guys[i]->aiType != MONS_MINECARTSLOW && guys[i]->aiType != MONS_RAFT && guys[i]->aiType != MONS_YUGO &&
 					guys[i]->aiType != MONS_LOG)
 				{
 					if (profile.difficulty == 0)
@@ -1612,9 +1610,9 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 		type=MONS_NOBODY;
 		while(type==MONS_NONE || type==MONS_NOBODY || type==MONS_BOUAPHA || type==MONS_FRIENDLY || type==MONS_GOODTURRET ||
 				type==MONS_WIZARD || type==MONS_GOODROBOT || type==MONS_GOODROBOT2 ||
-				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_MINECART || type==MONS_RAFT ||
+				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_MINECART || type==MONS_MINECARTSLOW || type==MONS_RAFT ||
 				type==MONS_YUGO || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM || type==MONS_LOG ||
-				(GetMonsterType(type)->theme==MT_NONE))
+				type==MONS_GOODBONE || (GetMonsterType(type)->theme==MT_NONE))
 			type=Random(NUM_MONSTERS);
 	}
 	else if(type==MONS_GOODGUY)
@@ -1623,7 +1621,7 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 		while(type==MONS_NONE || type==MONS_NOBODY || !(type==MONS_FRIENDLY || type==MONS_GOODTURRET ||
 				type==MONS_WIZARD || type==MONS_GOODROBOT || type==MONS_GOODROBOT2 ||
 				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM || type == MONS_LOG ||
-				(GetMonsterType(type)->theme==MT_NONE)))
+				type==MONS_GOODBONE || (GetMonsterType(type)->theme==MT_NONE)))
 			type=Random(NUM_MONSTERS);
 	}
 	else if(type==MONS_TAGGED)
@@ -1654,8 +1652,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 
 			if(friendly==1 || (friendly==2 && (type==MONS_BOUAPHA || type==MONS_FRIENDLY || type==MONS_GOODTURRET ||
 				type==MONS_WIZARD || type==MONS_GOODROBOT || type==MONS_GOODROBOT2 ||
-				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_MINECART || type==MONS_RAFT ||
-				type==MONS_YUGO || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM)))
+				type==MONS_FRIENDLY2 || type==MONS_FOLLOWBUNNY || type==MONS_MINECART || type==MONS_MINECARTSLOW || type==MONS_RAFT ||
+				type==MONS_YUGO || type==MONS_PUNKBUNNY || type==MONS_PTERO || type==MONS_GOLEM || type==MONS_GOODBONE )))
 			{
 				guys[i]->friendly=1;
 				j=LockOnEvil(x>>FIXSHIFT,y>>FIXSHIFT);
@@ -2177,7 +2175,8 @@ void AddMapGuys(Map *map)
 					if(genType[i]==MONS_BOUAPHA || genType[i]==MONS_FRIENDLY || genType[i]==MONS_GOODTURRET ||
 						genType[i]==MONS_WIZARD || genType[i]==MONS_GOODROBOT || genType[i]==MONS_GOODROBOT2 ||
 						genType[i]==MONS_FRIENDLY2 || genType[i]==MONS_PUNKBUNNY || genType[i]==MONS_FOLLOWBUNNY ||
-						genType[i]==MONS_MINECART || genType[i]==MONS_RAFT || genType[i]==MONS_YUGO || genType[i]==MONS_PTERO || genType[i]==MONS_GOLEM)
+						genType[i]==MONS_MINECART || genType[i]==MONS_MINECARTSLOW || genType[i]==MONS_RAFT || genType[i]==MONS_YUGO ||
+						genType[i]==MONS_PTERO || genType[i]==MONS_GOLEM || genType[i]==MONS_GOODBONE)
 					{
 						player.totalEnemies--;
 						g->friendly=1;

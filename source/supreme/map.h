@@ -10,7 +10,7 @@
 #define MIN_LIGHT -32
 
 // the maximum # of monsters you can put on the map
-#define MAX_MAPMONS 256
+#define MAX_MAPMONS 200
 
 // maximum width or height
 #define MAX_MAPSIZE	200

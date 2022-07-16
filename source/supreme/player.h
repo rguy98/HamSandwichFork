@@ -58,7 +58,6 @@
 #define VE_RAFT				2
 #define VE_YUGO				3
 #define VE_LOG				4
-#define VE_MINECART_SLOW	5
 
 typedef struct pocket_t {
 	byte used, wpn;
