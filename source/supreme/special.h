@@ -47,7 +47,9 @@
 #define TRG_TEMPFLAGS	36	// true if monster of type N at X,Y has condition/flag M
 #define TRG_PERMFLAGS	37	// true if monster of type N at X,Y has condition/flag M
 #define TRG_BEGINLEVEL	38	// activates exactly at beginning of level - no delay!
-#define MAX_TRIGGER		38
+#define TRG_CAMERASTEP	39	// true if top-left point of camera is on X,Y
+#define TRG_CAMERARECT	40	// true if camera is in rect
+#define MAX_TRIGGER		41
 
 // effects
 #define EFF_NONE		0
@@ -97,7 +99,9 @@
 #define EFF_COLORBULLET	44	// change bullet of type N at X,Y (or any X,Y) coloration
 #define EFF_CAMERAMONS	45	// focus camera on monster (picks first one) - use invis monster for static cameras!
 #define EFF_COLORMSG	46	// show color message M
-#define EFF_MAX			47
+#define EFF_AUTOSCROLL	47
+#define EFF_CONVEYOR	48
+#define EFF_MAX			49
 
 // trigger flags
 #define TF_NOT		1	// NOT this one

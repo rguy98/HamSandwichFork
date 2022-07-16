@@ -409,6 +409,11 @@
 #define SND_HOLOOUCH	348
 #define SND_HOLODIE		349
 #define SND_SDZLSUMMON	350
+#define SND_EMPRESSHEAD	351
+#define SND_EMPRESSSPWN	352
+#define SND_LPGINTRO	353
+#define SND_LASERSMALL1	354
+#define SND_LASERSMALL2	355
 
 // Import sounds from other games using synthetic sound numbers in the following ranges:
 #define SND_MYSTIC_START    1024

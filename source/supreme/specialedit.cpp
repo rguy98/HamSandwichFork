@@ -124,6 +124,9 @@ static char trigName[][16]={
 	"Have Weapon",
 	"Mons. TempFlag",
 	"Mons. PermFlag",
+	"Start of Level",
+	"Camera @ Point",
+	"Camera In Rect",
 };
 
 static char effName[][16]={
@@ -172,7 +175,9 @@ static char effName[][16]={
 	"Mons. PermFlag",
 	"Set Coin Limit",
 	"Color Bullet",
-	"Camera @ Mons."
+	"Camera @ Guy",
+	"Color Message",
+	"Set Autoscroll",
 };
 
 static char lvlFlagName[][16]={
@@ -384,9 +389,11 @@ static char bulletName[][20]={
 	"Evil Lunachick Ray",
 	"Evil Fireball",
 	"Evil Lightning Ball",
-	"Evil Boomerang"
+	"Evil Boomerang",
+	"Queen's Acid",
+	"Alien Egg",
 };
-#define MAX_BULLETS (BLT_BADLIGHTNING + 1)
+#define MAX_BULLETS (BLT_ALIENEGG + 1)
 
 static void SetupTriggerButtons(int t,int y);
 static void SetupEffectButtons(int t,int y);
@@ -757,11 +764,10 @@ static void Number3AClick(int id) // Not currently used
 	// enter a number for value
 	if (rightClick)
 	{
-		/*
 		if (!effMode)
-			spcl.trigger[curTrig].value3 = 0;
+			SetNumber3A(spcl.trigger[curTrig].value2, 0);
 		else
-			spcl.effect[curEff].value3 = 0;*/
+			SetNumber3A(spcl.effect[curEff].value2, 0);
 		MakeNormalSound(SND_MENUCLICK);
 		return;
 	}
@@ -2132,7 +2138,18 @@ static void SetupTriggerButtons(int t,int y)
 			MakeButton(BTN_NORMAL, ID_TRIG0 + OFS_CUSTOM + 5 + 100 * t, 0, 335, y + 17, 140, 14, permFlagName[trigger.value2], PermConditionClick);
 			break;
 		case TRG_BEGINLEVEL:
-			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"At the start of the level",NULL);
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"At the start of the level...",NULL);
+			break;
+		case TRG_CAMERASTEP:
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"If the top-left point of the camera is",NULL);
+			sprintf(s,"%d, %d",trigger.x,trigger.y);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+5+100*t,0,410,y+17,70,14,s,XYClick);
+			break;
+		case TRG_CAMERARECT:
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"If the camera",NULL);
+			MakeButton(BTN_STATIC,ID_TRIG0+OFS_CUSTOM+1+100*t,0,200,y+17,1,1,"steps inside the area: ",NULL);
+			sprintf(s,"(%d,%d)-(%d,%d)",trigger.x,trigger.y,((word)trigger.value2)%256,((word)trigger.value2)/256);
+			MakeButton(BTN_NORMAL,ID_TRIG0+OFS_CUSTOM+2+100*t,0,370,y+17,150,14,s,RectClick);
 			break;
 	}
 }
@@ -2863,6 +2880,15 @@ static void SetupEffectButtons(int t,int y)
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,455,y+17,60,14,"Large",ToggleClick);
 			else
 				MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,455,y+17,60,14,"Normal",ToggleClick);
+			break;
+		case EFF_AUTOSCROLL:
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+0+100*t,0,40,y+17,1,1,"Set camera speed to",NULL);
+			sprintf(s,"%d",effect.value);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+1+100*t,0,200,y+17,40,14,s,NumberClick);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+2+100*t,0,300,y+17,1,1,"horiz. and ",NULL);
+			sprintf(s,"%d",effect.value2);
+			MakeButton(BTN_NORMAL,ID_EFF0+OFS_CUSTOM+3+100*t,0,400,y+17,40,14,s,Number2Click);
+			MakeButton(BTN_STATIC,ID_EFF0+OFS_CUSTOM+4+100*t,0,500,y+17,1,1,"vert",NULL);
 			break;
 	}
 }

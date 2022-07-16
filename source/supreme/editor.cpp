@@ -92,18 +92,15 @@ byte InitEditor(void)
 	strcpy(MonsterName(MONS_TURRETU),"Laser:Up");
 	strcpy(MonsterName(MONS_PEEPBOMB), "Peeping Bomb:CW");
 	strcpy(MonsterName(MONS_PEEPBOMB2), "Peeping Bomb:CCW");
-	strcpy(MonsterName(MONS_CLONESHRM), "Evil Clone:Shroom");
-	strcpy(MonsterName(MONS_CLONEDRL), "Evil Clone:Lunatic");
-	strcpy(MonsterName(MONS_CLONELUNA), "Evil Clone:Chick");
-	strcpy(MonsterName(MONS_CLONEKM), "Evil Clone:Mystic");
 	strcpy(MonsterName(MONS_CENTIBODY), "Centipumpkin:Segment");
-	strcpy(MonsterName(MONS_CENTIBBODY), "Centiboomkin:Segment");
 
 	for(i=MONS_SUCKER1;i<=MONS_BLOWER4;i++)
 	{
 		MonsterAnim(i,0)[0]=0;
 	}
 	MonsterAnim(MONS_DARKNESS, 0)[0] = 1;
+	MonsterAnim(MONS_PUSHERH, 0)[0] = 1;
+	MonsterAnim(MONS_PUSHERV, 0)[0] = 1;
 
 	ChangeOffColor(MONS_SHARK,2,4);
 	ChangeOffColor(MONS_SNKYSHRK2,2,4);
@@ -168,17 +165,15 @@ void ExitEditor(void)
 	strcpy(MonsterName(MONS_TURRETU),"Laser");
 	strcpy(MonsterName(MONS_PEEPBOMB), "Peeping Bomb");
 	strcpy(MonsterName(MONS_PEEPBOMB2), "Peeping Bomb");
-	strcpy(MonsterName(MONS_CLONESHRM), "Evil Clone");
-	strcpy(MonsterName(MONS_CLONEDRL), "Evil Clone");
-	strcpy(MonsterName(MONS_CLONELUNA), "Evil Clone");
-	strcpy(MonsterName(MONS_CLONEKM), "Evil Clone");
 	strcpy(MonsterName(MONS_CENTIBODY), "Centipumpkin");
-	strcpy(MonsterName(MONS_CENTIBBODY), "Centiboomkin");
 
 	for(i=MONS_SUCKER1;i<=MONS_BLOWER4;i++)
 	{
 		MonsterAnim(i,0)[0]=254;
 	}
+	MonsterAnim(MONS_DARKNESS, 0)[0] = 254;
+	MonsterAnim(MONS_PUSHERH, 0)[0] = 254;
+	MonsterAnim(MONS_PUSHERV, 0)[0] = 254;
 	StopSong();
 	ExitGuys();
 	FreeWorld(&world);

@@ -209,6 +209,30 @@ void GetCamera(int *x,int *y)
 	*y=scry;
 }
 
+void GetCameraPoint(int *x,int *y)
+{
+	*x=scrx/32-10;
+	*y=scry/24-10;
+}
+
+void PushCamera(int dx,int dy,Map *map)
+{
+	scrdx = dx;
+	scrdy = dy;
+
+	if(rscrx<320<<FIXSHIFT)
+		rscrx=320<<FIXSHIFT;
+	if(rscrx>((map->width*TILE_WIDTH-320)<<FIXSHIFT))
+		rscrx=(map->width*TILE_WIDTH-320)<<FIXSHIFT;
+	if(rscry<(240-TILE_HEIGHT)<<FIXSHIFT)
+		rscry=(240-TILE_HEIGHT)<<FIXSHIFT;
+	if(rscry>((map->height*TILE_HEIGHT-240)<<FIXSHIFT))
+		rscry=(map->height*TILE_HEIGHT-240)<<FIXSHIFT;
+
+	scrx=(rscrx>>FIXSHIFT);
+	scry=(rscry>>FIXSHIFT);
+}
+
 void PutCamera(int x,int y)
 {
 	rscrx=x;
@@ -246,7 +270,7 @@ void UpdateCamera(int x,int y,int dx,int dy,Map *map)
 
 	if(config.camera)
 	{
-		if(player.vehicle==VE_YUGO || player.vehicle==VE_MINECART || player.vehicle==VE_LOG)
+		if(player.vehicle==VE_YUGO || player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_LOG)
 		{
 			desiredX=((x<<FIXSHIFT)+dx*20)>>FIXSHIFT;
 			desiredY=((y<<FIXSHIFT)+dy*20)>>FIXSHIFT;

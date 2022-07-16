@@ -579,7 +579,7 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 	color[8]=32*4+20;	// light red for weakness
 	color[9]=32*0+12;	// dark grey for steelskin
 	color[10]=32*7+16;	// aqua for frozen
-	color[10]=32*6+16;	// pink for confuse
+	color[11]=32*6+16;	// pink for confuse
 
 	swap=1;
 	while(swap)
@@ -658,7 +658,7 @@ void DrawPockets(int x, int y, MGLDraw* mgl)
 	{
 		if (pockets[i] == 0)
 			continue;
-		intfaceSpr->GetSprite(21+pockets[i])->Draw(x, y+i*24, mgl);
+		intfaceSpr->GetSprite(21+pockets[i])->Draw(x+(i%2)*32, y+i*12, mgl);
 	}
 }
 
@@ -770,11 +770,11 @@ void UpdateInterface(Map *map)
 	}
 
 	if (NumFilledPockets()>1){
-		intf[INTF_POCKETS].tx = 600;
+		intf[INTF_POCKETS].tx = 640;
 		intf[INTF_POCKETS].ty = 80;
 	}
 	else {
-		intf[INTF_POCKETS].tx = 639;
+		intf[INTF_POCKETS].tx = 680;
 		intf[INTF_POCKETS].ty = 80;
 	}
 
@@ -1015,7 +1015,18 @@ void RenderInterface(MGLDraw *mgl)
 	sprintf(combo,"Combo x%d",curCombo);
 	PrintGlow(240,comboY,combo,0,2);
 
-	//sprintf(debuggy, "WPNS - %d,%d,%d,%d", player.wpns[0].wpn, player.wpns[1].wpn, player.wpns[2].wpn, player.wpns[3].wpn);
+	int camx,camy;
+	GetCamera(&camx, &camy);
+	camx = camx/32-10;
+	camy = camy/24-10;
+	word w=0;
+	if(goodguy)
+	{
+		if(goodguy->parent)
+		w=goodguy->parent->ID;
+
+	}
+	sprintf(debuggy,"Parent: %d",w);
 	PrintGlow(240, 80, debuggy, 0, 2);
 }
 

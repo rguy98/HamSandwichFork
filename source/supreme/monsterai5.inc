@@ -3018,17 +3018,6 @@ void AI_Stickbat(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 }
 
-void DoMove(Guy *me,byte move,int dx,int dy)
-{
-	me->seq=move;
-	me->frm=0;
-	me->frmTimer=0;
-	me->frmAdvance=128;
-	me->action=ACTION_BUSY;
-	me->dx=dx;
-	me->dy=dy;
-}
-
 void AI_Dancer(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	if(me->reload)

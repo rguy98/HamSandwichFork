@@ -53,6 +53,14 @@ void Clamp(int* value, int amt)
 		*value = -amt;
 }
 
+void RevClamp(int* value, int amt)
+{
+	if (*value < amt)
+		*value = amt;
+	if (*value > -amt)
+		*value = -amt;
+}
+
 byte AngleFrom(int fromx, int fromy, int tox, int toy)
 {
 	float ang;

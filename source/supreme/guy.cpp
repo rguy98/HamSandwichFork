@@ -7,6 +7,7 @@
 #include "shop.h"
 #include "goal.h"
 #include "pathfinding.h"
+#include "dialogbits.h"
 
 Guy **guys;
 Guy *goodguy;
@@ -290,7 +291,7 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 	if(MonsterFlags(type,aiType)&MF_FREEWALK)
 		return result;	// can't have a guy collision
 
-	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO))
+	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO))
 	{
 		// be bigger, so you can smack into badguys better
 		rectx-=10;
@@ -305,8 +306,8 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 			{
 				if(guys[i]!=parent && guys[i]->parent!=this && CoconutBonk(xx,yy,guys[i]))
 				{
-					if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO)
-						&& parent && ((player.vehicle==VE_MINECART && parent->mind1>20) || player.vehicle==VE_YUGO))
+					if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO)
+						&& parent && (((player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW) && parent->mind1>20) || player.vehicle==VE_YUGO))
 					{
 						// if you hit someone while riding a minecart or yugo, they get hurt bad
 						guys[i]->GetShot(parent->dx,parent->dy,30,map,world);
@@ -315,7 +316,7 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 					}
 					else
 					{
-						if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO))
+						if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO))
 						{
 							// be bigger, so you can smack into badguys better
 							rectx+=10;
@@ -328,7 +329,7 @@ byte Guy::CanWalk(int xx,int yy,Map *map,world_t *world)
 				}
 			}
 
-	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_YUGO))
+	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW || player.vehicle==VE_YUGO))
 	{
 		// be bigger, so you can smack into badguys better
 		rectx+=10;
@@ -463,9 +464,7 @@ byte DoesBouncing(int type)
 		case MONS_ROLLSTONE:
 		case MONS_ROLLSTONE2:
 		case MONS_CENTIBODY:
-		case MONS_CENTIBBODY:
 		case MONS_CENTIHEAD:
-		case MONS_CENTIBHEAD:
 		case MONS_DRL:
 		case MONS_BOUAPHA:
 		case MONS_VAMPIRE:
@@ -506,6 +505,8 @@ byte DoesBouncing(int type)
 		case MONS_LARRY:
 		case MONS_HUMANLARRY:
 		case MONS_BOMB:
+		case MONS_LUNAMECHA:
+		case MONS_LUNABOSS:
 			return 1;
 		default:
 			return 0;
@@ -656,27 +657,38 @@ void Guy::Update(Map *map,world_t *world)
 
 	if (profile.progress.purchase[modeShopNum[MODE_REVERSE]] & SIF_ACTIVE) 
 		rv*= -1;
-
-	x+=(dx+ax)*cf*rv;
+	
+	ax=lerpi(ax,0,0.10);
+	x+=dx*cf*rv+ax;
 
 	b=0;
 	if(!CanWalk(x,y,map,world))
 	{
 		x-=(dx+ax)*cf*rv;
-		if(aiType==MONS_MINECART)
+		if(aiType==MONS_MINECART || aiType==MONS_MINECARTSLOW)
 			x=(mapx*TILE_WIDTH+TILE_WIDTH/2)*FIXAMT;
 
 		if(DoesBouncing(aiType))
-			mind1=1;	// tell it that it hit a wall
+			switch(aiType)
+			{
+				case MONS_LUNAMECHA:
+					if(mind==1||mind==3)
+						mind1 = 1;	// tell it that it hit a wall
+					break;
+				default:
+					mind1 = 1;	// tell it that it hit a wall
+					break;
+			}
 		b=1;
 	}
-
-	y+=(dy+ay)*cf*rv;
+	
+	ay=lerpi(ay,0,0.10);
+	y+=dy*cf*rv+ay;
 
 	if(!CanWalk(x,y,map,world))
 	{
 		y-=(dy+ay)*cf*rv;
-		if(aiType==MONS_MINECART)
+		if(aiType==MONS_MINECART||aiType==MONS_MINECARTSLOW)
 			y=(mapy*TILE_HEIGHT+TILE_HEIGHT/2)*FIXAMT;
 		
 		if(DoesBouncing(aiType))
@@ -746,7 +758,12 @@ void Guy::Update(Map *map,world_t *world)
 	mapx=(x>>FIXSHIFT)/TILE_WIDTH;
 	mapy=(y>>FIXSHIFT)/TILE_HEIGHT;
 
-	if(!player.camera.g){
+	if (player.camera.dx != 0 || player.camera.dy != 0)
+	{
+		// If the camera has a destination, then forget about the target and move there!
+		PushCamera(player.camera.dx*FIXAMT,player.camera.dy*FIXAMT, curMap);
+	}
+	else if (!player.camera.g) {
 		player.camera.g = goodguy;
 	}
 
@@ -756,7 +773,6 @@ void Guy::Update(Map *map,world_t *world)
 		{
 			profile.progress.footDistance+=abs(dx/FIXAMT)+abs(dy/FIXAMT);
 		}
-
 		if (player.camera.g == goodguy) {
 			int tdx,tdy;
 			tdx=dx;
@@ -764,6 +780,7 @@ void Guy::Update(Map *map,world_t *world)
 			switch(player.vehicle){
 				case VE_YUGO:
 				case VE_MINECART:
+				case VE_MINECART_SLOW:
 					if(goodguy->parent)
 					{
 						tdx=goodguy->parent->dx;
@@ -814,9 +831,7 @@ void Guy::Update(Map *map,world_t *world)
 			}
 		}
 		if(map->flags&MAP_WELLLIT)
-		{
 			map->DimTorch(mapx,mapy,20);
-		}
 		if(player.torch)
 			map->TempTorch(mapx,mapy,64);
 
@@ -836,8 +851,6 @@ void Guy::Update(Map *map,world_t *world)
 				seq=ANIM_A3;
 				dx=0;
 				dy=0;
-				ax=0;
-				ay=0;
 				frm=0;
 				frmAdvance=255;
 				frmTimer=0;
@@ -876,6 +889,12 @@ void Guy::Update(Map *map,world_t *world)
 			map->GetTile(mapx,mapy)->floor=GetTerrain(world,map->GetTile(mapx,mapy)->floor)->next;
 		}
 	}
+	else if (!goodguy && this == player.camera.g){ // If no Bouapha exists, this guy'll do
+		UpdateCamera(x >> FIXSHIFT, y >> FIXSHIFT, dx, dy, map);
+		if(map->flags&MAP_WELLLIT)
+			map->DimTorch(mapx,mapy,20);
+	}
+
 	if((oldmapx!=mapx || oldmapy!=mapy) && type!=MONS_NOBODY)
 		EventOccur(EVT_STEP,ID,mapx,mapy,this);
 
@@ -907,16 +926,23 @@ void Guy::Render(byte light)
 	if(type==MONS_NONE)
 		return;
 
-	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_YUGO || player.vehicle==VE_MINECART))
+	if(aiType==MONS_BOUAPHA && (player.vehicle==VE_YUGO || player.vehicle==VE_MINECART || player.vehicle==VE_MINECART_SLOW))
 		return;	// don't render him if he's in a car or minecart
 
-	if(aiType==MONS_MINECART && player.vehicle==VE_MINECART && goodguy->parent==this)
+	switch(player.vehicle)
 	{
-		goodguy->x=x;
-		goodguy->y=y+1;
-		player.vehicle=VE_NONE;
-		goodguy->Render(light);
-		player.vehicle=VE_MINECART;
+		case VE_MINECART:
+		case VE_MINECART_SLOW:
+			if(goodguy->parent == this)
+			{
+				byte v=player.vehicle;
+				goodguy->x=x;
+				goodguy->y=y+1;
+				player.vehicle=VE_NONE;
+				goodguy->Render(light);
+				player.vehicle=v;
+			}
+			break;
 	}
 
 	if(type==MONS_BOUAPHA)
@@ -1091,6 +1117,9 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		}
 	}
 
+	if(aiType == MONS_EMPRESSBODY && mind==0)
+		return;
+
 	if (aiType == MONS_INCATONGUE && !mind3)
 		return;
 
@@ -1227,7 +1256,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		frmTimer=0;
 		action=ACTION_BUSY;
 		if(type==MONS_MUSH || type==MONS_SVEN || type==MONS_BJORN || type==MONS_OLAF || type==MONS_SHOCKTR ||
-			type==MONS_TROOPER2 || type==MONS_PATTY || type==MONS_SCARAB)
+			type==MONS_TROOPER2 || type==MONS_PATTY || type==MONS_SCARAB || type==MONS_LUNAMECHA)
 			facing=2;	// these can only die facing forward, artistically speaking
 		// possible item drop
 		if(IsZombie(this))	// zombies always drop a brain
@@ -1484,6 +1513,11 @@ void UpdateGuys(Map *map,world_t *world)
 				else if (guys[i]->aiType == MONS_WOLF2 && guys[i]->type != 0 && guys[i]->mind3)
 				{
 					guys[i]->Render(1);
+					guys[i]->Update(map, world);
+				}
+				else if (guys[i]->aiType == MONS_LUNAMECHA && guys[i]->type != 0 && guys[i]->mind==3)
+				{
+					guys[i]->Render(2);
 					guys[i]->Update(map, world);
 				}
 				else if ((guys[i]->aiType == MONS_MUMBLE2 || guys[i]->aiType == MONS_FSTZOMBIE) && guys[i]->type != 0)
@@ -2026,6 +2060,15 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 				if(g)
 					g->parent=guys[i];
 			}
+			if(type==MONS_EMPRESSBODY)
+			{
+				g=AddGuy(x-FIXAMT*32,y+FIXAMT*32,0,MONS_EMPRESS,friendly);
+				if(g)
+					g->parent=guys[i];
+				g=AddGuy(x,y-FIXAMT*64,0,MONS_EMPRESSTAIL,friendly);
+				if(g)
+					g->parent=guys[i];
+			}
 
 			return guys[i];
 		}
@@ -2265,6 +2308,95 @@ byte FindNewVictim(int x, int y, word* target, byte size, int dx, int dy, byte d
 		}
 
 	return 0;
+}
+
+#define GEF_POISON	0
+#define GEF_FROZEN	1
+#define GEF_BURN	2
+#define GEF_WEAK	3
+#define GEF_STRONG	4
+#define GEF_CONFUSE	5
+#define GEF_GARLIC	6
+#define GEF_SPEEDY	7
+
+byte HealNearbyAllies(Guy *me, int x,int y,byte size,byte amt,Map *map,world_t *world,byte friendly,byte canBeSelf)
+{
+	int i;
+	byte result=0;
+
+	for(i=0;i<maxGuys;i++)
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==friendly))
+		{
+			if(!canBeSelf && guys[i]==me)
+				continue;
+			if(RangeToTarget(me,guys[i])<size*FIXAMT)
+			{
+				guys[i]->hp += amt;
+				if(amt<0)
+				{
+					MakeSound(SND_TURNEVIL, guys[i]->x, guys[i]->y, SND_CUTOFF, 600);
+					HealRing(4, guys[i]->x, guys[i]->y, 0, 16, 2);
+				}
+				else
+				{
+					MakeSound(SND_TURNGOOD, guys[i]->x, guys[i]->y, SND_CUTOFF, 600);
+					HealRing(1, guys[i]->x, guys[i]->y, 0, 16, 2);
+				}
+				result=1;
+			}
+		}
+
+	return result;
+}
+
+byte BuffNearbyAllies(Guy *me, int x,int y,byte size,byte effect,byte amt,Map *map,world_t *world,byte friendly,byte canBeSelf)
+{
+	int i;
+	byte result=0;
+
+	for(i=0;i<maxGuys;i++)
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==friendly))
+		{
+			if(!canBeSelf && guys[i]==me)
+				continue;
+			if(RangeToTarget(me,guys[i])<size*FIXAMT)
+			{
+				switch(effect)
+				{
+					case 0:
+						guys[i]->poison += amt;
+						break;
+					case 1:
+						guys[i]->frozen += amt;
+						break;
+					case 2:
+						guys[i]->ignited += amt;
+						break;
+					case 3:
+						guys[i]->weak += amt;
+						break;
+					case 4:
+						guys[i]->strong += amt;
+						MakeSound(SND_TURNGOOD,guys[i]->x,guys[i]->y,SND_CUTOFF,600);
+						LightningBolt(me->x,me->y,guys[i]->x,guys[i]->y);
+						MakeColdRingParticle(guys[i]->x,guys[i]->y,guys[i]->z,GetMonsterType(guys[i]->type)->size);
+						break;
+					case 5:
+						guys[i]->confuse += amt;
+						break;
+					case 6:
+						guys[i]->garlic += amt;
+						break;
+					case 7:
+						guys[i]->speedy += amt;
+						break;
+				}
+				guyHit=guys[i];
+				result=1;
+			}
+		}
+
+	return result;
 }
 
 word LockOnEvil(int x,int y)
@@ -2839,7 +2971,12 @@ void KillMonster(int x,int y,int type,byte nofx)
 				player.vehicle=VE_NONE;	// player was riding it
 				goodguy->parent=NULL;
 			}
-			if(guys[i]->aiType==MONS_MINECART && guys[i]->mind!=0)
+			if((guys[i]->aiType==MONS_MINECART) && guys[i]->mind!=0)
+			{
+				player.vehicle=VE_NONE;	// player was riding it
+				goodguy->parent=NULL;
+			}
+			if((guys[i]->aiType==MONS_MINECARTSLOW) && guys[i]->mind!=0)
 			{
 				player.vehicle=VE_NONE;	// player was riding it
 				goodguy->parent=NULL;
@@ -4068,6 +4205,41 @@ byte CheckMonsterPermCondition(int x, int y, int type, byte trg)
 	return 0;
 }
 
+byte CheckTopLeftCameraPoint(int x,int y)
+{
+	int x2,y2;
+	byte answer;
+	GetCameraPoint(&x2,&y2);
+	return (x==x2&&y==y2);
+}
+
+int CoordsToValue(int x, int y)
+{
+	return x + y * 256;
+}
+
+void ValueToCoords(int &x, int &y, int v)
+{
+	x = v%256;
+	y = v/256;
+}
+
+byte CheckCameraRect(int x,int y,int v)
+{
+	int cx,cy;
+	GetCameraPoint(&cx,&cy);
+	int pts[] = { CoordsToValue(cx,cy), CoordsToValue(cx+20,cy), CoordsToValue(cx,cy+20), CoordsToValue(cx+20,cy+20)};
+	for(int i=0;i<4;i++)
+	{
+		int px,py;
+		ValueToCoords(px,py,pts[i]);
+		if(PointInRect(px,py,x,y,(v%256),(v/256)))
+			return 1;
+	}
+	return 0;
+}
+
+
 void ChangeMonsItem(byte fx,int x,int y,int type,int newItem)
 {
 	int i;
@@ -4241,8 +4413,6 @@ void ChangeMonsterAI(byte fx,int x,int y,int type,int newtype)
 			guys[i]->dx=0;
 			guys[i]->dy=0;
 			guys[i]->dz=0;
-			guys[i]->ax=0;
-			guys[i]->ay=0;
 			guys[i]->seq=ANIM_IDLE;
 			guys[i]->frm=0;
 			guys[i]->frmTimer=0;
@@ -4752,6 +4922,7 @@ byte Guy::IsAwake(void)
 		case MONS_MECHABOUAPHA:
 		case MONS_DRL:
 		case MONS_MINECART:	// not being ridden=asleep
+		case MONS_MINECARTSLOW:	// not being ridden=asleep
 		case MONS_RAFT:		// same
 		case MONS_LOG:		// same
 		case MONS_GHOST:
@@ -5010,7 +5181,6 @@ byte IsInGroup(Guy *g, int group){
 				case MONS_PUMPKINFLY:
 				case MONS_PUMPKINFLY2:
 				case MONS_BOOMKIN:
-				case MONS_SEAPUMPKN:
 				case MONS_WACKYPUMP:
 				case MONS_PUNKIN:
 				case MONS_PINKPUMPKN:
@@ -5290,7 +5460,6 @@ byte GetBaseColor(Guy *me)
 		case MONS_STKBAT:
 		case MONS_STICKTREE:
 		case MONS_STICKWITCH:
-		case MONS_STICKSUPREME:
 			return 7; // aqua
 		case MONS_DJINNI:
 		case MONS_LICH:

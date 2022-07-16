@@ -53,11 +53,12 @@
 #define MAX_WEAPONS	  35
 
 // vehicles you could be on
-#define VE_NONE		0
-#define VE_MINECART 1
-#define VE_RAFT		2
-#define VE_YUGO		3
-#define VE_LOG		4
+#define VE_NONE				0
+#define VE_MINECART			1
+#define VE_RAFT				2
+#define VE_YUGO				3
+#define VE_LOG				4
+#define VE_MINECART_SLOW	5
 
 typedef struct pocket_t {
 	byte used, wpn;
@@ -67,6 +68,7 @@ typedef struct pocket_t {
 typedef struct camera_t {
 	Guy *g; // Focus on guy
 	int x,y; // Focus on point
+	int dx,dy; // Movin' around
 }camera_t;
 
 typedef struct player_t

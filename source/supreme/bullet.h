@@ -150,6 +150,9 @@
 #define BLT_BADFBALL		121
 #define BLT_BADLIGHTNING	122
 #define BLT_BADBOOMERANG	123
+#define BLT_BADLUNA2		124
+#define BLT_QUEENACID		125
+#define BLT_ALIENEGG		126
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1
@@ -159,7 +162,7 @@
 
 #define BFL_GRAVITY 1
 #define BFL_HOMING 	2
-#define BFL_ATTRACT 4
+#define BFL_WAVY	4
 #define BFL_AURA 	8
 
 #define CHT_ULTRA 	1

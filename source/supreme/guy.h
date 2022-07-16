@@ -35,7 +35,7 @@ class Guy
 		int x,y,z;
 		int oldx,oldy;
 		int dx,dy,dz;
-		int ax, ay; // acceleration provided by badguys
+		int ax,ay; // acceleration provided by badguys
 		byte mapx,mapy;
 		byte lastBumpX,lastBumpY;
 		byte facing;
@@ -164,6 +164,10 @@ void RaiseBaddies(Guy *g,int group);
 void KillAllMonsters(byte type);
 void ResetGuy(Guy *g);
 
+// Camera stuff
+byte CheckTopLeftCameraPoint(int x, int y);
+byte CheckCameraRect(int x, int y,int v);
+
 // Kid Mystic stuff
 byte PeepAtKid(int x,int y,Map *map,byte face);
 byte LogNearby(void);
@@ -186,6 +190,8 @@ byte Walkable(Guy *me, int x, int y, Map* map, world_t* world);
 void SpreadCharge(Guy* me);
 void GetSpook(void);
 void PutSpook(void);
+byte HealNearbyAllies(Guy *me,int x,int y,byte size,byte amt,Map *map,world_t *world,byte friendly,byte canBeSelf);
+byte BuffNearbyAllies(Guy *me,int x,int y,byte size,byte effect,byte amt,Map *map,world_t *world,byte friendly,byte canBeSelf);
 
 // LL stuff
 void LaunchJunk(Map* map, Guy* me);

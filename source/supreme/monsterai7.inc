@@ -1948,6 +1948,9 @@ void AI_Junk(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		DoMove(me,ANIM_DIE,128,1,0,0);
 	}
 
+	if(!goodguy || !me->parent)
+		return;
+
 	if(RangeToTarget(me,goodguy)<20*FIXAMT)
 	{
 		goodguy->GetShot(me->dx,me->dy,2,map,world);

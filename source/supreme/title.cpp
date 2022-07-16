@@ -834,6 +834,8 @@ TASK(void) SplashScreen(MGLDraw *mgl,const char *fname,int delay,byte sound)
 					{
 						if(sound==2)
 							MakeNormalSound(SND_HAMUMU);
+						else if (sound == 3)
+							MakeNormalSound(SND_LPGINTRO);
 					}
 					if(clock>64)
 					{

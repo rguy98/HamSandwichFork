@@ -340,11 +340,13 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 		case BLT_LUNA2:
 		case BLT_EVILHAMMER:	// reflects off walls
 		case BLT_BADLUNA:	// reflects off walls
+		case BLT_BADLUNA2:	// reflects off walls
 		case BLT_BADFBALL:	// reflects off walls
 			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
 		case BLT_COIN:	// reflects off walls w/o sound
 		case BLT_BIGCOIN:
 		case BLT_BIGYELLOW:
+		case BLT_ALIENEGG:
 			me->x -= me->dx;
 			me->dx = -me->dx;
 			me->facing = ((byte)(4 - me->facing)) & 7;
@@ -444,6 +446,13 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 			me->dx=-me->dx;
 			me->facing=((byte)(4-me->facing))&7;
 			MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
+			break;
+		case BLT_QUEENACID:	// reflects off walls
+			me->x-=me->dx;
+			me->dx=-me->dx;
+			me->facing=((byte)(4-me->facing))&7;
+			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
+			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
 			break;
 		case BLT_ACID:
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
@@ -613,11 +622,13 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 		case BLT_LUNA2:
 		case BLT_EVILHAMMER:	// reflects off walls
 		case BLT_BADLUNA:	// reflects off walls
+		case BLT_BADLUNA2:	// reflects off walls
 		case BLT_BADFBALL:	// reflects off walls
 			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
 		case BLT_COIN:	// reflects off walls w/o sound
 		case BLT_BIGCOIN:
 		case BLT_BIGYELLOW:
+		case BLT_ALIENEGG:
 			me->y -= me->dy;
 			me->dy = -me->dy;
 			me->facing = (8 - me->facing) & 7;
@@ -718,6 +729,13 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 			me->dy=-me->dy;
 			me->facing=(8-me->facing)&7;
 			MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
+			break;
+		case BLT_QUEENACID:	// reflects off walls
+			me->y-=me->dy;
+			me->dy=-me->dy;
+			me->facing=(8-me->facing)&7;
+			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
+			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
 			break;
 		case BLT_ACID:
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
@@ -863,6 +881,7 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_LUNA:
 		case BLT_LUNA2:
 		case BLT_BADLUNA:	// reflects off walls
+		case BLT_BADLUNA2:	// reflects off walls
 			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,850);
 			me->dz=-me->dz*3/4;
 			me->z=0;
@@ -987,12 +1006,18 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
 			me->type=0;
 			break;
+		case BLT_QUEENACID:
+			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
+			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+			BulletRanOut(me,map,world);
+			break;
 		case BLT_SHARK:
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
 			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
 			me->type=0;
 			break;
 		case BLT_SHROOM:
+		case BLT_ALIENEGG:
 			// detonate
 			BulletRanOut(me,map,world);
 			break;
@@ -1047,6 +1072,8 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 {
 	int i;
+	byte a;
+	bullet_t b;
 	Guy *g;
 
 	switch(me->type)
@@ -1080,7 +1107,6 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_REFLECT:
 		case BLT_BUBBLEPOP:
 		case BLT_SCANLOCK:
-		case BLT_BADLUNA:
 		case BLT_BLACKHOLE:
 		case BLT_ENERGY2:
 		case BLT_BIGSHOT:
@@ -1186,6 +1212,13 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
 			me->type=0;
 			break;
+		case BLT_QUEENACID:
+			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
+			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+			me->type=0;
+			for(i=0;i<8;i++)
+				FireBullet(me->x,me->y,(byte)i*32,BLT_ACID,me->friendly);
+			break;
 		case BLT_SCANNER:
 		case BLT_SCANSHOT:
 			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
@@ -1238,6 +1271,18 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			me->type=BLT_NONE;	// all gone
 			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1000);
 			break;
+		case BLT_ALIENEGG:
+			for(i=0;i<256;i+=8)
+			{
+				FireExactBullet(me->x,me->y,me->z,Cosine(i)*6,Sine(i)*6,0,0,16,i,BLT_ACID,me->friendly);
+			}
+			g=AddGuy(me->x-me->dx*2,me->y-me->dy*2,me->z,MONS_ALIENEGG,me->friendly);	// become a living shroom
+			if(g && (!g->CanWalk(g->x,g->y,map,world)))
+				RemoveGuy(g);
+
+			me->type=BLT_NONE;	// all gone
+			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
+			break;
 		case BLT_BIGSHELL:
 			me->type=BLT_NONE;
 			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
@@ -1276,6 +1321,19 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			if(Random(3)==0)
 				MakeSound(SND_WATERSPLASH,me->x,me->y,SND_CUTOFF,200);
 			ExplodeParticles(PART_WATER,me->x,me->y,me->z,8);
+			me->type=BLT_NONE;
+			break;
+		case BLT_BADLUNA:
+			if(Random(3)==0)
+			{
+				MakeSound(SND_BIGBOOM, me->x, me->y, SND_CUTOFF, 1200);
+				ExplodeParticles(PART_LUNA, me->x, me->y, me->z, 8);
+				a=5+Random(4);
+				for(int i=0;i<a;i++)
+				{
+					FireBullet(me->x,me->y,256/a*i,BLT_ENERGY,me->friendly);
+				}
+			}
 			me->type=BLT_NONE;
 			break;
 	}
@@ -1406,6 +1464,8 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_SKULL:
 		case BLT_LUNA:
 		case BLT_LUNA2:
+		case BLT_BADLUNA:
+		case BLT_BADLUNA2:
 		case BLT_BIGSHELL:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,5,map,world,me->friendly))
 			{
@@ -1602,6 +1662,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_SHROOM:
+		//case BLT_ALIENEGG:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
 			{
 				BulletRanOut(me,map,world);	// detonate, not to mention the 10 damage you already did
@@ -1659,6 +1720,14 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_ACID:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,5,map,world,me->friendly))
+			{
+				me->type=BLT_NONE;
+				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
+				ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+			}
+			break;
+		case BLT_QUEENACID:
+			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,10,map,world,me->friendly))
 			{
 				me->type=BLT_NONE;
 				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
@@ -2064,6 +2133,42 @@ inline void BulletFaceGuy2(bullet_t *me,Guy *goodguy)
 	me->facing+=dir*amt;
 }
 
+void RepositionMissile(bullet_t* me)
+{
+	if (me->dx > 0)
+	{
+		if (me->facing > 8)
+			me->facing++;
+		else
+			me->facing--;
+	}
+	if (me->dx < 0)
+	{
+		if (me->facing > 8)
+			me->facing--;
+		else
+			me->facing++;
+	}
+	if (me->dy > 0)
+	{
+		if (me->facing > 11 || me->facing < 4)
+			me->facing++;
+		else
+			me->facing--;
+	}
+	if (me->dy < 0)
+	{
+		if (me->facing > 11 || me->facing < 4)
+			me->facing--;
+		else
+			me->facing++;
+	}
+	if (me->facing > 200)
+		me->facing += 16;
+	if (me->facing > 15)
+		me->facing -= 16;
+}
+
 void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 {
 	int mapx,mapy;
@@ -2131,39 +2236,18 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	if(me->flags&BFL_GRAVITY || HasGravity(me))
 		me->dz-=FIXAMT;
 
+	if(me->flags&BFL_WAVY)
+	{
+		me->dx+=Cosine(me->timer/2)/2;
+		me->dy+=Sine(me->timer/2)/2;
+	}
+
 	me->timer--;
 	if(!me->timer)
 		BulletRanOut(me,map,world);
 
 	if(!me->type)
 		return;
-
-	if (me->flags & BFL_HOMING) {
-		if (me->timer == 40)
-		{
-			if (me->friendly)
-				me->target = LockOnEvil(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
-			else
-				me->target = LockOnGood(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
-		}
-
-		if (!GetGuyPos(me->target, &mapx, &mapy))
-			me->target = 65535;
-		else
-		{
-			if (me->x > mapx)
-				me->dx -= FIXAMT;
-			else
-				me->dx += FIXAMT;
-			if (me->y > mapy)
-				me->dy -= FIXAMT;
-			else
-				me->dy += FIXAMT;
-
-			Clamp(&me->dx, FIXAMT * 6);
-			Clamp(&me->dy, FIXAMT * 6);
-		}
-	}
 
 	// special things like animation
 	switch(me->type)
@@ -2204,9 +2288,10 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_BADLUNA:
+		case BLT_BADLUNA2:
 			me->dz = 0;
 			//ExplodeParticlesColor(0,me->x,me->y,me->z,1,1);
-			ColorDrop(0, me->x, me->y, me->z);
+			ColorDrop(6, me->x, me->y, me->z);
 			HitBadguys(me, map, world);
 			break;
 		case BLT_HAMMER:
@@ -2401,6 +2486,45 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_ACID:
 		case BLT_SHARK:
+			me->dz-=FIXAMT/2;	// less gravity than normal things
+			me->anim++;
+			if(me->anim>6)
+				me->anim=0;
+			HitBadguys(me,map,world);
+			break;
+		case BLT_QUEENACID:
+			me->dz-=FIXAMT/2;	// less gravity than normal things
+			me->anim++;
+			if(me->anim>6)
+				me->anim=0;
+			HitBadguys(me,map,world);
+			
+			if(me->timer==40)
+			{
+				if(me->friendly)
+					me->target=LockOnEvil(me->x>>FIXSHIFT,me->y>>FIXSHIFT);
+				else
+					me->target=LockOnGood(me->x>>FIXSHIFT,me->y>>FIXSHIFT);
+			}
+
+			if(!GetGuyPos(me->target,&mapx,&mapy))
+				me->target=65535;
+			else
+			{
+				if(me->x>mapx)
+					me->dx-=FIXAMT;
+				else
+					me->dx+=FIXAMT;
+				if(me->y>mapy)
+					me->dy-=FIXAMT;
+				else
+					me->dy+=FIXAMT;
+
+				Clamp(&me->dx,FIXAMT*8);
+				Clamp(&me->dy,FIXAMT*8);
+				RepositionMissile(me);
+			}
+			break;
 		case BLT_FREEZE2:
 			me->dz-=FIXAMT/2;	// less gravity than normal things
 			me->anim++;
@@ -2459,6 +2583,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_SHROOM:
+		//case BLT_ALIENEGG:
 			HitBadguys(me,map,world);
 			break;
 		case BLT_MEGABEAM:
@@ -2651,40 +2776,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 
 				Clamp(&me->dx,FIXAMT*12);
 				Clamp(&me->dy,FIXAMT*12);
-
-				if(me->dx>0)
-				{
-					if(me->facing>8)
-						me->facing++;
-					else
-						me->facing--;
-				}
-				if(me->dx<0)
-				{
-					if(me->facing>8)
-						me->facing--;
-					else
-						me->facing++;
-				}
-				if(me->dy>0)
-				{
-					if(me->facing>11 || me->facing<4)
-						me->facing++;
-					else
-						me->facing--;
-				}
-				if(me->dy<0)
-				{
-					if(me->facing>11 || me->facing<4)
-						me->facing--;
-					else
-						me->facing++;
-				}
-
-				if(me->facing>200)
-					me->facing+=16;
-				if(me->facing>15)
-					me->facing-=16;
+				RepositionMissile(me);
 			}
 			break;
 		case BLT_TORPEDO:
@@ -3152,6 +3244,29 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 	}
+	if (me->flags & BFL_HOMING)
+	{
+		if (me->friendly)
+			me->target = LockOnEvil(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
+		else
+			me->target = LockOnGood(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
+		if (!GetGuyPos(me->target, &mapx, &mapy))
+			me->target = 65535;
+		else
+		{
+			if (me->x > mapx)
+				me->dx -= FIXAMT;
+			else
+				me->dx += FIXAMT;
+			if (me->y > mapy)
+				me->dy -= FIXAMT;
+			else
+				me->dy += FIXAMT;
+
+			Clamp(&me->dx, FIXAMT * 12);
+			Clamp(&me->dy, FIXAMT * 12);
+		}
+	}
 }
 
 void RenderSmoke(int x,int y,int z,char bright,byte frm)
@@ -3227,13 +3342,25 @@ void SprDrawBullet(bullet_t *me,sprite_t *curSpr,word flags,char brt){
 void SprDrawBulletOffXY(int x, int y,bullet_t *me,sprite_t *curSpr,word flags,char brt){
 
 	if(flags&DISPLAY_SHADOW)
-		SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright+brt,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
+		SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,me->bright+brt,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
 
 	flags&=~DISPLAY_SHADOW;
 	if (me->fromColor == 255) // Display sprite minus w/o shadow flag
-		SprDrawOff(me->x >>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,255,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
+		SprDrawOff(x>>FIXSHIFT,y>>FIXSHIFT,me->z>>FIXSHIFT,255,255,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
 	else // Ditto, but w/ off-color
-		SprDrawOff(me->x >>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,me->fromColor,me->toColor,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
+		SprDrawOff(x>>FIXSHIFT,y>>FIXSHIFT,me->z>>FIXSHIFT,me->fromColor,me->toColor,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
+}
+
+void SprDrawBulletOffXYZ(int x, int y, int z,bullet_t *me,sprite_t *curSpr,word flags,char brt){
+
+	if(flags&DISPLAY_SHADOW)
+		SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,me->bright+brt,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
+
+	flags&=~DISPLAY_SHADOW;
+	if (me->fromColor == 255) // Display sprite minus w/o shadow flag
+		SprDrawOff(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,255,255,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
+	else // Ditto, but w/ off-color
+		SprDrawOff(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,me->fromColor,me->toColor,me->bright+brt,curSpr,flags|DISPLAY_DRAWME);
 }
 
 void RenderBullet(bullet_t *me)
@@ -3368,11 +3495,9 @@ void RenderBullet(bullet_t *me)
 			curSpr = bulletSpr->GetSprite(((me->facing + 8) / 16) + SPR_LASER);
 			for (v = 0; v < 3; v++)
 			{
-				z = me->z;//+Random(FIXAMT*8);
 				x = me->x - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
 				y = me->y - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
-				
-				SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
+				SprDrawBulletOffXY(x,y,me,curSpr,DISPLAY_GLOW,0);
 			}
 			break;
 		case BLT_PAPER:
@@ -3653,6 +3778,22 @@ void RenderBullet(bullet_t *me)
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
 					DISPLAY_DRAWME|DISPLAY_GHOST);
 			break;
+		case BLT_QUEENACID:
+			for (int i = 0; i < 8; i++)
+			{
+				byte v2 = (me->timer * 2 + i * 32) & 255;
+				v = SPR_ACID + v2 / 32 * 7 + me->anim;
+				curSpr = bulletSpr->GetSprite(v);
+				x = me->x + Cosine(v2)*16;
+				y = me->y + Sine(v2)*12;
+				SprDrawBulletOffXYZ(x,y,me->z,me,curSpr, DISPLAY_SHADOW, 0);
+			}
+			break;
+		case BLT_ALIENEGG:
+			curSpr = GetMonsterSprite(MONS_ALIENEGG,ANIM_IDLE,0,0);
+			SprDraw(me->x>>FIXSHIFT,me->y>> FIXSHIFT,0,255,me->bright,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
+			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,DISPLAY_DRAWME);
+			break;
 	}
 }
 
@@ -3678,7 +3819,7 @@ byte HasGravity(bullet_t* me) {
 	return (me->type == BLT_HAMMER || me->type == BLT_HAMMER2 || me->type == BLT_BOMB || me->type == BLT_GRENADE
 		|| me->type == BLT_ROCK || me->type == BLT_EVILHAMMER || me->type == BLT_SPEAR || me->type == BLT_BADSPEAR
 		|| me->type == BLT_BUBBLE || me->type == BLT_COIN || me->type == BLT_BIGCOIN || me->type == BLT_SITFLAME
-		|| me->type == BLT_BADSITFLAME || me->type == BLT_FLAME3 || me->type == BLT_ORBGRENADE);
+		|| me->type == BLT_BADSITFLAME || me->type == BLT_FLAME3 || me->type == BLT_ORBGRENADE || me->type == BLT_ALIENEGG);
 }
 
 byte HasHoming(bullet_t* me) {
@@ -3689,48 +3830,63 @@ byte HasHoming(bullet_t* me) {
 #define BD_EIGHT	1
 #define BD_SIXTEEN	2
 
-// Easy way to set initial bullet variables
-void SetBulletVars(bullet_t *me, int dx, int dy, int dz, int z, int timer, byte type) {
-	byte f;
-	switch(type){
-		default:
-			f=me->facing;
-			break;
-		case BD_EIGHT:
-			f=me->facing*32;
-			break;
-		case BD_SIXTEEN:
-			f=me->facing*16;
-			break;
-	}
-
-	me->anim=0;
-	me->dx = Cosine(f)*dx;
-	me->dy = Sine(f)*dy;
-	me->dz = dz;
-	me->z = z;
-	me->timer=timer;
-}
-
+// No recolor bullet!
 void UncolorBullet(bullet_t* me) {
 	me->fromColor = 255;
 	me->toColor = 0;
 }
 
-void RecolorBullet(bullet_t *me, byte from, byte to){
-	me->fromColor=from;
-	me->toColor=to;
+// Recolor bullet
+void RecolorBullet(bullet_t* me, byte from, byte to) {
+	me->fromColor = from;
+	me->toColor = to;
 }
 
 void CheckRecolor(bullet_t *me){
 	switch(me->type){
+		case BLT_TORPEDO:
+			RecolorBullet(me, 0, 4);
+			break;
 		case BLT_CHEESEHAMMER:
 			RecolorBullet(me, 4, 5);
+			break;
+		case BLT_EVILHAMMER:
+			RecolorBullet(me, 4, 5);
+			break;
+		case BLT_SHARK:
+			RecolorBullet(me, 1, 4);
+			break;
+		case BLT_FREEZE:
+		case BLT_FREEZE2:
+			RecolorBullet(me, 1, 7);
 			break;
 		default:
 			UncolorBullet(me);
 			break;
 	}
+}
+
+// Easy way to set initial bullet variables
+void SetBulletVars(bullet_t* me, int dx, int dy, int dz, int z, int timer, byte type) {
+	byte f;
+	switch (type) {
+	default:
+		f = me->facing;
+		break;
+	case BD_EIGHT:
+		f = me->facing * 32;
+		break;
+	case BD_SIXTEEN:
+		f = me->facing * 16;
+		break;
+	}
+	CheckRecolor(me);
+	me->anim = 0;
+	me->dx = Cosine(f) * dx;
+	me->dy = Sine(f) * dy;
+	me->dz = dz;
+	me->z = z;
+	me->timer = timer;
 }
 
 void SetMissileFacing(byte &facing){
@@ -3783,6 +3939,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 	me->bright=0;
 	me->fromColor=255;
 	me->toColor=0;
+	me->flags=0;
 
 	switch(me->type)
 	{
@@ -3862,14 +4019,13 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_CHEESEHAMMER:
-			RecolorBullet(me,4,5);
 			SetBulletVars(me,14,14,0,FIXAMT*15,50,BD_EIGHT);
 			break;
 		case BLT_EVILHAMMER:
-			RecolorBullet(me,4,0);
 			SetBulletVars(me,12,12,FIXAMT*10,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BADLUNA:
+		case BLT_BADLUNA2:
 			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BADFBALL:
@@ -3892,10 +4048,21 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			MakeSound(SND_MISSILELAUNCH,me->x,me->y,SND_CUTOFF,1100);
 			break;
 		case BLT_TORPEDO:
-			SetTorpedoFacing(me->facing,me->target);
-			SetMissileOffset(me->x, me->y);
-			SetBulletVars(me,0,0,-6+Random(13),FIXAMT*20,60,BD_SIXTEEN);
 			me->anim=Random(8);
+			me->timer=60;
+			me->z=FIXAMT*20;
+			me->dz=-6+Random(13);
+			f=facing*32*16;
+			f+=Random(33)-16;
+			if(f<0)
+				f+=256*16;
+			me->target=f%(256*16);
+			me->facing=me->target/256;
+			me->x+=((Random(17)-8)<<FIXSHIFT);
+			me->y+=((Random(17)-8)<<FIXSHIFT);
+			me->dx=0;
+			me->dy=0;
+			CheckRecolor(me);
 			break;
 		case BLT_ACID:
 		case BLT_SHARK:
@@ -3905,6 +4072,10 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_FREEZE:
 			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*10,30,BD_NONE);
+			SetSplatFacing(me->facing);
+			break;
+		case BLT_QUEENACID:
+			SetBulletVars(me,10,10,FIXAMT*8,FIXAMT*10,60,BD_NONE);
 			SetSplatFacing(me->facing);
 			break;
 		case BLT_FLAME:
@@ -3980,6 +4151,10 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 		case BLT_GRENADE:
 			f=Random(12)+1;
 			SetBulletVars(me,f,f,FIXAMT*20,FIXAMT*80,255,BD_NONE);
+			break;
+		case BLT_ALIENEGG:
+			f=Random(12)+1;
+			SetBulletVars(me,f,f,FIXAMT*10,FIXAMT*80,60,BD_NONE);
 			break;
 		case BLT_SHOCKWAVE:
 		case BLT_GOODSHOCK:
@@ -4288,6 +4463,7 @@ void SpitAcid(int x,int y,byte facing,byte type,byte friendly)
 			bullet[i].dx=Cosine(bullet[i].facing)*10;
 			bullet[i].dy=Sine(bullet[i].facing)*10;
 			bullet[i].facing=((bullet[i].facing+16)&255)/32;
+			bullet[i].flags=0;
 			break;
 		}
 }
@@ -4314,6 +4490,7 @@ bullet_t *GetFireBullet(int x,int y,byte facing,byte type,byte friendly)
 			FireMe(&bullet[i],x,y,facing,type,friendly);
 			return &bullet[i];
 		}
+	return 0;
 }
 
 // Overload that chooses target.
@@ -4381,6 +4558,8 @@ void FireBulletAfter(int x,int y,byte facing,byte type,bullet_t *thisone,byte fr
 		if(!bullet[i].type)
 		{
 			FireMe(&bullet[i],x,y,facing,type,friendly);
+			if(thisone->fromColor!=255)
+				RecolorBullet(&bullet[i],thisone->fromColor,thisone->toColor);
 			break;
 		}
 }
@@ -4521,7 +4700,7 @@ void HappyFire(int x,int y,byte facing)
 {
 	byte happyList[]={BLT_HAMMER,BLT_HAMMER2,BLT_MISSILE,BLT_FLAME,BLT_LASER,BLT_BOMB,
 					  BLT_BALLLIGHTNING,BLT_BIGSHELL,BLT_BIGAXE,BLT_LIGHTNING,BLT_SPEAR,BLT_SLASH,
-					  BLT_GREEN,BLT_TORPEDO,BLT_BUBBLE,BLT_LUNA,BLT_FIREBALL};
+					  BLT_GREEN,BLT_TORPEDO,BLT_BUBBLE,BLT_LUNA,BLT_FIREBALL,BLT_ROCKET};
 	byte b;
 
 	b=happyList[Random(16)];
@@ -4897,9 +5076,49 @@ static const byte bulletFacingType[] = {
 	0,		// BLT_BLACKHOLE 63	// black hole existing
 	255,	// BLT_BADGREEN 64
 	255,	// BLT_BADSITFLAME 65
+	7,		// BLT_LASERBEAM
+	255,	// BLT_ENERGY2
+	255,
+	255,
+	255,
+	0,		// megaboom
+	255,
+	255,
+	255,
+	255,
+	255,
+	255,
+	0,		// big bomb boom
+	255,	// hot pants
+	0,		// swamp gas
+	255,
+	255,
+	255,
+	0,		// rocket smoke
+	255,
+	255,	// "bat shot"
+	255,	
+	255,	
+	255,	
+	255,	
+	0,		// fountain	
+	255,	
+	0,	
+	255,	// evil face	
+	255,	
+	255,	// wolf shot	
+	255,	// wolf claw	
+	255,	
+	0,	
+	255,	
+	255,	
+	255,	
+	255,	
 	7,  	// BLT_LUNA	55
 	7,		// fireball
-	7,  	// BLT_BALLLIGHTNING 35
+	7,  	
+	255,  	
+	7,  	
 };
 
 byte BulletFacingType(byte type)

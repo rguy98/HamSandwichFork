@@ -129,8 +129,9 @@ void InitPlayer(byte level,const char *fname)
 	player.playAs=profile.playAs;
 
 	player.camera.g=NULL;
-	player.camera.x=0;
-	player.camera.y=0;
+	GetCamera(&player.camera.x,&player.camera.y);
+	player.camera.dx=0;
+	player.camera.dy=0;
 }
 
 void ExitPlayer(void)
@@ -1308,9 +1309,10 @@ void PlayerFirePowerArmor(Guy *me,byte mode)
 void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 {
 	byte c;
-	int x,y,i;
+	int x,y,i,cx,cy;
 	byte curWpn = player.wpns[player.curSlot].wpn,
 		curAmmo = player.wpns[player.curSlot].ammo;
+
 
 	player.stealthy=0;
 
@@ -1815,7 +1817,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			me->parent->mind3=120;
 	}
 	// if you are moving indeed
-	if((c&(CONTROL_UP|CONTROL_DN|CONTROL_LF|CONTROL_RT)) && (!player.jetting || me->z==0) && (player.vehicle!=VE_RAFT && player.vehicle!=VE_MINECART))
+	if((c&(CONTROL_UP|CONTROL_DN|CONTROL_LF|CONTROL_RT)) && (!player.jetting || me->z==0) && (player.vehicle!=VE_RAFT && player.vehicle!=VE_MINECART && player.vehicle!=VE_MINECART_SLOW))
 	{
 		if(!(GetTerrain(world,mapTile->floor)->flags&TF_ICE) || (player.cheatFlags&CHT_NOSKID))
 		{
@@ -1958,7 +1960,7 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 
 	if(me->parent)	// being grabbed by a Super Zombie or something
 	{
-		if(me->parent->aiType==MONS_MINECART)
+		if(me->parent->aiType==MONS_MINECART || me->parent->aiType==MONS_MINECARTSLOW)
 		{
 			me->x+=me->parent->dx;
 			me->y+=me->parent->dy;
@@ -2125,7 +2127,7 @@ void PlayerControlMiniSub(Guy *me,mapTile_t *mapTile,world_t *world)
 
 	if(me->parent)	// being grabbed by a Super Zombie or something
 	{
-		if(me->parent->aiType==MONS_MINECART)
+		if(me->parent->aiType==MONS_MINECART || me->parent->aiType==MONS_MINECARTSLOW)
 		{
 			me->x+=me->parent->dx;
 			me->y+=me->parent->dy;

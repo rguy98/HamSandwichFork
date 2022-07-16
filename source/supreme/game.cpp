@@ -307,10 +307,6 @@ TASK(byte) LunaticRun(int *lastTime)
 
 		if(gameMode==GAMEMODE_PLAY)
 		{
-			if (player.clock == 0)
-			{
-				CheckBOLSpecials(curMap);
-			}
 			if(!editing && !player.cheated && verified)
 			{
 				profile.progress.totalTime++;
@@ -325,6 +321,7 @@ TASK(byte) LunaticRun(int *lastTime)
 			{
 				if(windingUp)
 				{
+					CheckBOLSpecials(curMap);
 					curMap->Update(UPDATE_FADEIN,&curWorld);
 					EditorUpdateGuys(curMap);
 					windingUp--;

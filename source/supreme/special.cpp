@@ -227,6 +227,9 @@ void DefaultTrigger(trigger_t *trig,int x,int y)
 			trig->value = MONS_BOUAPHA;
 			trig->x = 255;
 			break;
+		case TRG_CAMERARECT:
+			trig->value2=0;
+			break;
 	}
 }
 
@@ -386,6 +389,10 @@ void DefaultEffect(effect_t *eff,int x,int y,byte savetext)
 			eff->x=255;
 			break;
 		case EFF_COLORMSG:
+			eff->value2=0;
+			break;
+		case EFF_AUTOSCROLL:
+			eff->value=0;
 			eff->value2=0;
 			break;
 		default:
@@ -1413,7 +1420,13 @@ byte TriggerYes(special_t *me,trigger_t *t,Map *map)
 			answer=CheckMonsterPermCondition(t->x,t->y,t->value,(byte)t->value2);
 			break;
 		case TRG_BEGINLEVEL:
-			answer=player.clock==0;
+			answer=(player.clock==1);
+			break;
+		case TRG_CAMERASTEP:
+			answer=CheckTopLeftCameraPoint((int)t->x,(int)t->y);
+			break;
+		case TRG_CAMERARECT:
+			answer=CheckCameraRect((int)t->x,(int)t->y,t->value2);
 			break;
 	}
 
@@ -1881,6 +1894,12 @@ void SpecialEffect(special_t *me,Map *map)
 					else if(NoRepeatNewMessage(me->effect[i].text,120,90,me->effect[i].value2) && !(me->effect[i].flags&EF_NOFX))
 						MakeNormalSound(SND_MESSAGE);
 				}
+				break;
+			case EFF_AUTOSCROLL:
+				GetCamera(&player.camera.x,&player.camera.y);
+				player.camera.dx=me->effect[i].value;
+				player.camera.dy=me->effect[i].value2;
+				break;
 		}
 	}
 	if(me->uses>0)
@@ -2142,6 +2161,13 @@ void AdjustSpecialCoords(special_t *me,int dx,int dy)
 				x2=me->trigger[i].value2%256;
 				y2=me->trigger[i].value2/256;
 				me->trigger[i].value2=(x2+dx)+(y2+dy)*256;
+				break;
+			case TRG_CAMERARECT:
+				me->trigger[i].x+=dx;
+				me->trigger[i].y+=dy;
+				x2=me->trigger[i].value%256;
+				y2=me->trigger[i].value/256;
+				me->trigger[i].value=(x2+dx)+(y2+dy)*256;
 				break;
 		}
 	}

@@ -397,65 +397,55 @@
 // Kid Mystic addon enemies
 #define MONS_EYEGUY2	356	// Deadeye (Peeping Bomb)
 #define MONS_CRAZYBUSH2	357	// Burning Bush (Crazy Bush)
-#define MONS_OCTOPUS2	358	// Calamari (Octon)
-#define MONS_SLUG2		359	// Banana Slug (Slimy Slug)
-#define MONS_PEEPER2	360	// Jeeper's Peeper (Oculoid)
-#define MONS_TOWER2		361	// Jeeper's Peeper (Oculoid)
+#define MONS_OCTOPUS2	358	// Calamari (Octon) - fire
+#define MONS_SLUG2		359	// Banana Slug (Slimy Slug) - more spammy, yellow projectiles
+#define MONS_PEEPER2	360	// NOT DONE - anti-stealth, scary
+#define MONS_TOWER2		361	// NOT DONE - more defensive
 
 // Operation SCARE Editions
 #define MONS_GOLEMEVIL	362	// Evil Grumpy Golem 
 #define MONS_PUNKEVIL	363	// Evil Punk Bunny
-#define MONS_CLONESHRM	364	// Evil Clone (Shtupid Shroom)
-#define MONS_CLONEDRL	365	// Evil Clone (Dr. Lunatic)
-#define MONS_CLONELUNA	366	// Evil Clone (LunaChick)
-#define MONS_CLONEKM	367	// Evil Clone (Kid Mystic)
-#define MONS_BOMB		368	// Live bomb
-#define MONS_HAMMER		369	// Live hammer
-#define MONS_DEATHCAP	370
-#define MONS_FSTZOMBIE	371
-#define MONS_FROZOMBIE	372
-#define MONS_SANDMAN	373
-#define MONS_ICYTHING	374
-#define MONS_SUMUZOMBIE	375
-#define MONS_ICYPUMPKN	376 // Cold to the touch
-#define MONS_WACKYPUMP	377 // Switches colors (red-yellow-blue)
-#define MONS_SEAPUMPKN	378 // Swims
-#define MONS_CENTIBBODY 379
-#define MONS_CENTIBHEAD 380
-#define MONS_MISSOZOID	381
-#define MONS_KELVOZOID	382
-#define MONS_ARMORCLONE	383
-#define MONS_SUBCLONE	384
-#define MONS_NIGHTVAMP	385
-#define MONS_ATOMBOT	386 // warhead robot
-#define MONS_CPTSEAL	387	// captain seal
-#define MONS_LUNABOSS	388	// lunachick boss
-#define MONS_LUNAMECHA	389 // lunachick mecha
-#define MONS_PYGMYBMR	390	// pygmy boomeranger
-#define MONS_PYGMYFIRE	391	// pygmy firedancer
-#define MONS_MINIZOMBIE		392	// mini zombie
-#define MONS_MINION			393	// sdzl minion
-#define MONS_MINIMATTIE  	394
-#define MONS_MINIMATBODY  	395
-#define MONS_MINIMATCLAW1 	396
-#define MONS_MINIMATCLAW2 	397
-#define MONS_MINIMATTAIL  	398
-#define MONS_HEALER		  	399 // medic shroom
-#define MONS_MINECARTSLOW	400 // slow minecart
-#define MONS_MINECARTEVIL	401 // evil minecart
-#define MONS_PAYLOAD		402 // like the payload from tf2
-#define MONS_BONERIDER		403 // bonehead riding cart
-#define MONS_PYGMYRIDER		404 // pygmy riding cart
-#define MONS_CHESTRIDER		405 // treasure c
-#define MONS_EMPRESS		406
-#define MONS_EMPRESSBODY	407
-#define MONS_EMPRESSTAIL	408
-#define MONS_SUPERSHROOM	409 // Shtupid Shroom's true form
-#define MONS_VOLTAGE	410 // Electric Jack Frost
-#define MONS_YERFBOSS  	411	// Yerfdog boss
-#define MONS_STICKSUPREME  	412	// the final final boss
+#define MONS_BOMB		364	// Live bomb
+#define MONS_HAMMER		365	// Live hammer - NOT DONE
+#define MONS_DEATHCAP	366 // NOT DONE
+#define MONS_FSTZOMBIE	367
+#define MONS_FROZOMBIE	368
+#define MONS_SANDMAN	369
+#define MONS_ICYTHING	370 // NOT DONE
+#define MONS_SUMUZOMBIE	371 // NOT DONE
+#define MONS_ICYPUMPKN	372
+#define MONS_WACKYPUMP	373
+#define MONS_MISSOZOID	374 
+#define MONS_KELVOZOID	375
+#define MONS_ARMORCLONE	376
+#define MONS_SUBCLONE	377 // NOT DONE
+#define MONS_NIGHTVAMP	378
+#define MONS_BUFFER		379 // defense robot - NOT DONE
+#define MONS_CPTSEAL	380	// captain seal - NOT DONE
+#define MONS_LUNABOSS	381	// lunachick boss
+#define MONS_LUNAMECHA	382 // lunachick mecha
+#define MONS_PYGMYBMR	383	// pygmy boomeranger
+#define MONS_PYGMYFIRE	384	// pygmy firedancer - NOT DONE
+#define MONS_MINIZOMBIE		385	// mini zombie
+#define MONS_MINION			386	// sdzl minion (not done)
+#define MONS_MINIMATTIE  	387
+#define MONS_MINIMATBODY  	388
+#define MONS_MINIMATCLAW1 	389
+#define MONS_MINIMATCLAW2 	390
+#define MONS_MINIMATTAIL  	391
+#define MONS_HEALER		  	392 // medic shroom
+#define MONS_MINECARTSLOW	393 // slow minecart
+#define MONS_MINECARTEVIL	394 // evil minecart
+#define MONS_PAYLOAD		395 // like the payload from tf2
+#define MONS_PUSHERH		396 // pushes anything not blocked by a wall
+#define MONS_PUSHERV		397 // ditto, but vertically
+#define MONS_EMPRESS		398
+#define MONS_EMPRESSBODY	399
+#define MONS_EMPRESSTAIL	400
+#define MONS_SUPERSHROOM	401 // Shtupid Shroom's true form
+#define MONS_VOLTAGE	402 // Electric Jack Frost
 
-#define NUM_MONSTERS  413    // Can grow as needed
+#define NUM_MONSTERS  403    // Can grow as needed
 #define NUM_PROFILE_MONSTERS 248 // Do not change without redoing the profile format
 
 // fake monster codes
@@ -584,6 +574,7 @@ void InstaRenderMonster(int x,int y,dword type,char bright,MGLDraw *mgl);
 int InstaRenderScannedMonster(int x,int y,dword type,char bright,MGLDraw *mgl);
 sprite_t *GetMonsterSprite(dword type,byte seq,byte frm,byte facing);
 int RangeToTarget(Guy *me,Guy *goodguy);
+byte TargetInSight(Guy* me, Map* map, Guy* goodguy);
 
 
 void DoMove(Guy* me, int move, int frmAdv, byte busy, int dx, int dy);
@@ -591,6 +582,7 @@ void UpdateColorBright(Guy *me);
 
 // base ai functions
 void WanderAI(Guy* me, int speed, int wanderRate, int wanderTime, int unWanderRate, Map* map, world_t* world, Guy* goodguy);
+byte Bounce(Guy *me, byte &chg);
 
 // ai functions for each monster type
 void AI_Bonehead(Guy *me,Map *map,world_t *world,Guy *goodguy);
@@ -870,12 +862,17 @@ void AI_StickWitch(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void SummonAI(Guy *me,Guy *target,int spd,int range,Map *map,world_t *world,Guy *goodguy);
 
 void AI_PunkBunny2(Guy* me, Map* map, world_t* world, Guy* goodguy);
-void AI_EvilClone2(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_LiveBomb(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Deadhead(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_MiniZombie(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Frozombie(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Sandman(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_SpisPumpkin(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Kelvozoid(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Missozoid(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_SubClone(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_BufferBot(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_CaptainSeal(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 //Matilda's AIs
 void AI_MiniMattie(Guy *me,Map *map,world_t *world,Guy *goodguy);
@@ -883,8 +880,18 @@ void AI_MiniMattieClaw(Guy *me,Map *map,world_t *world,Guy *goodguy);
 void AI_MiniMattieTail(Guy *me,Map *map,world_t *world,Guy *goodguy);
 void AI_MiniMattieBody(Guy *me,Map *map,world_t *world,Guy *goodguy);
 
+//Empress AIs
+void AI_EmpressHead(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_EmpressBody(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_EmpressTail(Guy* me, Map* map, world_t* world, Guy* goodguy);
+
 void AI_MineCartBad(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_NightTerror(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_RevengeClone(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_PygmyBoomer(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_LunaMecha(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_LunaChick(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Dummy(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Pusher(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 #endif

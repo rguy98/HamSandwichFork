@@ -846,8 +846,8 @@ void RenderParticles(void)
 							 DISPLAY_DRAWME|DISPLAY_CIRCLEPART);
 			else if(particleList[i]->type==PART_FIRE || particleList[i]->type==PART_COLDFIRE)
 				ParticleDraw(particleList[i]->x>>FIXSHIFT,particleList[i]->y>>FIXSHIFT,
-						particleList[i]->z>>FIXSHIFT,particleList[i]->color,particleList[i]->size/4,
-						DISPLAY_DRAWME|DISPLAY_CIRCLEPART|DISPLAY_GLOW);
+							 particleList[i]->z>>FIXSHIFT,particleList[i]->color,particleList[i]->size/4,
+							 DISPLAY_DRAWME|DISPLAY_CIRCLEPART|DISPLAY_GLOW);
 			else
 				ParticleDraw(particleList[i]->x>>FIXSHIFT,particleList[i]->y>>FIXSHIFT,
 							 particleList[i]->z>>FIXSHIFT,particleList[i]->color,particleList[i]->size,
