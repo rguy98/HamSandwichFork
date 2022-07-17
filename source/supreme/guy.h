@@ -202,6 +202,7 @@ byte IsZombie(Guy *g);
 byte IsSuperZombie(Guy *g);
 byte FocusOnGuy(Guy *g, Map *map);
 byte GetBaseColor(Guy *g);
+byte AngerYetis(Guy* me);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

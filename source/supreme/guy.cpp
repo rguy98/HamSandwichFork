@@ -2844,6 +2844,28 @@ void AddNinja(Map *map,world_t *world,byte friendly)
 	}
 }
 
+byte AngerYetis(Guy* me)
+{
+	byte result=0;
+	int i,t;
+	for(i=0;i<maxGuys;i++)
+	{
+		t=guys[i]->type;
+		if(t==me->type)
+			continue;
+		switch(t)
+		{
+			case MONS_SVEN:
+			case MONS_BJORN:
+			case MONS_OLAF:
+				guys[i]->mind2++;
+				result=1;
+				break;
+		}
+	}
+	return result;
+}
+
 byte ControlMind2(Guy *me)
 {
 	int i;
