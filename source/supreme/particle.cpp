@@ -1696,6 +1696,36 @@ void JackFrostWeather(int x,int y)
 	}
 }
 
+void VoltageWeather(int x,int y)
+{
+	int i;
+	int a;
+
+	// only 25% of particles may be snowflakes
+	if(snowCount>maxParticles/4)
+		return;
+
+	for(i=0;i<maxParticles;i++)
+	{
+		if(!particleList[i]->Alive())
+		{
+			a=Random(256);
+
+			particleList[i]->x=x+Cosine(a)*Random(FIXAMT*60)/FIXAMT;
+			particleList[i]->y=y+Sine(a)*Random(FIXAMT*50)/FIXAMT;
+			particleList[i]->z=(10+Random(100))<<FIXSHIFT;
+			particleList[i]->dx=-FIXAMT+Random(FIXAMT*2+1);
+			particleList[i]->dy=-FIXAMT+Random(FIXAMT*2+1);
+			particleList[i]->dz=0;
+			particleList[i]->size=2;
+			particleList[i]->life=50+Random(50);
+			particleList[i]->type=PART_RAIN;
+			particleList[i]->color=3*32+16;
+			break;
+		}
+	}
+}
+
 void TrackParticle(byte color,int x,int y,int tx,int ty)
 {
 	int i;

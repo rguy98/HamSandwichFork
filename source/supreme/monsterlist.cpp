@@ -5505,7 +5505,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},	// unused
 				{0,255},	// unused
 			}},
-		{"Super Shroom",1,4,1,AI_Mush,
+		{"Super Shroom",1,4,1,AI_SuperShroom,
 		 32,27,400,800,"graphics/bgshroom.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_MINIBOSS|MT_VEGGIE,
 			{
@@ -5519,7 +5519,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},
 				{0,255},
 			}},
-		{"Voltage",4,3,2,NULL,
+		{"Voltage",4,3,2,AI_Voltage,
 		 50,23,500,2000,"!45",0,MF_NOMOVE|MF_ONEFACE|MF_NOSHADOW,
 		 MT_EVIL|MT_WACKY|MT_MINIBOSS,
 			{

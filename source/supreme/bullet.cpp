@@ -2500,12 +2500,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			
 			if(me->timer==40)
-			{
-				if(me->friendly)
-					me->target=LockOnEvil(me->x>>FIXSHIFT,me->y>>FIXSHIFT);
-				else
-					me->target=LockOnGood(me->x>>FIXSHIFT,me->y>>FIXSHIFT);
-			}
+				me->target = LockOn3(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 1200, me->friendly);
 
 			if(!GetGuyPos(me->target,&mapx,&mapy))
 				me->target=65535;
@@ -2890,7 +2885,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_LIGHTNING2:
-			w=LockOnEvil2(me->x>>FIXSHIFT,me->y>>FIXSHIFT);
+			w=LockOn3(me->x>>FIXSHIFT,me->y>>FIXSHIFT,1200,me->friendly);
 			if(w!=65535)
 			{
 				GetGuy(w)->GetShot(0,0,5,map,world);
@@ -3221,7 +3216,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			me->dy-=Random(FIXAMT/16);
 			break;
 		case BLT_WOLFSHOCK:
-			w= LockOn3(me->x>>FIXSHIFT,me->y>>FIXSHIFT,6*TILE_HEIGHT,me->friendly);
+			w=LockOn3(me->x>>FIXSHIFT,me->y>>FIXSHIFT,6*TILE_HEIGHT,me->friendly);
 			if(w!=65535)
 			{
 				GetGuy(w)->GetShot(0,0,2,map,world);
@@ -3246,10 +3241,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	}
 	if (me->flags & BFL_HOMING)
 	{
-		if (me->friendly)
-			me->target = LockOnEvil(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
-		else
-			me->target = LockOnGood(me->x >> FIXSHIFT, me->y >> FIXSHIFT);
+		me->target=LockOn3(me->x >> FIXSHIFT, me->y >> FIXSHIFT,1200,me->friendly);
 		if (!GetGuyPos(me->target, &mapx, &mapy))
 			me->target = 65535;
 		else
@@ -4331,7 +4323,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_HOTPANTS:
 			SetBulletVars(me,8,8,0,FIXAMT*2,35,BD_NONE);
-			me->target=LockOnEvil(me->x,me->y);
+			me->target=LockOn3(me->x,me->y,600,me->friendly);
 			MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,600);
 			break;
 		case BLT_HOTDOGFIRE:

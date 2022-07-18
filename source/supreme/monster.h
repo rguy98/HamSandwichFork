@@ -873,6 +873,8 @@ void AI_Missozoid(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_SubClone(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_BufferBot(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_CaptainSeal(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Voltage(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_SuperShroom(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 //Matilda's AIs
 void AI_MiniMattie(Guy *me,Map *map,world_t *world,Guy *goodguy);

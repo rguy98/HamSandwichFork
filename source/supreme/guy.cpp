@@ -507,6 +507,7 @@ byte DoesBouncing(int type)
 		case MONS_BOMB:
 		case MONS_LUNAMECHA:
 		case MONS_LUNABOSS:
+		case MONS_VOLTAGE:
 			return 1;
 		default:
 			return 0;
@@ -2431,6 +2432,27 @@ word LockOnEvil2(int x,int y)
 	{
 		i=Random(maxGuys);
 		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==0) &&
+			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
+		{
+			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
+			if(range<160+120)
+			{
+				return i;
+			}
+		}
+	}
+	return 65535;
+}
+
+word LockOn2(int x,int y,byte friendly)
+{
+	int i,j;
+	int range;
+
+	for(j=0;j<128;j++)
+	{
+		i=Random(maxGuys);
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) &&
 			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));

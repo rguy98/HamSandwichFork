@@ -612,6 +612,11 @@ soundDesc_t soundInfo[MAX_SOUNDS] = {
 	{SND_SDZLSUMMON,"SDZL Summon",ST_MONSTER},
 	{SND_EMPRESSHEAD,"Empress Head Die",ST_MONSTER},
 	{SND_EMPRESSSPWN,"Empress Spawn",ST_MONSTER},
+	{SND_EMPRESSSPWN,"Empress Spawn",ST_MONSTER},
+	{SND_LPGINTRO,"LPG Intro",ST_INTFACE},
+	{SND_LASERSMALL1,"Laser Small 1",ST_EFFECT},
+	{SND_LASERSMALL1,"Laser Small 2",ST_EFFECT},
+	{SND_VOLTAGEDIE,"Voltage Die",ST_MONSTER},
 };
 
 byte soundAvailable = 0;

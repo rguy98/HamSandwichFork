@@ -87,7 +87,125 @@ void AI_Ptero(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	Clamp(&me->dy,FIXAMT*10);
 }
 
-// eye guy
+void AI_Eyeguy(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y;
+	bullet_t *b;
+
+	if(me->reload)
+		me->reload--;
+
+	if(me->ouch==4)
+	{
+		if(me->hp>0)
+			MakeSound(SND_EYEGUYOUCH,me->x,me->y,SND_CUTOFF,1200);
+		else
+			MakeSound(SND_EYEGUYDIE,me->x,me->y,SND_CUTOFF,1200);
+	}
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_ATTACK && me->frm==4 && me->reload==0 && goodguy)
+		{
+			x=me->x+Cosine(me->facing*32)*20;
+			y=me->y+Sine(me->facing*32)*20;
+			// fire a shot
+			if (me->aiType == MONS_EYEGUY2)
+			{
+				for(int i=0;i<3;i++)
+				{
+					b=GetFireBullet(x,y,(me->facing-1+i)&7, BLT_YELWAVE, me->friendly);
+					if(b)
+					{
+						RecolorBullet(b,5,GetBaseColor(me));
+					}
+				}
+			}
+			else
+			{
+				FireBullet(x,y, me->facing, BLT_YELWAVE, me->friendly);
+			}
+			me->reload=10;
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(goodguy)
+	{
+		if(RangeToTarget(me,goodguy)<(256*FIXAMT) && Random(32)==0 && me->reload==0)
+		{
+			// spit at him
+			MakeSound(SND_EYEGUYSHT,me->x,me->y,SND_CUTOFF,1200);
+			me->seq=ANIM_ATTACK;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+			me->action=ACTION_BUSY;
+			me->dx=0;
+			me->dy=0;
+			me->reload=0;
+			FaceGoodguy(me,goodguy);
+			return;
+		}
+	}
+
+	if(me->mind==0)		// when mind=0, singlemindedly lumber towards Bouapha
+	{
+		if(goodguy)
+		{
+			FaceGoodguy(me,goodguy);
+
+			if(me->aiType==MONS_EYEGUY2)
+			{
+				me->dx=Cosine(me->facing*32)*2;
+				me->dy=Sine(me->facing*32)*2;
+			}
+			else
+			{
+				me->dx=Cosine(me->facing*32)*3;
+				me->dy=Sine(me->facing*32)*3;
+			}
+			if(me->seq!=ANIM_MOVE)
+			{
+				me->seq=ANIM_MOVE;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+			}
+			if(Random(64)==0)
+			{
+				me->mind=1;		// occasionally wander
+				me->mind1=1;
+			}
+		}
+		else
+		{
+			me->mind=1;	// if there's no goodguy, get random
+			me->mind1=1;
+		}
+	}
+	else if(me->mind==1)	// random wandering
+	{
+		if(!(me->mind1--))	// time to get a new direction
+		{
+			if((goodguy) && Random(3)==0)
+				me->mind=0;	// get back on track
+			else
+				me->facing=(byte)Random(8);
+			me->mind1=Random(40)+1;
+		}
+
+		me->dx=Cosine(me->facing*32)*3;
+		me->dy=Sine(me->facing*32)*3;
+		if(me->seq!=ANIM_MOVE)
+		{
+			me->seq=ANIM_MOVE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+		}
+	}
+}
 
 void AI_Peeper(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {

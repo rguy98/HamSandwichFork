@@ -114,6 +114,7 @@ word LockOnEvil(int x,int y);
 word LockOnEvil2(int x,int y);
 word LockOnGood(int x,int y);
 word LockOnGood2(int x,int y);
+word LockOn2(int x,int y,byte friendly);
 word LockOn3(int x,int y,int maxRange, byte friendly);
 byte GetGuyPos(word guy,int *x,int *y);
 byte MonsterExists(int type);

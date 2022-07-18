@@ -109,6 +109,7 @@ void FloaterParticles(int x, int y, byte color, int radius, int spread, byte cou
 
 void SmokeTile(int x,int y);
 void JackFrostWeather(int x,int y);
+void VoltageWeather(int x,int y);
 void SuckParticle(int x, int y, int z);
 
 void MakeCircleParticle(int x, int y, int z, byte size);
