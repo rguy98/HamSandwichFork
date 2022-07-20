@@ -104,8 +104,6 @@
 #define BLT_EARTHSPIKE	86	// more advanced than the regular
 #define BLT_GASBLAST	87	// Green gas blast
 #define BLT_MEGABOOM	88	// Giant explosion
-
-// Player bullets
 #define BLT_WHOOPEE		89	// Whoopee cushion (yellow gas)
 #define BLT_CACTUS		90	// Potted cactus
 #define BLT_BOOMERANG	91	// Player boomerang
@@ -113,18 +111,13 @@
 #define BLT_BIGBOMB		93	// Loonyland bomb
 #define BLT_BIGBOOM		94	// Big bomb blast
 #define BLT_HOTPANTS	95	// Big bomb blast
-
-// Non-player bullets
 #define BLT_SWAMPGAS	96	// swamp gas
 #define BLT_ORBGRENADE	97	// Frankenjulie grenade
 #define BLT_ROCKET		98	// non-guided rocket
 #define BLT_HEATSEEKER	99	// guided rocket
 #define BLT_ROCKETSMOKE	100	// guided rocket
-
-// Player bullets
 #define BLT_ICEWAND2	101 //  shoots off of ice bolts
 #define BLT_BATSHOT		102 // 
-
 #define BLT_WIND		103
 #define BLT_EARTHSPIKE2	104
 #define BLT_ICESHARD	105
@@ -134,25 +127,24 @@
 #define BLT_SWAMPGAS2	109
 #define BLT_EVILFACE	110
 #define BLT_BIGSHOT		111
-
 #define BLT_WOLFSHOT	112
 #define BLT_WOLFSHOCK	113
-
 #define BLT_CLAW		114
-#define BLT_BOMBIEBOOM	115
-#define BLT_CROAKERGAS	116
-#define BLT_HOTDOGFIRE	117
-#define BLT_ICEWOLFICE	118
-#define BLT_FARLEYGAS	119
+#define BLT_CROAKERGAS	115
+#define BLT_HOTDOGFIRE	116
+#define BLT_ICEWOLFICE	117
+#define BLT_FARLEYGAS	118
 
 // Operation SCARE
-#define BLT_BADLUNA			120
-#define BLT_BADFBALL		121
-#define BLT_BADLIGHTNING	122
-#define BLT_BADBOOMERANG	123
-#define BLT_BADLUNA2		124
-#define BLT_QUEENACID		125
-#define BLT_ALIENEGG		126
+#define BLT_BADLUNA			119
+#define BLT_BADFBALL		120
+#define BLT_BADLIGHTNING	121
+#define BLT_BADBOOMERANG	122
+#define BLT_BADLUNA2		123
+#define BLT_QUEENACID		124
+#define BLT_ALIENEGG		125
+#define BLT_SPOREBALL		126
+#define BLT_SQUIRT			127
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1

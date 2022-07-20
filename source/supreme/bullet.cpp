@@ -287,194 +287,193 @@ void LaserMirrorHit(bullet_t* me, Map* map, world_t* world)
 	}
 }
 
-void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
+// Just a nice litle way to set bullets to type 0
+void Remove(bullet_t *me)
 {
-	switch(me->type)
+	me->type = BLT_NONE;
+}
+
+// Do this upon "death"
+void Splat(bullet_t* me)
+{
+	switch (me->type)
 	{
-		case BLT_ICEBEAM2:
-		case BLT_DEATHBEAM2:
-		case BLT_COMET:
-		case BLT_COMETBOOM:
-			break;
 		case BLT_HAMMER:
-		case BLT_LUNA:
 		case BLT_BIGSHELL:
-			me->type=BLT_NONE;
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
-			MakeSound(SND_HAMMERBONK,me->x,me->y,SND_CUTOFF,1000);
+		case BLT_LUNA:
+			ExplodeParticles(PART_HAMMER, me->x, me->y, me->z, 8);
+			MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000);
+			Remove(me);
 			break;
 		case BLT_FIREBALL:
-			me->type = BLT_NONE;
 			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 8);
-			MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000); // check
+			MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000);
+			Remove(me);
 			break;
+		case BLT_HAMMER2:
+		case BLT_EVILHAMMER:
+		case BLT_LUNA2:
+		case BLT_FIREBALL2:
 		case BLT_SKULL:
-			if (player.hammerFlags & HMR_REFLECT)
-			{
-				me->x -= me->dx;
-				me->dx = -me->dx;
-				me->facing = ((byte)(8 - me->facing)) & 15;
-				MakeSound(SND_HAMMERREFLECT, me->x, me->y, SND_CUTOFF, 900);
-			}
-			else
-			{
-				me->type = BLT_NONE;
-				ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 8);
-				MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000);
-			}
+		case BLT_BADLUNA:
+		case BLT_BADFBALL:
+		case BLT_BADLUNA2:
+			MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000);
+			Remove(me);
 			break;
 		case BLT_MINIFBALL:
 		case BLT_YELWAVE:
-			me->type = BLT_NONE;
-			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 2);
+			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 8);
+			Remove(me);
 			break;
-		case BLT_ORBITER:
-		case BLT_ORBITER2:
+		case BLT_ACID:
+		case BLT_QUEENACID:
 		case BLT_SWAP:
-		case BLT_SCANSHOT:
-			me->x-=me->dx;
-			me->dx=-me->dx;
+			MakeSound(SND_ACIDSPLAT, me->x, me->y, SND_CUTOFF, 950);
+			ExplodeParticles(PART_SLIME, me->x, me->y, me->z, 6);
+			Remove(me);
 			break;
-		case BLT_HAMMER2:
-		case BLT_FIREBALL2:
-		case BLT_LUNA2:
-		case BLT_EVILHAMMER:	// reflects off walls
-		case BLT_BADLUNA:	// reflects off walls
-		case BLT_BADLUNA2:	// reflects off walls
-		case BLT_BADFBALL:	// reflects off walls
-			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
-		case BLT_COIN:	// reflects off walls w/o sound
-		case BLT_BIGCOIN:
-		case BLT_BIGYELLOW:
-		case BLT_ALIENEGG:
-			me->x -= me->dx;
-			me->dx = -me->dx;
-			me->facing = ((byte)(4 - me->facing)) & 7;
+		case BLT_SHARK:
+			MakeSound(SND_ACIDSPLAT, me->x, me->y, SND_CUTOFF, 950);
+			ExplodeParticles(PART_WATER, me->x, me->y, me->z, 6);
+			Remove(me);
 			break;
-		case BLT_CHEESEHAMMER:
-			me->x-=me->dx;
-			if(me->facing<128)
-				me->facing=128-me->facing;
-			else
-				me->facing=128+(256-me->facing);
-			me->dx=Cosine(me->facing)*14;
-			me->dy=Sine(me->facing)*14;
-			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
+		case BLT_ENERGY:
+			MakeSound(SND_ENERGYBONK, me->x, me->y, SND_CUTOFF, 950);
+			ExplodeParticles(PART_HAMMER, me->x, me->y, me->z, 4);
+			Remove(me);
 			break;
-		case BLT_BALLLIGHTNING:
-			if(player.hammerFlags&HMR_REFLECT)
-			{
-				me->x-=me->dx;
-				me->facing=84+Random(89);
-				if(me->dx<0)
-					me->facing=(me->facing+128)&255;
-				me->dx=Cosine(me->facing)*11;
-				me->dy=Sine(me->facing)*11;
-			}
-			else
-				BulletRanOut(me,map,world);
+		case BLT_ENERGY2:
+			MakeSound(SND_ENERGYBONK, me->x, me->y, SND_CUTOFF, 950);
+			ExplodeParticles(PART_HAMMER, me->x, me->y, me->z, 6);
+			Remove(me);
 			break;
-		case BLT_BADLIGHTNING:
-			me->x -= me->dx;
-			me->facing = 84 + Random(89);
-			if (me->dx < 0)
-				me->facing = (me->facing + 128) & 255;
-			me->dx = Cosine(me->facing) * 11;
-			me->dy = Sine(me->facing) * 11;
-			break;
-		case BLT_GRENADE:
-		case BLT_ICECLOUD:
-			me->x-=me->dx;
-			break;
-		case BLT_LASER:	// reflects off walls
-			MakeSound(SND_BULLETREFLECT,me->x,me->y,SND_CUTOFF,900);
-			me->x-=me->dx;
-			me->dx=-me->dx;
-			me->dy+=-FIXAMT/4+Random(FIXAMT/2);
-			me->facing=((byte)(8-me->facing))&15;
-			break;
-		case BLT_HOLESHOT:
-		case BLT_BLACKHOLE:
-			me->x -= me->dx;
-			break;
-		case BLT_LASERBEAM:	// reflects off mirrors
-			LaserMirrorHit(me, map, world);
-			break;
-		case BLT_BOMB:
-			MakeSound(SND_BOMBREFLECT,me->x,me->y,SND_CUTOFF,600);
-			me->x-=me->dx;
-			me->dx=-me->dx;
-			me->dy+=-FIXAMT/4+Random(FIXAMT/2);
-			me->facing=((byte)(8-me->facing))&15;
+		case BLT_GREEN:
+		case BLT_BADGREEN:
+			MakeSound(SND_ENERGYBONK, me->x, me->y, SND_CUTOFF, 950);
+			ExplodeParticles(PART_SLIME, me->x, me->y, me->z, 4);
+			Remove(me);
 			break;
 		case BLT_SLASH:
-			MakeSound(SND_CLANG,me->x,me->y,SND_CUTOFF,950);
-			// supposedly sparks
-			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,4,8);
-			me->type=BLT_NONE;
+			ExplodeParticles2(PART_SNOW2, me->x, me->y, me->z, 4, 8);
+			Remove(me);
 			break;
-		case BLT_MISSILE:
-		case BLT_MAGICMISSILE:
-		case BLT_SPINE:
-		case BLT_BIGAXE:
-		case BLT_SPEAR:
-		case BLT_BADSPEAR:
-		case BLT_MINDWIPE:
-		case BLT_REFLECT:
-		case BLT_HARPOON:
-		case BLT_SCANNER:
-		case BLT_TORPEDO:
+		case BLT_BIGSHOT:
+		case BLT_FLAMEWALL:
+		case BLT_FLAMESHOT:
+		case BLT_BATSHOT:
+		case BLT_WOLFSHOT:
+			ExplodeParticles(PART_HAMMER, me->x, me->y, me->z, 4);
+			Remove(me);
+			break;
+		case BLT_CLAW:
+			ExplodeParticles(PART_SNOW2, me->x, me->y, me->z, 7);
+			Remove(me);
+			break;
+		case BLT_EARTHSPIKE:
+		case BLT_EARTHSPIKE2:
+			ExplodeParticles(PART_DIRT, me->x, me->y, me->z, 8);
+			Remove(me);
+			break;
 		case BLT_PAPER:
-		case BLT_BUBBLE:
+			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,6,12);
+			Remove(me);
+			break;
+		case BLT_BIGAXE:
+			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,10,8);
+			Remove(me);
+			break;
+		case BLT_IGNITE:
+		case BLT_WIND:
+			ExplodeParticles2(PART_SNOW2, me->x, me->y, me->z, 10, 8);
+			Remove(me);
+			break;
+		case BLT_SNOWBALL:
 		case BLT_FREEZE:
 		case BLT_FREEZE2:
-			BulletRanOut(me,map,world);
+			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
+			Remove(me);
+			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,6,12);
+			break;
+		case BLT_BUBBLE:
+			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
+			me->type=BLT_BUBBLEPOP;
+			me->anim=0;
+			me->timer=10;
+			me->dx=0;
+			me->dy=0;
+			MakeSound(SND_BUBBLEPOP,me->x,me->y,SND_CUTOFF,1);
+			break;
+		case BLT_SCANNER:
+		case BLT_SCANSHOT:
+			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+			Remove(me);
 			break;
 		case BLT_FLAME:
 		case BLT_FLAME2:
 		case BLT_FLAME3:
-			me->x-=me->dx;
-			me->dy=((3-Random(7))<<FIXSHIFT);
-			me->dx=0;
-			break;
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
-			me->dx = me->dy = 0;
+			Remove(me);
+			BlowSmoke(me->x, me->y, me->z, FIXAMT);
 			break;
-		case BLT_ROCK:	// reflects off walls
-			me->x-=me->dx;
-			me->dx=-me->dx;
-			me->facing=((byte)(4-me->facing))&7;
-			MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
+		case BLT_BALLLIGHTNING:
+		case BLT_BADLIGHTNING:
+			ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,8);
+			Remove(me);
 			break;
-		case BLT_QUEENACID:	// reflects off walls
-			me->x-=me->dx;
-			me->dx=-me->dx;
-			me->facing=((byte)(4-me->facing))&7;
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+		case BLT_BOOMERANG:
+			ExplodeParticles(PART_DIRT,me->x,me->y,me->z,8);
+			Remove(me);
 			break;
+		case BLT_ICEWAND:
+		case BLT_ICEWAND2:
+		case BLT_ICESHARD:
+		case BLT_ICEWOLFICE:
+			ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,8);
+			Remove(me);
+			break;
+		case BLT_WATER:
+			if(Random(3)==0)
+				MakeSound(SND_WATERSPLASH,me->x,me->y,SND_CUTOFF,200);
+			ExplodeParticles(PART_WATER,me->x,me->y,me->z,8);
+			Remove(me);
+			break;
+		default:
+			Remove(me);
+			break;
+	}
+}
+
+// Used for both wall hit functions.
+void InteractWithWall(bullet_t *me, Map* map, world_t* world)
+{
+	switch (me->type)
+	{
+		case BLT_HAMMER:
+		case BLT_BIGSHELL:
+		case BLT_LUNA:
+		case BLT_FIREBALL:
+		case BLT_SKULL:
+		case BLT_MINIFBALL:
+		case BLT_YELWAVE:
 		case BLT_ACID:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
+		case BLT_QUEENACID:
 		case BLT_SHARK:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
 		case BLT_ENERGY:
 		case BLT_ENERGY2:
-			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
 		case BLT_GREEN:
 		case BLT_BADGREEN:
-			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,4);
-			me->type=0;
+		case BLT_SLASH:
+		case BLT_BIGSHOT:
+		case BLT_FLAMEWALL:
+		case BLT_FLAMESHOT:
+		case BLT_BATSHOT:
+		case BLT_WOLFSHOT:
+		case BLT_CLAW:
+		case BLT_EARTHSPIKE:
+		case BLT_EARTHSPIKE2:
+			Splat(me);
 			break;
 		case BLT_MEGABEAM:
 		case BLT_MEGABEAM1:
@@ -482,18 +481,23 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 			me->dy=0;
 			me->timer=2;
 			break;
-		case BLT_SPORE:
-		case BLT_ICESPIKE:
-		case BLT_DIRTSPIKE:
-			me->type=BLT_NONE;
+		case BLT_LASER:	// reflects off walls
+			MakeSound(SND_BULLETREFLECT,me->x,me->y,SND_CUTOFF,900);
 			break;
-		case BLT_SHROOM:
-			// detonate
-			BulletRanOut(me,map,world);
+		case BLT_LASERBEAM:	// reflects off mirrors
+			LaserMirrorHit(me, map, world);
 			break;
-		case BLT_SNOWBALL:
-		case BLT_BIGSNOW:
-			BulletRanOut(me,map,world);
+		case BLT_SITFLAME:
+		case BLT_BADSITFLAME:
+			me->dx = me->dy = 0;
+			break;
+		case BLT_HAMMER2:
+		case BLT_LUNA2:
+		case BLT_FIREBALL2:
+			MakeSound(SND_HAMMERREFLECT, me->x, me->y, SND_CUTOFF, 600);
+			break;
+		case BLT_ROCK:
+			MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
 			break;
 		case BLT_ICEBEAM:
 			me->timer = 8;
@@ -506,196 +510,82 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 			else
 				LaserMirrorHit(me,map,world);
 			break;
+		case BLT_GASBLAST:
+			if(me->timer>6)
+				me->timer=6;
+			break;
+		case BLT_CACTUS:
+			me->target=0;
+			me->dx=Cosine(me->facing)*16;
+			me->dy=Sine(me->facing)*16;
+			break;
+		case BLT_BALLLIGHTNING:
+		case BLT_BADLIGHTNING:
+			me->dx=Cosine(me->facing)*11;
+			me->dy=Sine(me->facing)*11;
+			break;
+		case BLT_CHEESEHAMMER:
+			me->dx=Cosine(me->facing)*14;
+			me->dy=Sine(me->facing)*14;
+			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
+			break;
+	}
+}
+
+// How does the bullet react to hitting a wall?
+byte OnHitWall(bullet_t* me)
+{
+	switch(me->type)
+	{
+		case BLT_HAMMER2:
+		case BLT_LASER:
+		case BLT_BOMB:
+		case BLT_EVILHAMMER:
+		case BLT_ORBITER:
+		case BLT_ORBITER2:
+		case BLT_SWAP:
+		case BLT_SCANSHOT:
+		case BLT_CHEESEHAMMER:
+		case BLT_LUNA2:
+		case BLT_FIREBALL2:
+		case BLT_COIN:
+		case BLT_BIGCOIN:
+		case BLT_BIGYELLOW:
+		case BLT_SKULL:
+		case BLT_BIGBOMB:
+		case BLT_BOOMERANG:
+		case BLT_BADLUNA:
+		case BLT_BADLUNA2:
+		case BLT_BADFBALL:
+		case BLT_BADLIGHTNING:
+		case BLT_QUEENACID:
+		case BLT_ALIENEGG:
+			return 1; // reflects
+		case BLT_HAMMER:
+		case BLT_BIGSHELL:
+		case BLT_LUNA:
+		case BLT_FIREBALL:
+		case BLT_MINIFBALL:
+		case BLT_YELWAVE:
+		case BLT_ACID:
+		case BLT_SHARK:
+		case BLT_ENERGY:
+		case BLT_ENERGY2:
+		case BLT_GREEN:
+		case BLT_BADGREEN:
+		case BLT_SPORE:
+		case BLT_ICESPIKE:
+		case BLT_DIRTSPIKE:
 		case BLT_BIGSHOT:
 		case BLT_FLAMEWALL:
 		case BLT_FLAMESHOT:
 		case BLT_BATSHOT:
 		case BLT_WOLFSHOT:
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
 		case BLT_CLAW:
-			ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,7);
-			me->type=0;
-			break;
 		case BLT_EARTHSPIKE:
 		case BLT_EARTHSPIKE2:
-			ExplodeParticles(PART_DIRT,me->x,me->y,me->z,8);
-			me->type=0;
-			break;
-		case BLT_GASBLAST:
-			me->x-=me->dx;
-			me->dx=0;
-			if(me->timer>6)
-				me->timer=6;
-			break;
-		case BLT_WHOOPEE:
-		case BLT_HOTPANTS:
-		case BLT_ORBGRENADE:
-		case BLT_WATER:
-		case BLT_FOUNTAIN:
-		case BLT_CROAKERGAS:
-		case BLT_FARLEYGAS:
-			me->x-=me->dx;
-			me->dx=0;
-			break;
-		case BLT_MEGABOOM:
-			break;
-		case BLT_CACTUS:
-			me->target=0;
-			me->x-=me->dx;
-			me->facing=(byte)(84+Random(89));
-			if(me->dx<0)
-				me->facing=(me->facing+128)&255;
-			me->dx=Cosine(me->facing)*16;
-			me->dy=Sine(me->facing)*16;
-			break;
-		case BLT_ICEWAND:
-		case BLT_ICEWAND2:
-		case BLT_ICESHARD:
-		case BLT_ICEWOLFICE:
-		case BLT_WIND:
-			BulletRanOut(me,map,world);
-			break;
-		case BLT_BIGBOMB:
-		case BLT_BOOMERANG:
-			me->x-=me->dx;
-			me->dx=-me->dx;
-			break;
-		case BLT_EVILFACE:
-			// can go through anything
-			break;
-
-	}
-}
-
-void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
-{
-	switch(me->type)
-	{
-		case BLT_ICEBEAM2:
-		case BLT_DEATHBEAM2:
-		case BLT_COMET:
-		case BLT_COMETBOOM:
-			break;
-		case BLT_HAMMER:
-		case BLT_LUNA:
-		case BLT_BIGSHELL:
-			me->type=BLT_NONE;
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
-			MakeSound(SND_HAMMERBONK,me->x,me->y,SND_CUTOFF,1000);
-			break;
-		case BLT_FIREBALL:
-			me->type = BLT_NONE;
-			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 8);
-			MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000);
-			break;
-		case BLT_SKULL:
-			if (player.hammerFlags & HMR_REFLECT)
-			{
-				me->y -= me->dy;
-				me->dy = -me->dy;
-				me->facing = (16 - me->facing) & 15;
-				MakeSound(SND_HAMMERREFLECT, me->x, me->y, SND_CUTOFF, 900);
-			}
-			else
-			{
-				me->type = BLT_NONE;
-				ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 8);
-				MakeSound(SND_HAMMERBONK, me->x, me->y, SND_CUTOFF, 1000);
-			}
-			break;
-		case BLT_ORBITER:
-		case BLT_ORBITER2:
-		case BLT_SWAP:
-		case BLT_SCANSHOT:
-			me->y-=me->dy;
-			me->dy=-me->dy;
-			break;
-		case BLT_MINIFBALL:
-		case BLT_YELWAVE:
-			me->type = BLT_NONE;
-			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 2);
-			break;
-		case BLT_HAMMER2:
-		case BLT_FIREBALL2:
-		case BLT_LUNA2:
-		case BLT_EVILHAMMER:	// reflects off walls
-		case BLT_BADLUNA:	// reflects off walls
-		case BLT_BADLUNA2:	// reflects off walls
-		case BLT_BADFBALL:	// reflects off walls
-			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
-		case BLT_COIN:	// reflects off walls w/o sound
-		case BLT_BIGCOIN:
-		case BLT_BIGYELLOW:
-		case BLT_ALIENEGG:
-			me->y -= me->dy;
-			me->dy = -me->dy;
-			me->facing = (8 - me->facing) & 7;
-			//MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900); ching!
-			break;
-		case BLT_CHEESEHAMMER:
-			me->y-=me->dy;
-			if(me->facing<128)
-				me->facing=128+(128-me->facing);
-			else
-				me->facing=128-(me->facing-128);
-			me->dx=Cosine(me->facing)*14;
-			me->dy=Sine(me->facing)*14;
-			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,900);
-			break;
-		case BLT_BALLLIGHTNING:
-			if(player.hammerFlags&HMR_REFLECT)
-			{
-				me->y-=me->dy;
-				me->facing=20+Random(89);
-				if(me->dy>0)
-					me->facing+=128;
-				me->dx=Cosine(me->facing)*11;
-				me->dy=Sine(me->facing)*11;
-			}
-			else
-				BulletRanOut(me,map,world);
-			break;
-		case BLT_BADLIGHTNING:
-			me->y -= me->dy;
-			me->facing = 20 + Random(89);
-			if (me->dy > 0)
-				me->facing += 128;
-			me->dx = Cosine(me->facing) * 11;
-			me->dy = Sine(me->facing) * 11;
-			break;
-		case BLT_GRENADE:
-		case BLT_ICECLOUD:
-			me->y-=me->dy;
-			break;
-		case BLT_LASER:
-			MakeSound(SND_BULLETREFLECT,me->x,me->y,SND_CUTOFF,900);
-			me->y-=me->dy;
-			me->dy=-me->dy;
-			me->dx+=-FIXAMT/4+Random(FIXAMT/2);
-			me->facing=(16-me->facing)&15;
-			break;
-		case BLT_HOLESHOT:
-		case BLT_BLACKHOLE:
-			me->y -= me->dy;
-			break;
-		case BLT_LASERBEAM:	// reflects off mirrors
-			LaserMirrorHit(me, map, world);
-			break;
-		case BLT_BOMB:
-			MakeSound(SND_BOMBREFLECT,me->x,me->y,SND_CUTOFF,600);
-			me->y-=me->dy;
-			me->dy=-me->dy;
-			me->dx+=-FIXAMT/4+Random(FIXAMT/2);
-			me->facing=(16-me->facing)&15;
-			break;
 		case BLT_SLASH:
-			MakeSound(SND_CLANG,me->x,me->y,SND_CUTOFF,950);
-			// supposedly sparks
-			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,4,8);
-			me->type=BLT_NONE;
-			break;
+			return 2; // breaks w/o running out
 		case BLT_MISSILE:
 		case BLT_MAGICMISSILE:
 		case BLT_SPINE:
@@ -711,106 +601,19 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 		case BLT_BUBBLE:
 		case BLT_FREEZE:
 		case BLT_FREEZE2:
-			BulletRanOut(me,map,world);
-			break;
-		case BLT_FLAME:
-		case BLT_FLAME2:
-		case BLT_FLAME3:
-			me->y-=me->dy;
-			me->dx=((3-Random(7))<<FIXSHIFT);
-			me->dy=0;
-			break;
-		case BLT_SITFLAME:
-		case BLT_BADSITFLAME:
-			me->dx = me->dy = 0;
-			break;
-		case BLT_ROCK:	// reflects off walls
-			me->y-=me->dy;
-			me->dy=-me->dy;
-			me->facing=(8-me->facing)&7;
-			MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
-			break;
-		case BLT_QUEENACID:	// reflects off walls
-			me->y-=me->dy;
-			me->dy=-me->dy;
-			me->facing=(8-me->facing)&7;
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			break;
-		case BLT_ACID:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
-		case BLT_SHARK:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
-		case BLT_ENERGY:
-			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
-		case BLT_GREEN:
-		case BLT_BADGREEN:
-			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
-		case BLT_MEGABEAM:
-		case BLT_MEGABEAM1:
-			me->type=BLT_MEGABEAM2;
-			me->dy=0;
-			me->timer=2;
-			break;
-		case BLT_SPORE:
-		case BLT_ICESPIKE:
-		case BLT_DIRTSPIKE:
-			me->type=BLT_NONE;
-			break;
-		case BLT_SHROOM:
-			// detonate
-			BulletRanOut(me,map,world);
-			break;
 		case BLT_SNOWBALL:
 		case BLT_BIGSNOW:
-			BulletRanOut(me,map,world);
-			break;
-		case BLT_ICEBEAM:
-			me->timer = 8;
-			me->type = BLT_ICEBEAM2;
-			break;
-		case BLT_DEATHBEAM:
-			me->timer = 8;
-			if (Random(3) == 0)
-				me->type = BLT_DEATHBEAM2;
-			else
-				LaserMirrorHit(me, map, world);
-			break;
-		case BLT_BIGSHOT:
-		case BLT_FLAMEWALL:
-		case BLT_FLAMESHOT:
-		case BLT_BATSHOT:
-		case BLT_WOLFSHOT:
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
-		case BLT_CLAW:
-			ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,7);
-			me->type=0;
-			break;
-		case BLT_EARTHSPIKE:
-		case BLT_EARTHSPIKE2:
-			ExplodeParticles(PART_DIRT,me->x,me->y,me->z,8);
-			me->type=0;
-			break;
-		case BLT_GASBLAST:
-			me->y-=me->dy;
-			me->dx=0;
-			if(me->timer>6)
-				me->timer=6;
-			break;
+		case BLT_ICEWAND:
+		case BLT_ICEWAND2:
+		case BLT_ICESHARD:
+		case BLT_ICEWOLFICE:
+		case BLT_WIND:
+		case BLT_SHROOM:
+			return 3; // runs out
+		case BLT_GRENADE:
+		case BLT_ICECLOUD:
+		case BLT_HOLESHOT:
+		case BLT_BLACKHOLE:
 		case BLT_WHOOPEE:
 		case BLT_HOTPANTS:
 		case BLT_ORBGRENADE:
@@ -818,35 +621,228 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 		case BLT_FOUNTAIN:
 		case BLT_CROAKERGAS:
 		case BLT_FARLEYGAS:
-			me->y-=me->dy;
-			me->dy=0;
-			break;
-		case BLT_MEGABOOM:
-			break;
 		case BLT_CACTUS:
-			me->target=0;
-			me->y-=me->dy;
-			me->facing=(byte)(20+Random(89));
-			if(me->dy>0)
-				me->facing+=128;
-			me->dx=Cosine(me->facing)*16;
-			me->dy=Sine(me->facing)*16;
+		case BLT_GASBLAST:
+		case BLT_FLAME:
+		case BLT_FLAME2:
+		case BLT_FLAME3:
+			return 4; // pushes back, and that's all
+		default:
+			return 0; // does nothing
+		case BLT_BALLLIGHTNING:
+			return (player.hammerFlags&HMR_REFLECT) ? 1 : 3; // conditional - must have hammer reflect
+	}
+}
+
+void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
+{
+
+	if(OnHitWall(me)==1)
+	{
+		me->x -= me->dx;
+		me->dx = -me->dx;
+		// Special facing sets.
+		switch (me->type)
+		{
+			case BLT_SKULL:
+				me->facing = ((byte)(8 - me->facing)) & 15; // 16 directions
+				break;
+			case BLT_LASER:
+			case BLT_BOMB:
+				me->dy+=-FIXAMT/4+Random(FIXAMT/2);
+				me->facing = ((byte)(8 - me->facing)) & 15; // 16 directions
+				break;
+			case BLT_CHEESEHAMMER:
+				if(me->facing<128)
+					me->facing=128-me->facing;
+				else
+					me->facing=128+(256-me->facing);
+				break;
+			case BLT_HAMMER2:
+			case BLT_FIREBALL2:
+			case BLT_LUNA2:
+			case BLT_EVILHAMMER:
+			case BLT_BADLUNA:
+			case BLT_BADFBALL:
+			case BLT_ROCK:
+			case BLT_COIN:
+			case BLT_BIGCOIN:
+			case BLT_BIGYELLOW:
+			case BLT_ALIENEGG:
+			case BLT_QUEENACID:
+				me->facing = ((byte)(4 - me->facing)) & 7; // 8 directions
+				break;
+			case BLT_BALLLIGHTNING: // Lightning balls
+			case BLT_BADLIGHTNING:
+				me->facing = 84 + Random(89);
+				if (me->dx < 0)
+					me->facing = (me->facing + 128) & 255;
+				break;
+			case BLT_FLAME:
+			case BLT_FLAME2:
+			case BLT_FLAME3:
+				me->dy=((3-Random(7))<<FIXSHIFT);
+				Dampen(&me->dx,FIXAMT/2);
+				break;
+			case BLT_CACTUS:
+				me->facing=(byte)(84+Random(89));
+				if(me->dx<0)
+					me->facing=(me->facing+128)&255;
+				break;
+		}
+	}
+	else if(OnHitWall(me)==4)
+		me->x-=me->dx;
+		
+	InteractWithWall(me,map,world);
+
+	if(OnHitWall(me)==2)
+		Remove(me);
+	else if(OnHitWall(me)==3)
+		BulletRanOut(me,map,world);
+}
+
+void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
+{
+	if(OnHitWall(me)==1)
+	{
+		me->y -= me->dy;
+		me->dy = -me->dy;
+		// Special facing sets.
+		switch (me->type)
+		{
+			case BLT_SKULL:
+				me->facing = (16 - me->facing) & 15;
+				break;
+			case BLT_LASER:
+			case BLT_BOMB:
+				me->dx+=-FIXAMT/4+Random(FIXAMT/2);
+				me->facing = (16 - me->facing) & 15; // 16 directions
+				break;
+			case BLT_CHEESEHAMMER:
+				if(me->facing<128)
+					me->facing=128-me->facing;
+				else
+					me->facing=128+(256-me->facing);
+				break;
+			case BLT_HAMMER2:
+			case BLT_FIREBALL2:
+			case BLT_LUNA2:
+			case BLT_EVILHAMMER:
+			case BLT_BADLUNA:
+			case BLT_BADFBALL:
+			case BLT_ROCK:
+			case BLT_COIN:
+			case BLT_BIGCOIN:
+			case BLT_BIGYELLOW:
+			case BLT_ALIENEGG:
+			case BLT_QUEENACID:
+				me->facing = (8 - me->facing)&7; // 8 directions
+				break;
+			case BLT_BALLLIGHTNING: // Lightning balls
+			case BLT_BADLIGHTNING:
+				me->facing = 20 + Random(89);
+				if (me->dy > 0)
+					me->facing += 128;
+				break;
+			case BLT_FLAME:
+			case BLT_FLAME2:
+			case BLT_FLAME3:
+				me->dx=((3-Random(7))<<FIXSHIFT);
+				Dampen(&me->dy,FIXAMT/2);
+				break;
+			case BLT_CACTUS:
+				me->facing=(byte)(20+Random(89));
+				if(me->dy>0)
+					me->facing+=128;
+				break;
+		}
+	}
+	else if(OnHitWall(me)==4)
+		me->y-=me->dy;
+
+	InteractWithWall(me,map,world);
+
+	if(OnHitWall(me)==2)
+		Remove(me);
+	else if(OnHitWall(me)==3)
+		BulletRanOut(me,map,world);
+}
+
+void CheckForWater(bullet_t *me,Map *map,world_t *world)
+{
+	int x,y;
+	x = (me->x >> FIXSHIFT) / TILE_WIDTH;
+	y = (me->y >> FIXSHIFT) / TILE_HEIGHT;
+	if (GetTerrain(world, map->GetTile(x, y)->floor)->flags & TF_WATER)
+	{
+		ExplodeParticles(PART_WATER, me->x, me->y, 0, 8);
+		switch (me->type)
+		{
+			case BLT_COIN:
+			case BLT_BIGCOIN:
+				Remove(me);
+				break;
+		}
+	}
+	else if (GetTerrain(world, map->GetTile(x, y)->floor)->flags & TF_LAVA)
+	{
+		switch(me->type)
+		{
+			case BLT_FIREBALL:
+			case BLT_FIREBALL2:
+			case BLT_BADFBALL:	// reflects off walls
+				ExplodeParticles(PART_YELLOW, me->x, me->y, 0, 8);
+				break;
+			case BLT_COIN:
+			case BLT_BIGCOIN:
+				for(int i=0;i<3;i++)
+					BlowWigglySmoke(me->x, me->y, 0, FIXAMT * 2+i*2);
+				Remove(me);
+				break;
+			default:
+				ExplodeParticles(PART_HAMMER, me->x, me->y, 0, 8);
+				break;
+		}
+	}
+}
+
+void Dribble(bullet_t* me)
+{
+	me->z=0;
+	switch (me->type)
+	{
+		default:
+			me->dz=-me->dz*3/4;
 			break;
-		case BLT_ICEWAND:
-		case BLT_ICEWAND2:
-		case BLT_ICESHARD:
-		case BLT_ICEWOLFICE:
-		case BLT_WIND:
-			BulletRanOut(me,map,world);
+		case BLT_COIN:
+		case BLT_BIGCOIN:
+			me->dz=-me->dz*7/8;
 			break;
-		case BLT_BIGBOMB:
-		case BLT_BOOMERANG:
-			me->y-=me->dy;
-			me->dy=-me->dy;
-			break;
-		case BLT_EVILFACE:
-			// can go through anything
-			break;
+	}
+	if (me->dz < -FIXAMT) // Check if the sound needs doing!
+	{
+		switch(me->type)
+		{
+			case BLT_HAMMER:
+			case BLT_HAMMER2:
+			case BLT_EVILHAMMER:
+			case BLT_LUNA:
+			case BLT_LUNA2:
+			case BLT_BADLUNA:
+			case BLT_BADLUNA2:
+			case BLT_FIREBALL:
+			case BLT_FIREBALL2:
+			case BLT_BADFBALL:
+				MakeSound(SND_HAMMERREFLECT, me->x, me->y, SND_CUTOFF, 850);
+				break;
+			case BLT_BOMB:
+				MakeSound(SND_BOMBREFLECT, me->x, me->y, SND_CUTOFF, 600);
+				break;
+			case BLT_ROCK:
+				MakeSound(SND_ROCKBOUNCE, me->x, me->y, SND_CUTOFF, 600);
+				break;
+		}
 	}
 }
 
@@ -880,61 +876,23 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_EVILHAMMER:
 		case BLT_LUNA:
 		case BLT_LUNA2:
-		case BLT_BADLUNA:	// reflects off walls
-		case BLT_BADLUNA2:	// reflects off walls
-			MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,850);
-			me->dz=-me->dz*3/4;
-			me->z=0;
-			x=(me->x>>FIXSHIFT)/TILE_WIDTH;
-			y=(me->y>>FIXSHIFT)/TILE_HEIGHT;
-			if(GetTerrain(world,map->GetTile(x,y)->floor)->flags&TF_WATER)
-				ExplodeParticles(PART_WATER,me->x,me->y,0,8);
-			else if(GetTerrain(world,map->GetTile(x,y)->floor)->flags&TF_LAVA)
-				ExplodeParticles(PART_HAMMER,me->x,me->y,0,8);
-			break;
+		case BLT_BADLUNA:
+		case BLT_BADLUNA2:
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
-		case BLT_BADFBALL:	// reflects off walls
+		case BLT_BADFBALL:
+		case BLT_BOMB:
+		case BLT_MINDWIPE:
+		case BLT_BUBBLE:
+		case BLT_ROCK:
 			MakeSound(SND_HAMMERREFLECT, me->x, me->y, SND_CUTOFF, 850);
-			me->z = 0;
-			x = (me->x >> FIXSHIFT) / TILE_WIDTH;
-			y = (me->y >> FIXSHIFT) / TILE_HEIGHT;
-			if (GetTerrain(world, map->GetTile(x, y)->floor)->flags & TF_WATER)
-				ExplodeParticles(PART_WATER, me->x, me->y, 0, 8);
-			else if (GetTerrain(world, map->GetTile(x, y)->floor)->flags & TF_LAVA)
-				ExplodeParticles(PART_YELLOW, me->x, me->y, 0, 8);
+			Dribble(me);
+			CheckForWater(me, map, world);
 			break;
 		case BLT_COIN:
 		case BLT_BIGCOIN:
-			//if(me->dz<-FIXAMT)	// don't make it on small bounces, because it'd be annoying
-				//MakeSound(SND_HAMMERREFLECT,me->x,me->y,SND_CUTOFF,850); ching!
-			me->dz=-me->dz*7/8;
-			me->z=0;
-			x=(me->x>>FIXSHIFT)/TILE_WIDTH;
-			y=(me->y>>FIXSHIFT)/TILE_HEIGHT;
-			if(world->terrain[map->map[x+y*map->width].floor].flags&TF_WATER)
-			{
-				ExplodeParticles(PART_WATER,me->x,me->y,0,8);
-				me->type=BLT_NONE;
-			}
-			else if(world->terrain[map->map[x+y*map->width].floor].flags&TF_LAVA)
-			{
-				BlowWigglySmoke(me->x,me->y,0,FIXAMT*4);
-				BlowWigglySmoke(me->x,me->y,0,FIXAMT*2);
-				BlowWigglySmoke(me->x,me->y,0,FIXAMT*6);
-				me->type=BLT_NONE;
-			}
-			break;
-		case BLT_BOMB:
-		case BLT_MINDWIPE:
-			if(me->dz<-FIXAMT)	// don't make it on small bounces, because it'd be annoying
-				MakeSound(SND_BOMBREFLECT,me->x,me->y,SND_CUTOFF,600);
-			me->dz=-me->dz*3/4;
-			me->z=0;
-			break;
-		case BLT_BUBBLE:
-			me->dz=-me->dz*3/4;
-			me->z=0;
+			Dribble(me);
+			CheckForWater(me, map, world);
 			break;
 		case BLT_CHEESEHAMMER:
 		case BLT_MISSILE: // this really really should never happen
@@ -982,39 +940,15 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_FREEZE2:
 			BulletRanOut(me,map,world);
 			break;
-		case BLT_ROCK:
-			if(me->dz<-FIXAMT)
-				MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
-			me->dz=-me->dz*3/4;
-			me->z=0;
-			break;
 		case BLT_ENERGY:
 		case BLT_ENERGY2:
 		case BLT_BIGSHOT:
-			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
 		case BLT_GREEN:
 		case BLT_BADGREEN:
-			MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,4);
-			me->type=0;
-			break;
 		case BLT_ACID:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
 		case BLT_QUEENACID:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			BulletRanOut(me,map,world);
-			break;
 		case BLT_SHARK:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
-			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
-			me->type=0;
+			Splat(me);
 			break;
 		case BLT_SHROOM:
 		case BLT_ALIENEGG:
@@ -1052,7 +986,6 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_FLAMESHOT:
 		case BLT_WOLFSHOT:
 		case BLT_CLAW:
-		case BLT_BOMBIEBOOM:
 		case BLT_CROAKERGAS:
 		case BLT_HOTDOGFIRE:
 		case BLT_ICEWOLFICE:
@@ -1078,61 +1011,8 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 
 	switch(me->type)
 	{
-		case BLT_LUNA:
-		case BLT_LUNA2:
-		case BLT_HAMMER:
-		case BLT_HAMMER2:
-		case BLT_LILBOOM:
-		case BLT_LILBOOM2:
-		case BLT_LASER:
-		case BLT_LASERBEAM:
-		case BLT_BOOM:
-		case BLT_ENERGY:
-		case BLT_MEGABEAM:
-		case BLT_MEGABEAM1:
-		case BLT_MEGABEAM2:
-		case BLT_SPORE:
-		case BLT_GRENADE:
-		case BLT_YELBOOM:
-		case BLT_SHOCKWAVE:
-		case BLT_GOODSHOCK:
-		case BLT_ICESPIKE:
-		case BLT_DIRTSPIKE:
-		case BLT_ROCK:
-		case BLT_SPINE:
-		case BLT_EVILHAMMER:
-		case BLT_SLASH:
-		case BLT_GREEN:
-		case BLT_BADGREEN:
-		case BLT_REFLECT:
-		case BLT_BUBBLEPOP:
-		case BLT_SCANLOCK:
-		case BLT_BLACKHOLE:
-		case BLT_ENERGY2:
-		case BLT_BIGSHOT:
-		case BLT_FLAMEWALL:
-		case BLT_EARTHSPIKE:
-		case BLT_EARTHSPIKE2:
-		case BLT_GASBLAST:
-		case BLT_MEGABOOM:
-		case BLT_BIGBOOM:
-		case BLT_WHOOPEE:
-		case BLT_CACTUS:
-		case BLT_SWAMPGAS:
-		case BLT_SWAMPGAS2:
-		case BLT_ROCKETSMOKE:
-		case BLT_HOTPANTS:
-		case BLT_BATSHOT:
-		case BLT_FOUNTAIN:
-		case BLT_FLAMESHOT:
-		case BLT_EVILFACE:
-		case BLT_WOLFSHOT:
-		case BLT_CLAW:
-		case BLT_BOMBIEBOOM:
-		case BLT_HOTDOGFIRE:
-		case BLT_FARLEYGAS:
-		default:
-			me->type=0;
+		default: // most bullets use this
+			Splat(me);
 			break;
 		case BLT_HOLESHOT:
 			me->type = BLT_BLACKHOLE;
@@ -1146,6 +1026,12 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			me->type = BLT_NONE;
 			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 2);
 			break;
+		case BLT_HAMMER2:
+		case BLT_EVILHAMMER:
+		case BLT_LUNA2:
+		case BLT_BADLUNA2:
+			ExplodeParticles2(PART_HAMMER, me->x, me->y, me->z, 6, 3);
+			break;
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
 		case BLT_BADFBALL:
@@ -1154,39 +1040,12 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			ExplodeParticles2(PART_YELLOW, me->x, me->y, me->z, 6, 3);
 			me->type = 0;
 			break;
-		case BLT_SPEAR:
-		case BLT_BADSPEAR:
-		case BLT_MINDWIPE:
-		case BLT_HARPOON:
-			ExplodeParticles(PART_HAMMER,me->x,me->y,0,8);
-			me->type=0;
-			break;
 		case BLT_BIGSNOW:
 			// poof into snowballs
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
 			me->type=0;
 			for(i=0;i<8;i++)
 				FireBullet(me->x,me->y,(byte)i*32,BLT_SNOWBALL,me->friendly);
-			break;
-		case BLT_SNOWBALL:
-		case BLT_FREEZE:
-		case BLT_FREEZE2:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
-			me->type=0;
-			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,6,12);
-			break;
-		case BLT_PAPER:
-			me->type=0;
-			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,6,12);
-			break;
-		case BLT_BIGAXE:
-			me->type=0;
-			ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,10,8);
-			break;
-		case BLT_IGNITE:
-		case BLT_WIND:
-			me->type = 0;
-			ExplodeParticles2(PART_SNOW2, me->x, me->y, me->z, 10, 8);
 			break;
 		case BLT_MISSILE:
 		case BLT_MAGICMISSILE:
@@ -1223,28 +1082,6 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_SCANSHOT:
 			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
 			me->type=0;
-			break;
-		case BLT_SHARK:
-			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
-			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
-		case BLT_BUBBLE:
-			ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
-			me->type=BLT_BUBBLEPOP;
-			me->anim=0;
-			me->timer=10;
-			me->dx=0;
-			me->dy=0;
-			MakeSound(SND_BUBBLEPOP,me->x,me->y,SND_CUTOFF,1);
-			break;
-		case BLT_FLAME:
-		case BLT_FLAME2:
-		case BLT_FLAME3:
-		case BLT_SITFLAME:
-		case BLT_BADSITFLAME:
-			me->type = 0;
-			BlowSmoke(me->x, me->y, me->z, FIXAMT);
 			break;
 		case BLT_BOMB:
 		case BLT_MINE:
@@ -1283,27 +1120,6 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			me->type=BLT_NONE;	// all gone
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
 			break;
-		case BLT_BIGSHELL:
-			me->type=BLT_NONE;
-			ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
-			MakeSound(SND_HAMMERBONK,me->x,me->y,SND_CUTOFF,1000);
-			break;
-		case BLT_BALLLIGHTNING:
-		case BLT_BADLIGHTNING:
-			ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,8);
-			me->type=BLT_NONE;
-			break;
-		case BLT_BOOMERANG:
-			ExplodeParticles(PART_DIRT,me->x,me->y,me->z,8);
-			me->type=0;
-			break;
-		case BLT_ICEWAND:
-		case BLT_ICEWAND2:
-		case BLT_ICESHARD:
-		case BLT_ICEWOLFICE:
-			ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,8);
-			me->type=0;
-			break;
 		case BLT_ORBGRENADE:
 			FireBullet(me->x,me->y,0,BLT_MEGABOOM,me->friendly);
 			me->type=0;
@@ -1316,12 +1132,6 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			me->type = BLT_BIGBOOM;
 			me->timer = 7;
 			MakeSound(SND_BIGBOOM, me->x, me->y, SND_CUTOFF, 1200);
-			break;
-		case BLT_WATER:
-			if(Random(3)==0)
-				MakeSound(SND_WATERSPLASH,me->x,me->y,SND_CUTOFF,200);
-			ExplodeParticles(PART_WATER,me->x,me->y,me->z,8);
-			me->type=BLT_NONE;
 			break;
 		case BLT_BADLUNA:
 			if(Random(3)==0)
@@ -1573,17 +1383,19 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			{
 				if (me->type == BLT_COIN)
 				{
-					FloaterParticles(me->x, me->y, 5, 24, 0, 4);
+					//FloaterParticles(me->x, me->y, 5, 24, 0, 4);
+					player.coins++;
 				}
 				else
 				{
-					FloaterParticles(me->x, me->y, 5, 24, 0, 4);
-					FloaterParticles(me->x, me->y, 5, 32, -1, 4);
+					//FloaterParticles(me->x, me->y, 5, 24, 0, 4);
+					//FloaterParticles(me->x, me->y, 5, 32, -1, 4);
 					// double noise
-					//MakeSound(SND_MONEY, me->x, me->y, SND_CUTOFF, 500);
+					MakeSound(SND_MONEY, me->x, me->y, SND_CUTOFF, 500);
+					player.coins+=5;
 				}
-				me->type = BLT_NONE;
-				//MakeSound(SND_MONEY, me->x, me->y, SND_CUTOFF, 500);
+				Remove(me);
+				MakeSound(SND_MONEY, me->x, me->y, SND_CUTOFF, 500);
 			}
 			break;
 		case BLT_TORPEDO:
@@ -1907,9 +1719,10 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_MEGABOOM:
-			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,100,0,0,4,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,100,(16-Random(33))<<FIXSHIFT,
+				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly))
 			{
-				// ouch
+				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
 		case BLT_WHOOPEE:
@@ -1976,17 +1789,11 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_BIGBOOM:
-			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,48,0,0,3,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,96,(16-Random(33))<<FIXSHIFT,
+				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly))
 			{
-				// ouch
+				// nothing much to do here, the victim will scream quite enough
 			}
-			break;
-		case BLT_BOMBIEBOOM:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,128,0,0,40,map,world,me->friendly))
-			{
-				// ouch
-			}
-			//CheckBoomRocks(map,me->x,me->y,128);
 			break;
 		case BLT_SWAMPGAS:
 		case BLT_SWAMPGAS2:
@@ -2530,6 +2337,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_FREEZE:
+			me->dz -= FIXAMT / 2;	// less gravity than normal things
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
@@ -3808,10 +3616,32 @@ void RenderBullets(void)
 }
 
 byte HasGravity(bullet_t* me) {
-	return (me->type == BLT_HAMMER || me->type == BLT_HAMMER2 || me->type == BLT_BOMB || me->type == BLT_GRENADE
-		|| me->type == BLT_ROCK || me->type == BLT_EVILHAMMER || me->type == BLT_SPEAR || me->type == BLT_BADSPEAR
-		|| me->type == BLT_BUBBLE || me->type == BLT_COIN || me->type == BLT_BIGCOIN || me->type == BLT_SITFLAME
-		|| me->type == BLT_BADSITFLAME || me->type == BLT_FLAME3 || me->type == BLT_ORBGRENADE || me->type == BLT_ALIENEGG);
+	switch(me->type)
+	{
+		default:
+			return 0;
+		case BLT_HAMMER:
+		case BLT_HAMMER2:
+		case BLT_BOMB:
+		case BLT_GRENADE:
+		case BLT_ROCK:
+		case BLT_EVILHAMMER:
+		case BLT_SPEAR:
+		case BLT_BADSPEAR:
+		case BLT_BUBBLE:
+		case BLT_FREEZE:
+		case BLT_FREEZE2:
+		case BLT_ACID:
+		case BLT_QUEENACID:
+		case BLT_ALIENEGG:
+		case BLT_COIN:
+		case BLT_BIGCOIN:
+		case BLT_SITFLAME:
+		case BLT_BADSITFLAME:
+		case BLT_FLAME3:
+		case BLT_ORBGRENADE:
+			return 1;
+	}
 }
 
 byte HasHoming(bullet_t* me) {
@@ -3969,12 +3799,12 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 		case BLT_COIN:
 		case BLT_BIGCOIN:
 			me->facing = (byte)Random(256);
-			// Random dx/dy/dz
 			f = Random(3) + 1;
-			x = -FIXAMT * 4 + Random(FIXAMT * 8);
-			y = -FIXAMT * 4 + Random(FIXAMT * 8);
-			z = Random(FIXAMT * 6) + FIXAMT * 4;
-			SetBulletVars(me,x2,y2,z,FIXAMT/2,270+Random(120),BD_NONE);
+			me->dx = -FIXAMT * 4 + Random(FIXAMT * 8);
+			me->dy = -FIXAMT * 4 + Random(FIXAMT * 8);
+			me->dz = Random(FIXAMT * 6) + FIXAMT * 4;
+			me->z = FIXAMT / 2;
+			me->timer = 30 * 9 + Random(30 * 4);
 			break;
 		case BLT_SCANSHOT:
 			me->facing=Random(256);
@@ -4006,6 +3836,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetBulletVars(me,12,12,me->dz,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_LUNA:
+		case BLT_LUNA2:
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
 			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);

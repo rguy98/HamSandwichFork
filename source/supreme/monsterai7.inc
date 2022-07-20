@@ -194,6 +194,12 @@ void AI_Zombie2(Guy *me,Map *map,world_t *world,Guy *goodguy)
 
 	if(me->action==ACTION_BUSY)
 	{
+		if(me->seq==ANIM_DIE && me->reload==0)
+		{
+			if(me->aiType==MONS_BOMBIE)
+				FireBullet(me->x,me->y,0,BLT_BOOM,me->friendly);
+			me->reload=2;
+		}
 		if(me->seq==ANIM_ATTACK && me->frm==5)
 		{
 			if(me->aiType==MONS_FSTZOMBIE){
@@ -212,7 +218,6 @@ void AI_Zombie2(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			if(me->frm==11 && me->reload==0 && (me->aiType==MONS_BOMBIE || me->aiType==MONS_BOMBIELORD))	// bombie
 			{
 				// blow self up
-				FireBullet(me->x,me->y,0,BLT_MEGABOOM,me->friendly);
 				if(me->aiType==MONS_BOMBIE)
 				{
 					me->seq=ANIM_DIE;
