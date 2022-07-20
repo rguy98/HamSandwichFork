@@ -1078,11 +1078,6 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			for(i=0;i<8;i++)
 				FireBullet(me->x,me->y,(byte)i*32,BLT_ACID,me->friendly);
 			break;
-		case BLT_SCANNER:
-		case BLT_SCANSHOT:
-			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			me->type=0;
-			break;
 		case BLT_BOMB:
 		case BLT_MINE:
 		case BLT_ORBITER:
@@ -1122,11 +1117,11 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_ORBGRENADE:
 			FireBullet(me->x,me->y,0,BLT_MEGABOOM,me->friendly);
-			me->type=0;
+			Remove(me);
 			break;
 		case BLT_ROCKET:
 			FireBullet(me->x,me->y,0,BLT_BIGBOOM,me->friendly);
-			me->type=0;
+			Remove(me);
 			break;
 		case BLT_BIGBOMB:
 			me->type = BLT_BIGBOOM;
@@ -1144,7 +1139,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 					FireBullet(me->x,me->y,256/a*i,BLT_ENERGY,me->friendly);
 				}
 			}
-			me->type=BLT_NONE;
+			Remove(me);
 			break;
 	}
 }
@@ -1160,13 +1155,13 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 	{
 		case BLT_COMETBOOM:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,64,(8-Random(17))<<FIXSHIFT,
-				(8-Random(16))<<FIXSHIFT,10,map,world, me->friendly))
+				(8-Random(16))<<FIXSHIFT,10,map,world, me->friendly,0))
 			{
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
 		case BLT_BLACKHOLE:
-			if (FindVictims2(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, 0, 0, 1, map, world, me->friendly))
+			if (FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, 0, 0, 1, map, world, me->friendly,1))
 			{
 
 			}
@@ -1214,14 +1209,14 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_ICECLOUD:
-			if (FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 20, 0, 0, -1000, map, world, me->friendly))
+			if (FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 20, 0, 0, -1000, map, world, me->friendly,0))
 			{
 				ExplodeParticles(PART_SNOW2, me->x, me->y, me->z, 4);
 				MakeSound(SND_FREEZE, me->x, me->y, SND_CUTOFF, 900);
 			}
 			break;
 		case BLT_ICEBEAM:
-			if (FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 20, 0, 0, -1000, map, world, me->friendly))
+			if (FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 20, 0, 0, -1000, map, world, me->friendly,0))
 			{
 				ExplodeParticles(PART_SNOW2, me->x, me->y, me->z, 4);
 				MakeSound(SND_FREEZE, me->x, me->y, SND_CUTOFF, 900);
@@ -1406,14 +1401,14 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_LILBOOM:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,(8-Random(17))<<FIXSHIFT,
-				(8-Random(16))<<FIXSHIFT,2,map,world,me->friendly))
+				(8-Random(16))<<FIXSHIFT,2,map,world,me->friendly,0))
 			{
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
 		case BLT_SLASH:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,Cosine(me->facing*32)*4,
-				Sine(me->facing*32)*4,6,map,world,me->friendly))
+				Sine(me->facing*32)*4,6,map,world,me->friendly,0))
 			{
 				// nothing needs to be done
 			}
@@ -1447,7 +1442,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
 			BurnHay(me->x, me->y);
-			if (FindVictims2(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 1, map, world, me->friendly))
+			if (FindAndInflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 1, map, world, me->friendly,1))
 			{
 				BlowSmoke(me->x, me->y, me->z, FIXAMT);
 				// no noise, just let them scream
@@ -1462,19 +1457,18 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_SPORE:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,4,me->dx/2,me->dy/2,1,map,world,me->friendly))
 			{
-
-				PoisonVictim(GetLastGuyHit(),30);
-				me->type=BLT_NONE;	// go away
+				Inflict(GetLastGuyHit(),GEF_POISON,30);
+				Remove(me);
 			}
 			break;
 		case BLT_SPINE:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,4,me->dx/4,me->dy/4,4,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
+				Remove(me);
 			}
 			break;
 		case BLT_SHROOM:
-		//case BLT_ALIENEGG:
+		case BLT_ALIENEGG:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
 			{
 				BulletRanOut(me,map,world);	// detonate, not to mention the 10 damage you already did
@@ -1502,14 +1496,14 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_BOOM:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,64,(8-Random(17))<<FIXSHIFT,
-				(8-Random(16))<<FIXSHIFT,4,map,world,me->friendly))
+				(8-Random(16))<<FIXSHIFT,4,map,world,me->friendly,0))
 			{
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
 		case BLT_BIGAXE:
-			if(FindVictims2(me->x>>FIXSHIFT,me->y>>FIXSHIFT,32,(4-Random(9))<<FIXSHIFT,
-				(4-Random(9))<<FIXSHIFT,5,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,32,(4-Random(9))<<FIXSHIFT,
+				(4-Random(9))<<FIXSHIFT,5,map,world,me->friendly,1))
 			{
 				ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,10,8);
 			}
@@ -1631,7 +1625,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_FREEZE2:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,0,map,world,me->friendly))
 			{
-				if(FreezeGuy(GetLastGuyHit()))
+				if(Inflict(GetLastGuyHit(),GEF_FROZEN,30*5))
 				{
 					MakeSound(SND_FREEZE,me->x,me->y,SND_CUTOFF,1400);
 				}
@@ -1656,7 +1650,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				BulletRanOut(me,map,world);
 			break;
 		case BLT_FARLEYGAS:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,1,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,1,map,world,me->friendly,0))
 			{
 				// nothing, just ouch
 			}
@@ -1689,7 +1683,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_HOTDOGFIRE:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,0,0,1,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,0,0,1,map,world,me->friendly,0))
 			{
 				// ouch
 			}
@@ -1715,24 +1709,24 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_GASBLAST:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,0,map,world,me->friendly))
 			{
-				PoisonVictim(GetLastGuyHit(), 96);
+				Inflict(GetLastGuyHit(),GEF_POISON,96);
 			}
 			break;
 		case BLT_MEGABOOM:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,100,(16-Random(33))<<FIXSHIFT,
-				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly))
+				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly,0))
 			{
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
 		case BLT_WHOOPEE:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,1,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,1,map,world,me->friendly,0))
 			{
 				// nothing, just ouch
 			}
 			break;
 		case BLT_CROAKERGAS:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,1,map,world,me->friendly))
+			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,24,me->dx,me->dy,1,map,world,me->friendly,0))
 			{
 				// nothing, just ouch
 			}
@@ -1754,7 +1748,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_ICEWAND2:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,me->target,map,world,me->friendly))
 			{
-				if(FreezeGuy(GetLastGuyHit()))
+				if(Inflict(GetLastGuyHit(),GEF_FROZEN,30*5))
 				{
 					MakeSound(SND_FREEZE,me->x,me->y,SND_CUTOFF,1400);
 				}
@@ -1774,7 +1768,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_ICEWOLFICE:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,12,map,world,me->friendly))
 			{
-				if(FreezeGuy(GetLastGuyHit()))
+				if(Inflict(GetLastGuyHit(),GEF_FROZEN,30*5))
 				{
 					MakeSound(SND_FREEZE,me->x,me->y,SND_CUTOFF,1400);
 				}
@@ -1790,7 +1784,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_BIGBOOM:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,96,(16-Random(33))<<FIXSHIFT,
-				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly))
+				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly,0))
 			{
 				// nothing much to do here, the victim will scream quite enough
 			}
@@ -1799,7 +1793,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_SWAMPGAS2:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,10,me->dx,me->dy,0,map,world,me->friendly))
 			{
-				PoisonVictim(GetLastGuyHit(),32);
+				Inflict(GetLastGuyHit(),GEF_POISON,32);
 			}
 			break;
 		case BLT_ROCKET:

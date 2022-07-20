@@ -2253,13 +2253,39 @@ byte FindVictim(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t
 	return 0;
 }
 
-// this doesn't quit when it finds one victim, it keeps going
-byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly)
+//
+byte InflictVictims(int x,int y,byte size,int dx,int dy,byte type,byte amt,Map *map,world_t *world,byte friendly,byte slow)
 {
 	int i;
 	byte result=0;
 
 	for(i=0;i<maxGuys;i++)
+	{
+		if(slow&&guys[i]->type>0)
+			continue;
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly))
+		{
+			if(CheckHit(size,x,y,guys[i]))
+			{
+				//guys[i]->GetShot(dx,dy,damage,map,world);
+				guyHit=guys[i];
+				result=1;
+			}
+		}
+	}
+	return result;
+}
+
+// this doesn't quit when it finds one victim, it keeps going
+byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly,byte slow)
+{
+	int i;
+	byte result=0;
+
+	for(i=0;i<maxGuys;i++)
+	{
+		if(slow&&guys[i]->type>0)
+			continue;
 		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly))
 		{
 			if(CheckHit(size,x,y,guys[i]))
@@ -2269,27 +2295,7 @@ byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_
 				result=1;
 			}
 		}
-
-	return result;
-}
-
-// Same as above, but won't hit someone who is currently in ouch mode (to avoid rapid rehits)
-byte FindVictims2(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly)
-{
-	int i;
-	byte result=0;
-
-	for(i=0;i<maxGuys;i++)
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) && guys[i]->ouch==0)
-		{
-			if(CheckHit(size,x,y,guys[i]))
-			{
-				guys[i]->GetShot(dx,dy,damage,map,world);
-				guyHit=guys[i];
-				result=1;
-			}
-		}
-
+	}
 	return result;
 }
 
@@ -2306,19 +2312,75 @@ byte FindNewVictim(int x, int y, word* target, byte size, int dx, int dy, byte d
 				return 1;
 			}
 		}
-
 	return 0;
 }
 
-#define GEF_POISON	0
-#define GEF_FROZEN	1
-#define GEF_BURN	2
-#define GEF_WEAK	3
-#define GEF_STRONG	4
-#define GEF_CONFUSE	5
-#define GEF_GARLIC	6
-#define GEF_SPEEDY	7
+// Add amount to effect - caps at 255.
+byte AddToBar(byte& bar, byte amt)
+{
+	if(bar>255)
+		bar=255;
+	else
+		bar+=amt;
+}
 
+// Adds [amt] of effect to guy.
+byte Inflict(Guy* me,byte effect,byte amt)
+{
+	switch (effect)
+	{
+		case GEF_POISON:
+			AddToBar(me->poison,amt);
+			return 1;
+		case GEF_FROZEN:
+			if(me->aiType==MONS_BOUAPHA && (me->frozen || player.shield))
+				return 0;	// can't freeze bouapha when he's already frozen or shielded
+			while (me->parent) // move up the chain to the top
+				me = me->parent;
+			return FreezeGuy2(me,amt);
+			AddToBar(me->frozen,amt);
+			return 1;
+		case GEF_BURN:
+			AddToBar(me->ignited,amt);
+			return 1;
+		case GEF_WEAK:
+			AddToBar(me->weak,amt);
+			return 1;
+		case GEF_STRONG:
+			AddToBar(me->strong,amt);
+			return 1;
+		case GEF_CONFUSE:
+			AddToBar(me->confuse,amt);
+			return 1;
+		case GEF_GARLIC:
+			AddToBar(me->garlic,amt);
+			return 1;
+		case GEF_SPEEDY:
+			AddToBar(me->speedy,amt);
+			return 1;
+	}
+}
+
+// Prevents glitches involving frozen enemies.
+byte FreezeGuy2(Guy *me,byte amt)
+{
+	int i;
+
+	AddToBar(me->frozen,amt);
+	if(me->aiType==MONS_SUPERZOMBIE)
+		return 1;	// super zombies do not have their children frozen, on the extremely
+					// off chance that you freeze one while it is holding you
+	for(i=0;i<maxGuys;i++)
+	{
+		if(guys[i]->type!=MONS_NONE && guys[i]->type!=MONS_NOBODY && guys[i]->parent==me)
+		{
+			FreezeGuy2(guys[i],amt);
+		}
+	}
+	return 1;
+}
+
+// Heals/hurts all nearby allies.
 byte HealNearbyAllies(Guy *me, int x,int y,byte size,byte amt,Map *map,world_t *world,byte friendly,byte canBeSelf)
 {
 	int i;
@@ -2349,6 +2411,7 @@ byte HealNearbyAllies(Guy *me, int x,int y,byte size,byte amt,Map *map,world_t *
 	return result;
 }
 
+// Buffs nearby allies with effect.
 byte BuffNearbyAllies(Guy *me, int x,int y,byte size,byte effect,byte amt,Map *map,world_t *world,byte friendly,byte canBeSelf)
 {
 	int i;
@@ -2361,35 +2424,12 @@ byte BuffNearbyAllies(Guy *me, int x,int y,byte size,byte effect,byte amt,Map *m
 				continue;
 			if(RangeToTarget(me,guys[i])<size*FIXAMT)
 			{
-				switch(effect)
+				Inflict(me, effect, amt);
+				if(effect==4)
 				{
-					case 0:
-						guys[i]->poison += amt;
-						break;
-					case 1:
-						guys[i]->frozen += amt;
-						break;
-					case 2:
-						guys[i]->ignited += amt;
-						break;
-					case 3:
-						guys[i]->weak += amt;
-						break;
-					case 4:
-						guys[i]->strong += amt;
-						MakeSound(SND_TURNGOOD,guys[i]->x,guys[i]->y,SND_CUTOFF,600);
-						LightningBolt(me->x,me->y,guys[i]->x,guys[i]->y);
-						MakeColdRingParticle(guys[i]->x,guys[i]->y,guys[i]->z,GetMonsterType(guys[i]->type)->size);
-						break;
-					case 5:
-						guys[i]->confuse += amt;
-						break;
-					case 6:
-						guys[i]->garlic += amt;
-						break;
-					case 7:
-						guys[i]->speedy += amt;
-						break;
+					MakeSound(SND_TURNGOOD,guys[i]->x,guys[i]->y,SND_CUTOFF,600);
+					LightningBolt(me->x,me->y,guys[i]->x,guys[i]->y);
+					MakeColdRingParticle(guys[i]->x,guys[i]->y,guys[i]->z,GetMonsterType(guys[i]->type)->size);
 				}
 				guyHit=guys[i];
 				result=1;
@@ -2465,6 +2505,7 @@ word LockOn2(int x,int y,byte friendly)
 	return 65535;
 }
 
+// Locks on closest ally/enemy.
 word LockOn3(int x,int y,int maxRange, byte friendly)
 {
 	int i;
@@ -2929,39 +2970,6 @@ byte ControlMind(Guy *me)
 	}
 
 	return ControlMind2(me);
-}
-
-byte FreezeGuy2(Guy *me)
-{
-	int i;
-
-	me->frozen=30*5;
-
-	if(me->aiType==MONS_SUPERZOMBIE)
-		return 1;	// super zombies do not have their children frozen, on the extremely
-					// off chance that you freeze one while it is holding you
-	for(i=0;i<maxGuys;i++)
-	{
-		if(guys[i]->type!=MONS_NONE && guys[i]->type!=MONS_NOBODY && guys[i]->parent==me)
-		{
-			FreezeGuy2(guys[i]);
-		}
-	}
-	return 1;
-}
-
-byte FreezeGuy(Guy *me)
-{
-	if(me->aiType==MONS_BOUAPHA && (me->frozen || player.shield))
-		return 0;	// can't freeze bouapha when he's already frozen or shielded
-
-	// move up the chain to the top
-	while(me->parent)
-	{
-		me=me->parent;
-	}
-
-	return FreezeGuy2(me);
 }
 
 void KillMonster(int x,int y,int type,byte nofx)

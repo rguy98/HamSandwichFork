@@ -90,8 +90,16 @@ class Guy
 #define GSF_NEWAI		1	// New AI - avoids pre-mod conflict
 #define GSF_LOONY		2	// Rainbow - like a loonykey!
 #define GSF_FASTFWD		4	// 2x speed (stacks with speedy - BEWARE!)
-
 #define NUM_MONSFLAGS	3
+
+#define GEF_POISON	0
+#define GEF_FROZEN	1
+#define GEF_BURN	2
+#define GEF_WEAK	3
+#define GEF_STRONG	4
+#define GEF_CONFUSE	5
+#define GEF_GARLIC	6
+#define GEF_SPEEDY	7
 #define NUM_CONDITIONS	8
 
 extern Guy *goodguy;
@@ -107,8 +115,8 @@ Guy *GetGuy(word w);
 void DeleteGuy(int x,int y,int type);
 void AddMapGuys(Map *map);
 byte FindVictim(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
-byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
-byte FindVictims2(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
+byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly,byte slow);
+byte FindAndInflictVictims(int x,int y,byte size,int dx,int dy,byte damage,byte type,Map *map,world_t *world,byte friendly,byte slow);
 byte FindNewVictim(int x,int y,word* target,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
 word LockOnEvil(int x,int y);
 word LockOnEvil2(int x,int y);
@@ -138,7 +146,6 @@ int CountMonstersInRect(int type,int x,int y,int x2,int y2);
 Guy *GetGuyOfType(int type);
 void RemoveGuy(Guy *g);
 void Telefrag(Guy *g);
-byte FreezeGuy(Guy *me);
 byte TryToPushItem(int x,int y,int destx,int desty,Map *map,world_t *world);
 void ChangeMonster(byte fx,int x,int y,int type,int newtype);
 void ChangeMonsterAI(byte fx,int x,int y,int type,int newtype);
@@ -199,6 +206,7 @@ void LaunchJunk(Map* map, Guy* me);
 void Sneeze(Guy *me);
 
 // Helpful new functions
+byte Inflict(Guy* me,byte effect,byte amt);
 byte IsZombie(Guy *g);
 byte IsSuperZombie(Guy *g);
 byte FocusOnGuy(Guy *g, Map *map);

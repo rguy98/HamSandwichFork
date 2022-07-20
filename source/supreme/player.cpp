@@ -163,22 +163,6 @@ int PlayerBrains(void)
 	return player.brains;
 }
 
-void PoisonVictim(Guy *me,byte amt)
-{
-	if(me==goodguy && player.shield)
-		return;	// can't be poisoned when invulnerable
-	if(me==goodguy && profile.difficulty==0)
-	{
-		amt/=2;
-		if(amt==0)
-			amt=1;
-	}
-	if(me->poison+amt>255)
-		me->poison=255;
-	else
-		me->poison+=amt;
-}
-
 void PlayerWinLevel(byte isSecret)
 {
 	PrintToLog("PlayerWinLevel",0);
