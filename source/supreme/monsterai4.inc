@@ -4468,9 +4468,9 @@ void AI_Traffic(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	if(me->mind==0)
 	{
 		me->friendly=1-me->friendly;
-		FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly);
+		FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly,0);
 		me->friendly=1-me->friendly;
-		FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly);
+		FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly,0);
 	}
 
 	me->facing=me->mind2/32;	// mind2 holds the 'true' visual facing 0-255

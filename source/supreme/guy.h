@@ -116,7 +116,6 @@ void DeleteGuy(int x,int y,int type);
 void AddMapGuys(Map *map);
 byte FindVictim(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
 byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly,byte slow);
-byte FindAndInflictVictims(int x,int y,byte size,int dx,int dy,byte damage,byte type,Map *map,world_t *world,byte friendly,byte slow);
 byte FindNewVictim(int x,int y,word* target,byte size,int dx,int dy,byte damage,Map *map,world_t *world,byte friendly);
 word LockOnEvil(int x,int y);
 word LockOnEvil2(int x,int y);
@@ -212,6 +211,8 @@ byte IsSuperZombie(Guy *g);
 byte FocusOnGuy(Guy *g, Map *map);
 byte GetBaseColor(Guy *g);
 byte AngerYetis(Guy* me);
+byte InflictVictims(int x,int y,byte size,int dx,int dy,byte type,byte amt,Map *map,world_t *world,byte friendly,byte slow);
+byte FreezeGuy2(Guy *me,byte amt);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

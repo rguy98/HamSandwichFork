@@ -1382,7 +1382,7 @@ void AI_Ghost2(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			{
 				goodguy->dx=0;
 				goodguy->dy=0;
-				FreezeGuy(goodguy);
+				Inflict(goodguy,GEF_FROZEN,150);
 				MakeSound(SND_FREEZE,x*FIXAMT,y*FIXAMT,SND_CUTOFF,1200);
 			}
 		}
@@ -1887,7 +1887,7 @@ void AI_Polterguy(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 
 	if(RangeToTarget(me,goodguy)<128*FIXAMT)
-		PoisonVictim(goodguy,32*3);
+		Inflict(goodguy,GEF_POISON,96);
 
 	if(me->action==ACTION_BUSY)
 	{

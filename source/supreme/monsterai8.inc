@@ -1422,7 +1422,7 @@ void AI_LunaMecha(Guy* me, Map* map, world_t* world, Guy* goodguy)
 		else if(me->mind==1) // bounce
 		{
 			if(me->mind1>0) {
-				FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,48,me->dx,me->dy,20,map,world,me->friendly);
+				FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,48,me->dx,me->dy,20,map,world,me->friendly,0);
 				if(me->mind1&1)
 				{
 					if(me->dx>0)
@@ -1507,7 +1507,7 @@ void AI_LunaMecha(Guy* me, Map* map, world_t* world, Guy* goodguy)
 		{
 			if(me->mind1)
 			{
-				if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,48,me->dx,me->dy,40,map,world,me->friendly))
+				if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,48,me->dx,me->dy,40,map,world,me->friendly,0))
 				{
 					ShakeScreen(15,7);
 					for(int i=0;i<4;i++)
@@ -1817,7 +1817,7 @@ void AI_SpisPumpkin(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		else if (me->aiType == MONS_ICYPUMPKN)
 		{
 			FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 24, Cosine(me->facing * 32) * 2, Sine(me->facing * 32) * 2, 2, map, world, me->friendly);
-			FreezeGuy(goodguy);
+			Inflict(goodguy,GEF_FROZEN,150);
 		}
 	}
 
@@ -2678,8 +2678,8 @@ void AI_MineCartBad(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 	else	// being ridden
 	{
-		FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly);
-		//FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly);
+		FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly,0);
+		//FindVictims((me->x+me->dx)>>FIXSHIFT,(me->y+me->dy)>>FIXSHIFT,16,-FIXAMT*10+Random(FIXAMT*21),-FIXAMT*10+Random(FIXAMT*21),20,map,world,me->friendly,0);
 		if(me->parent)
 		{
 			// confine the parent to the cart

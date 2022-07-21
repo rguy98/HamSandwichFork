@@ -178,6 +178,7 @@ static char effName[][16]={
 	"Camera @ Guy",
 	"Color Message",
 	"Set Autoscroll",
+	"Adv. ChgBullet",
 };
 
 static char lvlFlagName[][16]={
@@ -1551,6 +1552,22 @@ static void ColorClick2(int id)
 	if((spcl.effect[t].value2/256)>7)
 		spcl.effect[t].value2=(spcl.effect[t].value2%256);
 	SetupEffectButtons(t-effStart,(t-effStart)*38+264);
+}
+
+static void EvilGoodClick(int id)
+{
+	int t;
+
+	MakeNormalSound(SND_MENUCLICK);
+
+	effMode = 1;
+	t = effStart + (id - ID_EFF0) / 100;
+
+	spcl.effect[t].flags++;
+	if (spcl.effect[t].flags > 2)
+		spcl.effect[t].flags = 0;
+
+	SetupEffectButtons(t - effStart, (t - effStart) * 38 + 264);
 }
 
 static void PicNameClick(int id)
@@ -3256,6 +3273,19 @@ void SpecialEdit_Key(char k)
 	}
 }
 
+#define NUM_ROWS 24
+int GetNumColumns(int n)
+{
+	int i=n,
+		j=0;
+	while(i>0)
+	{
+		i-=NUM_ROWS;
+		j++;
+	}
+	return j;
+}
+
 void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 {
 	char s[16];
@@ -3360,8 +3390,8 @@ void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 			RenderTextDialog(mouseX,mouseY,mgl);
 			break;
 		case SMODE_PICKTRIG:
-			r = 24;
-			c = MAX_TRIGGER/r;
+			r = NUM_ROWS,
+			c = GetNumColumns(MAX_TRIGGER),
 			x1 = 40,
 			y1 = selectY,
 			x2 = x1 + c*TRG_W,
@@ -3384,8 +3414,8 @@ void SpecialEdit_Render(int mouseX,int mouseY,MGLDraw *mgl)
 			}
 			break;
 		case SMODE_PICKEFF:
-			r = 24;
-			c = EFF_MAX/r;
+			r = NUM_ROWS;
+			c = GetNumColumns(EFF_MAX),
 			x1 = 40,
 			y1 = selectY,
 			x2 = x1 + c*EFF_W,

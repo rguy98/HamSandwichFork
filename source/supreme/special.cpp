@@ -1835,7 +1835,7 @@ void SpecialEffect(special_t *me,Map *map)
 				FireBullet(x<<FIXSHIFT, y<<FIXSHIFT, GetVar(255), me->effect[i].value2, me->effect[i].flags&EF_PERMLIGHT);
 				break;
 			case EFF_CHANGEBULLET:
-				ChangeBullet(!(me->effect[i].flags&EF_NOFX),me->effect[i].x,me->effect[i].y,me->effect[i].value,me->effect[i].value2);
+				ChangeBullet(!(me->effect[i].flags&EF_NOFX),me->effect[i].x,me->effect[i].y,me->effect[i].value,me->effect[i].value2,0);
 				break;
 			case EFF_BONUSGOAL:
 				if(map->flags&MAP_BONUS){

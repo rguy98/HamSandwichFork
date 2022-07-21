@@ -2316,12 +2316,16 @@ byte FindNewVictim(int x, int y, word* target, byte size, int dx, int dy, byte d
 }
 
 // Add amount to effect - caps at 255.
-byte AddToBar(byte& bar, byte amt)
+void AddToBar(byte& bar, int amt)
 {
-	if(bar>255)
-		bar=255;
+	int i=(int)bar;
+	if(i+amt>255)
+		i=255;
+	else if(i-amt<=0)
+		i=0;
 	else
-		bar+=amt;
+		i+=amt;
+	bar=(byte)i;
 }
 
 // Adds [amt] of effect to guy.

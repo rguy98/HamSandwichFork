@@ -4016,7 +4016,7 @@ void AI_Lich(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		{
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,55,0,0,1,map,world,me->friendly))
 			{
-				PoisonVictim(GetLastGuyHit(),60);
+				Inflict(GetLastGuyHit(),GEF_POISON,60);
 			}
 
 			// calculate desired location (want to be above Bouapha)

@@ -211,14 +211,16 @@ void FireScanShots(Guy *victim);
 void MakeRadar(int rx,int ry,byte w);
 byte GetBulletAttackType(void);
 byte HasGravity(bullet_t* me);
+int GetGravityAmt(bullet_t* me);
 
 void FireBullet(int x, int y, byte facing, byte type, byte friendly, word target);
 bullet_t *GetFireBullet(int x, int y, byte facing, byte type, byte friendly);
 void RecolorBullet(bullet_t *me, byte from, byte to);
+void SetBulletVars(bullet_t* me, int dx, int dy, int dz, int z, int timer, byte type);
 
 int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets
-void ChangeBullet(byte fx,int x,int y,int type,int newtype); // for specials to change bullets
+void ChangeBullet(byte fx,int x,int y,int type,int newtype,int friendly); // for specials to change bullets
 void ChangeBulletColor(byte fx,int x,int y,int type,int colCode); // for specials to change bullet color
 byte BulletFacingType(byte type); // To check if a type of bullet uses none, 0-7, or 0-255 facings
 void RenderMysticalHammerItem(byte col1, byte col2, char brt, int x, int y);

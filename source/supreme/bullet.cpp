@@ -861,12 +861,8 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_COMET:
 			me->type=BLT_COMETBOOM;
-			me->anim=0;
-			me->timer=18;	// 9 frames of animation
-			me->dz=0;
-			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,200);
-			break;
-		case BLT_COMETBOOM:
+			SetBulletVars(me,0,0,0,0,18,0);
+			MakeSound(SND_INFERNAL,me->x,me->y,SND_CUTOFF,200);
 			break;
 		case BLT_BIGSHELL:
 			BulletRanOut(me,map,world);
@@ -894,52 +890,13 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 			Dribble(me);
 			CheckForWater(me, map, world);
 			break;
-		case BLT_CHEESEHAMMER:
-		case BLT_MISSILE: // this really really should never happen
-		case BLT_MAGICMISSILE:
-		case BLT_FLAME:
-		case BLT_FLAME2:
-		case BLT_FLAME3:
-		case BLT_LASER:
-		case BLT_LASERBEAM:
-		case BLT_MEGABEAM:
-		case BLT_MEGABEAM1:
-		case BLT_MEGABEAM2:
-		case BLT_SPORE:
-		case BLT_YELBOOM:
-		case BLT_LILBOOM:
-		case BLT_LILBOOM2:
-		case BLT_SHOCKWAVE:
-		case BLT_GOODSHOCK:
-		case BLT_ICESPIKE:
-		case BLT_DIRTSPIKE:
-		case BLT_SPINE:
-		case BLT_BIGAXE:
-		case BLT_SLASH:
-		case BLT_MINE:
-		case BLT_ORBITER:
-		case BLT_ORBITER2:
-		case BLT_BALLLIGHTNING:
-		case BLT_BADLIGHTNING:
-		case BLT_REFLECT:
-		case BLT_SWAP:
-		case BLT_SCANNER:
-		case BLT_SCANSHOT:
-		case BLT_TORPEDO:
-		case BLT_PAPER:
-		case BLT_FREEZE:
-		case BLT_IGNITE:
-		case BLT_HOLESHOT:
-		case BLT_BLACKHOLE:
-		case BLT_BIGBOMB:
-			me->z=0;
-			break;
 		case BLT_SPEAR:
 		case BLT_BADSPEAR:
 		case BLT_HARPOON:
-		case BLT_FREEZE2:
 			BulletRanOut(me,map,world);
 			break;
+		case BLT_FREEZE:
+		case BLT_FREEZE2:
 		case BLT_ENERGY:
 		case BLT_ENERGY2:
 		case BLT_BIGSHOT:
@@ -957,47 +914,23 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_GRENADE:
 			me->type=BLT_YELBOOM;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
-			me->anim=0;
-			me->timer=9;
+			SetBulletVars(me,0,0,0,0,9,0);
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,950);
 			break;
 		case BLT_SNOWBALL:
 		case BLT_BIGSNOW:
 			BulletRanOut(me,map,world);
 			break;
-		case BLT_FLAMEWALL:
-		case BLT_EARTHSPIKE:
-		case BLT_EARTHSPIKE2:
-		case BLT_GASBLAST:
-		case BLT_WHOOPEE:
-		case BLT_MEGABOOM:
-		case BLT_CACTUS:
-		case BLT_ICEWAND:
-		case BLT_ICEWAND2:
-		case BLT_BOOMERANG:
-		case BLT_HOTPANTS:
-		case BLT_BATSHOT:
-		case BLT_WIND:
-		case BLT_ICESHARD:
-		case BLT_FOUNTAIN:
-		case BLT_FLAMESHOT:
-		case BLT_WOLFSHOT:
-		case BLT_CLAW:
-		case BLT_CROAKERGAS:
-		case BLT_HOTDOGFIRE:
-		case BLT_ICEWOLFICE:
-		case BLT_FARLEYGAS:
-			// don't care about the floor
-			break;
 		case BLT_ORBGRENADE:
 		case BLT_WATER:
 			BulletRanOut(me, map, world);
 			break;
 		case BLT_EVILFACE:
+		case BLT_COMETBOOM:
 			// can go through anything
+			break;
+		default: // Just have it not go through the ground
+			me->z=0;
 			break;
 	}
 }
@@ -1016,29 +949,27 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_HOLESHOT:
 			me->type = BLT_BLACKHOLE;
-			me->dx = 0;
-			me->dy = 0;
-			me->timer = 30 * 2 + 50;
-			me->anim = 0;
+			SetBulletVars(me,0,0,me->dz,me->z,30*2+50,0);
 			break;
 		case BLT_MINIFBALL:
 		case BLT_YELWAVE:
-			me->type = BLT_NONE;
-			ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 2);
+			//ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 2);
+			Splat(me);
 			break;
 		case BLT_HAMMER2:
 		case BLT_EVILHAMMER:
 		case BLT_LUNA2:
 		case BLT_BADLUNA2:
-			ExplodeParticles2(PART_HAMMER, me->x, me->y, me->z, 6, 3);
+			//ExplodeParticles2(PART_HAMMER, me->x, me->y, me->z, 6, 3);
+			Splat(me);
 			break;
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
 		case BLT_BADFBALL:
 		case BLT_BIGYELLOW:
 		case BLT_SKULL:
-			ExplodeParticles2(PART_YELLOW, me->x, me->y, me->z, 6, 3);
-			me->type = 0;
+			//ExplodeParticles2(PART_YELLOW, me->x, me->y, me->z, 6, 3);
+			Splat(me);
 			break;
 		case BLT_BIGSNOW:
 			// poof into snowballs
@@ -1058,23 +989,20 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			me->dz=0;
 			break;
 		case BLT_TORPEDO:
-			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1500);
 			me->type=BLT_LILBOOM2;
-			me->timer=9;
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
+			SetBulletVars(me,0,0,0,me->z,9,0);
+			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1500);
 			break;
 		case BLT_ACID:
 		case BLT_SWAP:
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
 			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			me->type=0;
+			Remove(me);
 			break;
 		case BLT_QUEENACID:
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,850);
 			ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
-			me->type=0;
+			Remove(me);
 			for(i=0;i<8;i++)
 				FireBullet(me->x,me->y,(byte)i*32,BLT_ACID,me->friendly);
 			break;
@@ -1083,12 +1011,8 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_ORBITER:
 		case BLT_ORBITER2:
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,2000);
-			me->dx=0;
-			me->dy=0;
-			me->dz=0;
 			me->type=BLT_BOOM;
-			me->timer=7;
-			me->anim=0;
+			SetBulletVars(me,0,0,0,me->z,7,0);
 			break;
 		case BLT_SHROOM:
 			for(i=0;i<256;i+=8)
@@ -1099,8 +1023,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			g=AddGuy(me->x-me->dx*2,me->y-me->dy*2,me->z,MONS_SHROOM,me->friendly);	// become a living shroom
 			if(g && (!g->CanWalk(g->x,g->y,map,world)))
 				RemoveGuy(g);
-
-			me->type=BLT_NONE;	// all gone
+			Remove(me);
 			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1000);
 			break;
 		case BLT_ALIENEGG:
@@ -1111,8 +1034,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			g=AddGuy(me->x-me->dx*2,me->y-me->dy*2,me->z,MONS_ALIENEGG,me->friendly);	// become a living shroom
 			if(g && (!g->CanWalk(g->x,g->y,map,world)))
 				RemoveGuy(g);
-
-			me->type=BLT_NONE;	// all gone
+			Remove(me);
 			MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
 			break;
 		case BLT_ORBGRENADE:
@@ -1157,6 +1079,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,64,(8-Random(17))<<FIXSHIFT,
 				(8-Random(16))<<FIXSHIFT,10,map,world, me->friendly,0))
 			{
+				Inflict(GetLastGuyHit(), GEF_BURN, 64);
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
@@ -1396,6 +1319,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_TORPEDO:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,0,0,2,map,world,me->friendly))
 			{
+				Inflict(GetLastGuyHit(), GEF_BURN, 12);
 				BulletRanOut(me,map,world);	// detonate
 			}
 			break;
@@ -1417,18 +1341,22 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			BurnHay(me->x, me->y);
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,1,map,world,me->friendly))
 			{
+				Inflict(GetLastGuyHit(), GEF_BURN, 4);
 				// no noise, just let them scream
 			}
 			break;
 		case BLT_LIQUIFY:
 			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 1, map, world,me->friendly))
 			{
+				Inflict(GetLastGuyHit(),GEF_BURN,4);
 				// no noise, just let them scream
 			}
+			break;
 		case BLT_FLAME2:
 			BurnHay(me->x, me->y);
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,1,map,world,me->friendly))
 			{
+				Inflict(GetLastGuyHit(), GEF_BURN, 4);
 				// no noise, just let him scream
 			}
 			break;
@@ -1442,8 +1370,10 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
 			BurnHay(me->x, me->y);
-			if (FindAndInflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 1, map, world, me->friendly,1))
+			if (FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 1, map, world, me->friendly, 1)
+				|| InflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, GEF_BURN, 5, map, world, me->friendly,1))
 			{
+				Inflict(GetLastGuyHit(),GEF_BURN,4);
 				BlowSmoke(me->x, me->y, me->z, FIXAMT);
 				// no noise, just let them scream
 			}
@@ -1454,6 +1384,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				// hit noise
 				BulletRanOut(me, map, world);
 			}
+			break;
 		case BLT_SPORE:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,4,me->dx/2,me->dy/2,1,map,world,me->friendly))
 			{
@@ -1471,6 +1402,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_ALIENEGG:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
 			{
+				Inflict(GetLastGuyHit(), GEF_POISON, 30);
 				BulletRanOut(me,map,world);	// detonate, not to mention the 10 damage you already did
 			}
 			break;
@@ -1495,15 +1427,19 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_BOOM:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,64,(8-Random(17))<<FIXSHIFT,
-				(8-Random(16))<<FIXSHIFT,4,map,world,me->friendly,0))
+			if(FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 64, (8 - Random(17)) << FIXSHIFT,
+				(8 - Random(16)) << FIXSHIFT, 3, map, world, me->friendly, 0)
+				|| InflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 64, (8 - Random(17)) << FIXSHIFT,
+					(8 - Random(16)) << FIXSHIFT, GEF_BURN, 5, map, world, me->friendly, 0))
 			{
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
 		case BLT_BIGAXE:
-			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,32,(4-Random(9))<<FIXSHIFT,
-				(4-Random(9))<<FIXSHIFT,5,map,world,me->friendly,1))
+			if(FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, (4 - Random(9)) << FIXSHIFT,
+				(4 - Random(9)) << FIXSHIFT, 4, map, world, me->friendly, 1)
+				|| InflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, (4 - Random(9)) << FIXSHIFT,
+					(4 - Random(9)) << FIXSHIFT, GEF_WEAK, 5, map, world, me->friendly, 1))
 			{
 				ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,10,8);
 			}
@@ -1527,25 +1463,27 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_ACID:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,5,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
 				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
 				ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+				Remove(me);
 			}
 			break;
 		case BLT_QUEENACID:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,10,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
+				Inflict(GetLastGuyHit(), GEF_WEAK, 16);
 				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
 				ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+				Remove(me);
 			}
 			break;
 		case BLT_SHARK:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,5,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
+				Inflict(GetLastGuyHit(), GEF_BURN, -16);
 				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
 				ExplodeParticles(PART_WATER,me->x,me->y,me->z,6);
+				Remove(me);
 			}
 			break;
 		case BLT_BUBBLE:
@@ -1563,7 +1501,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_MEGABEAM1:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,40,0,12*FIXAMT,5,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
+				Remove(me);
 				MakeSound(SND_MEGABEAMHIT,me->x,me->y,SND_CUTOFF,1000);
 				me->type=BLT_MEGABEAM2;
 				me->dy=0;
@@ -1573,42 +1511,32 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_ENERGY:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,3,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
-				MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,6);
+				Splat(me);
 			}
 			break;
 		case BLT_ENERGY2:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,6,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
-				MakeSound(SND_ENERGYBONK,me->x,me->y,SND_CUTOFF,950);
-				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,6);
+				Splat(me);
 			}
 			break;
 		case BLT_BADFBALL:
 			BurnHay(me->x, me->y);
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
-				MakeSound(SND_HAMMERBONK,me->x,me->y,SND_CUTOFF,950);
-				ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,8);
+				Splat(me);
 			}
 			break;
 		case BLT_EVILHAMMER:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
-				MakeSound(SND_HAMMERBONK,me->x,me->y,SND_CUTOFF,950);
-				ExplodeParticles(PART_SNOW2,me->x,me->y,me->z,8);
+				Splat(me);
 			}
 			break;
 		case BLT_ROCK:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,8,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
-				MakeSound(SND_ROCKBOUNCE,me->x,me->y,SND_CUTOFF,600);
-				ExplodeParticles2(PART_DIRT,me->x,me->y,me->z,12,6);
+				Splat(me);
 			}
 			break;
 		case BLT_SNOWBALL:
@@ -1617,7 +1545,8 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			{
 				if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,6,map,world,me->friendly))
 				{
-					BulletRanOut(me,map,world);
+					Inflict(GetLastGuyHit(), GEF_BURN, -16);
+					Splat(me);
 				}
 			}
 			break;
@@ -1658,40 +1587,37 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_WOLFSHOT:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,8,map,world,me->friendly))
 			{
-				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
-				me->type=BLT_NONE;
+				Splat(me);
 			}
 			break;
 		case BLT_BATSHOT:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,1,map,world,me->friendly))
 			{
-				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,8);
-				me->type=BLT_NONE;
+				Splat(me);
 			}
 			break;
 		case BLT_BIGSHOT:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,12,map,world,me->friendly))
 			{
-				me->type=BLT_NONE;
-				ExplodeParticles(PART_HAMMER,me->x,me->y,me->z,12);
+				Splat(me);
 			}
 			break;
 		case BLT_FLAMEWALL:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,me->dx,me->dy,1,map,world,me->friendly))
 			{
-				// make a noise
+				Inflict(GetLastGuyHit(),GEF_BURN,16);
 			}
 			break;
 		case BLT_HOTDOGFIRE:
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,0,0,1,map,world,me->friendly,0))
 			{
-				// ouch
+				Inflict(GetLastGuyHit(),GEF_BURN,8);
 			}
 			break;
 		case BLT_FLAMESHOT:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,me->dx,me->dy,3,map,world,me->friendly))
 			{
-				// make a noise
+				Inflict(GetLastGuyHit(),GEF_BURN,16);
 			}
 			break;
 		case BLT_EARTHSPIKE:
@@ -1734,14 +1660,13 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_CACTUS:
 			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 4, me->dx, me->dy, 2, map, world,me->friendly))
 			{
-				me->type = BLT_NONE;
-				ExplodeParticles(PART_YELLOW, me->x, me->y, me->z, 3);
+				Splat(me);
 			}
 			break;
 		case BLT_BOOMERANG:
 			if(FindNewVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,&me->target,12,me->dx,me->dy,7,map,world,me->friendly))
 			{
-				ExplodeParticles(PART_DIRT,me->x,me->y,me->z,3);
+				Splat(me);
 			}
 			break;
 		case BLT_ICEWAND:
@@ -1786,6 +1711,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			if(FindVictims(me->x>>FIXSHIFT,me->y>>FIXSHIFT,96,(16-Random(33))<<FIXSHIFT,
 				(16-Random(33))<<FIXSHIFT,4,map,world,me->friendly,0))
 			{
+				Inflict(GetLastGuyHit(),GEF_BURN,16);
 				// nothing much to do here, the victim will scream quite enough
 			}
 			break;
@@ -1822,8 +1748,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_CLAW:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,0,0,3,map,world,me->friendly))
 			{
-				ExplodeParticles(PART_SNOW2,me->x,me->y,0,10);
-				me->type=BLT_NONE;
+				Splat(me);
 			}
 			break;
 	}
@@ -2035,7 +1960,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 
 	// all gravity-affected bullets, get gravitized
 	if(me->flags&BFL_GRAVITY || HasGravity(me))
-		me->dz-=FIXAMT;
+		me->dz-=FIXAMT/GetGravityAmt(me);
 
 	if(me->flags&BFL_WAVY)
 	{
@@ -2146,7 +2071,6 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_BUBBLE:
-			me->dz+=FIXAMT/2;	// less gravity
 			HitBadguys(me,map,world);
 			me->anim++;
 			if(me->anim>=7*4)
@@ -2287,14 +2211,12 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_ACID:
 		case BLT_SHARK:
-			me->dz-=FIXAMT/2;	// less gravity than normal things
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
 			HitBadguys(me,map,world);
 			break;
 		case BLT_QUEENACID:
-			me->dz-=FIXAMT/2;	// less gravity than normal things
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
@@ -2322,7 +2244,6 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_FREEZE2:
-			me->dz-=FIXAMT/2;	// less gravity than normal things
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
@@ -2331,7 +2252,6 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_FREEZE:
-			me->dz -= FIXAMT / 2;	// less gravity than normal things
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
@@ -2348,14 +2268,12 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			HitBadguys(me,map,world);
 			break;
 		case BLT_SNOWBALL:
-			me->dz-=FIXAMT/2;	// less gravity than normal things
 			HitBadguys(me,map,world);
 			break;
 		case BLT_BIGSNOW:
 			me->anim++;
 			if(me->anim>5)
 				me->anim=0;
-			me->dz-=FIXAMT/2;	// less gravity than normal things
 			if(me->z<64*FIXAMT)
 				HitBadguys(me,map,world);
 			break;
@@ -3634,7 +3552,24 @@ byte HasGravity(bullet_t* me) {
 		case BLT_BADSITFLAME:
 		case BLT_FLAME3:
 		case BLT_ORBGRENADE:
+		case BLT_SHARK:
 			return 1;
+	}
+}
+
+int GetGravityAmt(bullet_t *me)
+{
+	switch(me->type)
+	{
+		default:
+			return 1;
+		case BLT_BUBBLE:
+		case BLT_FREEZE:
+		case BLT_FREEZE2:
+		case BLT_ACID:
+		case BLT_QUEENACID:
+		case BLT_SHARK:
+			return 2;
 	}
 }
 
@@ -3667,10 +3602,10 @@ void CheckRecolor(bullet_t *me){
 			RecolorBullet(me, 4, 5);
 			break;
 		case BLT_EVILHAMMER:
-			RecolorBullet(me, 4, 5);
+			RecolorBullet(me, 4, 0);
 			break;
 		case BLT_SHARK:
-			RecolorBullet(me, 1, 4);
+			RecolorBullet(me, 1, 3);
 			break;
 		case BLT_FREEZE:
 		case BLT_FREEZE2:
@@ -4764,12 +4699,22 @@ int CountBulletsInRect(byte type,int x,int y,int x2,int y2)
 	return count;
 }
 
-void ChangeBullet(byte fx,int x,int y,int type,int newtype)
+void ChangeBullet(byte fx,int x,int y,int type,int newtype,int friendly)
 {
 	for(int i=0;i<config.numBullets;i++)
 		if(bullet[i].type != newtype && ((type != 0 && bullet[i].type == type) || (type == 0 && bullet[i].type != 0)))
 			if (x == 255 || ((bullet[i].x >> FIXSHIFT)/TILE_WIDTH == x && (bullet[i].y >> FIXSHIFT)/TILE_HEIGHT == y))
 			{
+				switch(friendly)
+				{
+					case 1:
+						if(bullet[i].friendly)
+							continue;
+					case 2:
+						if(!bullet[i].friendly)
+							continue;
+				}
+
 				int dx = bullet[i].dx, dy = bullet[i].dy, f = bullet[i].facing;
 
 				if (type == BLT_LASER)
