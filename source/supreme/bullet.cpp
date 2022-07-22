@@ -1916,7 +1916,6 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	activeBulDY=me->dy;
 	b=0;
 
-
 	if (me->type == BLT_LASERBEAM)
 	{
 		me->x += me->dx;
@@ -1961,12 +1960,6 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	// all gravity-affected bullets, get gravitized
 	if(me->flags&BFL_GRAVITY || HasGravity(me))
 		me->dz-=FIXAMT/GetGravityAmt(me);
-
-	if(me->flags&BFL_WAVY)
-	{
-		me->dx+=Cosine(me->timer/2)/2;
-		me->dy+=Sine(me->timer/2)/2;
-	}
 
 	me->timer--;
 	if(!me->timer)
@@ -3723,7 +3716,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetBulletVars(me,4,4,0,FIXAMT*30,30*10,BD_NONE);
 			break;
 		case BLT_YELWAVE:
-			SetBulletVars(me,10,10,0,FIXAMT*2,15,BD_EIGHT);
+			SetBulletVars(me,10,10,0,FIXAMT*2,60,BD_EIGHT);
 			break;
 		case BLT_COIN:
 		case BLT_BIGCOIN:

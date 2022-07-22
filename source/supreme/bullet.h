@@ -155,7 +155,6 @@
 #define BFL_GRAVITY 1
 #define BFL_HOMING 	2
 #define BFL_WAVY	4
-#define BFL_AURA 	8
 
 #define CHT_ULTRA 	1
 #define CHT_JESUS 	2
@@ -168,8 +167,8 @@
 typedef struct bullet_t
 {
 	int x,y,z;
-	int dx,dy,dz;
-	int timer;
+	int dx,dy,dz; // destination x/y/z
+	int timer; // how many frames left
 	word target;
 	byte anim;
 	byte facing;
