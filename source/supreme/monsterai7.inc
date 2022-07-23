@@ -1649,14 +1649,14 @@ void AI_Frankenjulie(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			else
 				MakeSound(SND_FRANKOUCH2,me->x,me->y,SND_CUTOFF,1200);
 
-			if(me->hp<monsType[me->type].hp/2 && me->mind==0)
+			if(me->hp<me->maxHP/2 && me->mind==0)
 			{
 				me->mind=1;
 				FireBullet(me->x,me->y,0,BLT_MEGABOOM,me->friendly);
 				DoMove(me,ANIM_A1,128,0,0,0);
 				ShakeScreen(5);
 			}
-			if(me->hp<monsType[me->type].hp/4 && me->mind==1)
+			if(me->hp<me->maxHP/4 && me->mind==1)
 			{
 				me->mind=2;
 				FireBullet(me->x,me->y,0,BLT_MEGABOOM,me->friendly);

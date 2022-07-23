@@ -553,7 +553,7 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 	color[5]=32*5+16;	// yellow for cheese
 	if(goodguy)
 	{
-		height[1]=goodguy->speedy*64/255;
+		height[1]=goodguy->quick*64/255;
 		height[4]=goodguy->poison*64/255;
 		height[6]=goodguy->garlic*64/255;
 		height[7]=goodguy->ignited*64/255;
@@ -675,7 +675,7 @@ void UpdateInterface(Map *map)
 
 	wpn = player.wpns[player.curSlot].wpn;
 
-	if(player.shield || (goodguy && goodguy->garlic) || (goodguy && goodguy->speedy) || player.invisibility || player.ammoCrate ||
+	if(player.shield || (goodguy && goodguy->garlic) || (goodguy && goodguy->quick) || player.invisibility || player.ammoCrate ||
 	  (goodguy && goodguy->poison) || (goodguy && goodguy->ignited) || (goodguy && goodguy->weak) || (goodguy && goodguy->strong) ||
 	  player.cheesePower || (goodguy && goodguy->frozen))
 	{

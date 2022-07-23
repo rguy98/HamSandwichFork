@@ -308,7 +308,7 @@ byte PlayerPowerup(char powerup)
 				AddAffliction(goodguy->garlic,255);
 				break;
 			case PU_SPEED:
-				AddAffliction(goodguy->speedy,255);
+				AddAffliction(goodguy->quick,255);
 				break;
 			case PU_INVISO:
 				player.invisibility=255;
@@ -365,7 +365,7 @@ byte PlayerPowerup(char powerup)
 				goodguy->garlic=0;
 				break;
 			case PU_SPEED:
-				goodguy->speedy=0;
+				goodguy->quick=0;
 				break;
 			case PU_INVISO:
 				player.invisibility=0;
@@ -408,7 +408,7 @@ void PlayerRadioactiveFood(void)
 		case 0:
 			NewMessage("Radioactive Energy!!",75,0);
 			PlayerHeal(30);
-			goodguy->speedy=255;
+			goodguy->quick=255;
 			break;
 		case 1:
 			NewMessage("Szechwan Surprise!",75,0);
@@ -1303,7 +1303,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	player.life=me->hp;
 
 	if(player.cheatFlags&CHT_SPEED)
-		me->speedy=255;
+		me->quick=255;
 
 	if(player.rage)
 	{

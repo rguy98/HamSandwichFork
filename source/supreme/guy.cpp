@@ -643,7 +643,11 @@ void Guy::Update(Map *map,world_t *world)
 	}*/
 
 	if (weak > 0)
+	{
 		weak--;
+		if(Random(32)==0)
+			ExplodeParticles(PART_HAMMER,x,y,z,6);
+	}
 	if (strong > 0 && !weak)
 		strong--;
 	if (confuse > 0)
@@ -1235,7 +1239,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		hp=0;
 		GoalKilledSomebody(this,type,frozen);
 		garlic=0;
-		speedy=0;
+		quick=0;
 		ignited=0;
 		frozen=0;
 		confuse=0;
@@ -1504,8 +1508,8 @@ void UpdateGuys(Map *map,world_t *world)
 					guys[i]->Update(map, world);
 				}
 
-				if (guys[i]->type != 0 && guys[i]->speedy) {
-					guys[i]->speedy--;
+				if (guys[i]->type != 0 && guys[i]->quick) {
+					guys[i]->quick--;
 					guys[i]->Render(1);
 					guys[i]->Update(map, world);
 				}
@@ -1714,7 +1718,7 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->strong = 0;
 			guys[i]->confuse = 0;
 			guys[i]->garlic = 0;
-			guys[i]->speedy = 0;
+			guys[i]->quick = 0;
 			guys[i]->specialFlags = 0;
 			guys[i]->mapx=(guys[i]->x>>FIXSHIFT)/TILE_WIDTH;
 			guys[i]->mapy=(guys[i]->y>>FIXSHIFT)/TILE_HEIGHT;
@@ -2284,7 +2288,7 @@ byte FindVictims(int x,int y,byte size,int dx,int dy,byte damage,Map *map,world_
 
 	for(i=0;i<maxGuys;i++)
 	{
-		if(slow&&guys[i]->type>0)
+		if(slow&&guys[i]->ouch>0)
 			continue;
 		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly))
 		{
@@ -2321,7 +2325,7 @@ void AddToBar(byte& bar, int amt)
 	int i=(int)bar;
 	if(i+amt>255)
 		i=255;
-	else if(i-amt<=0)
+	else if(i+amt<=0)
 		i=0;
 	else
 		i+=amt;
@@ -2360,7 +2364,7 @@ byte Inflict(Guy* me,byte effect,byte amt)
 			AddToBar(me->garlic,amt);
 			return 1;
 		case GEF_SPEEDY:
-			AddToBar(me->speedy,amt);
+			AddToBar(me->quick,amt);
 			return 1;
 	}
 }
@@ -3529,7 +3533,7 @@ void SetMonsterTempCondition(byte fx, int x, int y, int type, int cond, int amt)
 				AddAfflictionSpecial(guys[i]->garlic, amt, fx);
 				break;
 			case 7:
-				AddAfflictionSpecial(guys[i]->speedy, amt, fx);
+				AddAfflictionSpecial(guys[i]->quick, amt, fx);
 				break;
 			}
 		}
@@ -4195,7 +4199,7 @@ byte CheckMonsterTempCondition(int x, int y, int type, byte flags, byte trg, int
 				b=guys[i]->garlic;
 				break;
 			case 7:
-				b=guys[i]->speedy;
+				b=guys[i]->quick;
 				break;
 			}
 

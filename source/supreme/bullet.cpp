@@ -441,7 +441,6 @@ void Splat(bullet_t* me)
 			Remove(me);
 			break;
 		case BLT_SPOREBALL:
-			MakeSound(SND_ENERGYBONK, me->x, me->y, SND_CUTOFF, 950);
 			ExplodeParticles(PART_SLIME, me->x, me->y, me->z, 8);
 			Remove(me);
 			break;
@@ -617,6 +616,7 @@ byte OnHitWall(bullet_t* me)
 		case BLT_ICEWOLFICE:
 		case BLT_WIND:
 		case BLT_SHROOM:
+		case BLT_SPOREBALL:
 			return 3; // runs out
 		case BLT_GRENADE:
 		case BLT_ICECLOUD:
@@ -634,7 +634,6 @@ byte OnHitWall(bullet_t* me)
 		case BLT_FLAME:
 		case BLT_FLAME2:
 		case BLT_FLAME3:
-		case BLT_SPOREBALL:
 			return 4; // pushes back, and that's all
 		default:
 			return 0; // does nothing
@@ -880,7 +879,7 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_COMET:
 			me->type=BLT_COMETBOOM;
-			SetBulletVars(me,0,0,0,0,18,0);
+			SetBulletVars(me,0,0,0,18,0);
 			MakeSound(SND_INFERNAL,me->x,me->y,SND_CUTOFF,200);
 			break;
 		case BLT_BIGSHELL:
@@ -934,7 +933,7 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_GRENADE:
 			me->type=BLT_YELBOOM;
-			SetBulletVars(me,0,0,0,0,9,0);
+			SetBulletVars(me,0,0,0,9,0);
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,950);
 			break;
 		case BLT_SNOWBALL:
@@ -969,7 +968,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_HOLESHOT:
 			me->type = BLT_BLACKHOLE;
-			SetBulletVars(me,0,0,me->dz,me->z,30*2+50,0);
+			SetBulletVars(me,0,me->dz,me->z,30*2+50,0);
 			break;
 		case BLT_MINIFBALL:
 		case BLT_YELWAVE:
@@ -1010,7 +1009,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_TORPEDO:
 			me->type=BLT_LILBOOM2;
-			SetBulletVars(me,0,0,0,me->z,9,0);
+			SetBulletVars(me,0,0,me->z,9,0);
 			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1500);
 			break;
 		case BLT_ACID:
@@ -1032,7 +1031,7 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_ORBITER2:
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,2000);
 			me->type=BLT_BOOM;
-			SetBulletVars(me,0,0,0,me->z,7,0);
+			SetBulletVars(me,0,0,me->z,7,0);
 			break;
 		case BLT_SHROOM:
 			for(i=0;i<256;i+=8)
@@ -1086,10 +1085,10 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 		case BLT_SPOREBALL:
 			for(i=0;i<256;i+=16)
 			{
-				FireExactBullet(me->x,me->y,me->z,Cosine(i)*12,Sine(i)*12,0,0,16,i,BLT_SPORE,me->friendly);
+				FireExactBullet(me->x+Cosine(i)*16,me->y+Sine(i)*16,me->z,Cosine(i)*12,Sine(i)*12,0,0,16,i,BLT_SPORE,me->friendly);
 			}
-			Remove(me);
 			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1000);
+			Splat(me);
 			break;
 	}
 }
@@ -1407,7 +1406,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_YELWAVE:
-			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx, me->dy, 8, map, world, me->friendly))
+			if (FindVictim(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 12, me->dx*2, me->dy*2, 8, map, world, me->friendly))
 			{
 				// hit noise
 				BulletRanOut(me, map, world);
@@ -1465,11 +1464,11 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_BIGAXE:
 			if(FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, (4 - Random(9)) << FIXSHIFT,
-				(4 - Random(9)) << FIXSHIFT, 4, map, world, me->friendly, 1)
-				|| InflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, (4 - Random(9)) << FIXSHIFT,
-					(4 - Random(9)) << FIXSHIFT, GEF_WEAK, 5, map, world, me->friendly, 1))
+				(4 - Random(9)) << FIXSHIFT, 4, map, world, me->friendly, 1)||
+				InflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, (4 - Random(9)) << FIXSHIFT,
+					(4 - Random(9)) << FIXSHIFT, GEF_WEAK, 8, map, world, me->friendly,1))
 			{
-				ExplodeParticles2(PART_SNOW2,me->x,me->y,me->z,10,8);
+				ExplodeParticles2(PART_SNOW2, me->x, me->y, me->z, 10, 8);
 			}
 			break;
 		case BLT_YELBOOM:
@@ -1788,10 +1787,18 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				Splat(me);
 			}
 			break;
+		case BLT_SPOREBALL:
+			if(FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, me->dx, me->dy, 8, map, world, me->friendly, 1)||
+				InflictVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, me->dx, me->dy, GEF_POISON, 32, map, world, me->friendly,1))
+			{
+				ExplodeParticles2(PART_SLIME, me->x, me->y, me->z, 10, 8);
+			}
+			break;
 	}
 	attackType=BLT_NONE;
 }
 
+// Gets the bullet to face the targeted goodguy/enemy.
 inline void BulletFaceGuy(bullet_t *me,Guy *goodguy)
 {
 	int desired;
@@ -1932,14 +1939,62 @@ void RepositionMissile(bullet_t* me)
 		me->facing -= 16;
 }
 
+// Sets tallness and frequency of wavy bullets
+void SetTallFreq(bullet_t *me)
+{
+	// get tall
+	switch(me->type)
+	{
+		case BLT_YELWAVE:
+			me->tall = 8;
+			me->freq = 16;
+			break;
+		default:
+			me->tall = 4;
+			me->freq = 8;
+			break;
+	}
+}
+
 // Adds waviness to bullets by modifying their dx and dy variables.
 // Credit to SpaceManiac for helping with the math!!
-void AddWaviness(bullet_t *me,int tall,int freq,int spd)
+void AddWaviness(bullet_t *me)
 {
-	byte f = me->facing;
 
-	int ux = spd * Cosine(freq),
-		uy = tall * Sine(me->frms * freq),
+	byte f = me->facing;
+	if (BulletFacingType(me->type) == 7)
+		f *= 32;
+
+	int ux = me->speed * Cosine(me->freq),
+		uy = me->tall * Sine(me->frms * me->freq),
+		vx = Cosine(f)*ux - Sine(f)*uy,
+		vy = Sine(f)*ux + Cosine(f)*uy;
+	me->dx = vx/256;
+	me->dy = vy/256;
+}
+
+// Sets curve of curvy bullets
+void SetCurveClen(bullet_t *me)
+{
+	switch(me->type)
+	{
+		default:
+			me->curve = 4;
+			break;
+	}
+}
+
+// Adds curviness to bullets by modifying their dx and dy variables.
+// Credit to SpaceManiac for helping with the math!!
+void AddCurviness(bullet_t *me)
+{
+
+	byte f = me->facing;
+	if (BulletFacingType(me->type) == 7)
+		f *= 32;
+
+	int ux = me->speed * Cosine(me->frms * me->curve),
+		uy = me->speed * Sine(me->frms * me->curve),
 		vx = Cosine(f)*ux - Sine(f)*uy,
 		vy = Sine(f)*ux + Cosine(f)*uy;
 	me->dx = vx/256;
@@ -1967,7 +2022,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	activeBulDY=me->dy;
 	b=0;
 
-	//AddWaviness(me, 4, 8, 4); (this is a pretty good preset O_O)
+	
 	if (me->type == BLT_LASERBEAM)
 	{
 		me->x += me->dx;
@@ -2010,8 +2065,14 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 		BulletHitFloor(me,map,world);
 
 	// all gravity-affected bullets, get gravitized
-	if(me->flags&BFL_GRAVITY || HasGravity(me))
+	if(me->flags&BFL_GRAVITY)
 		me->dz-=FIXAMT/GetGravityAmt(me);
+
+	if(me->flags&BFL_WAVY)
+		AddWaviness(me);
+
+	if(me->flags&BFL_CURVY)
+		AddCurviness(me);
 
 	me->timer--;
 	if(!me->timer)
@@ -3002,11 +3063,11 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			}
 			me->type=BLT_NONE;	// begone immediately
 			break;
-		case BLT_CLAW:
+		default:
 			HitBadguys(me,map,world);
 			break;
 	}
-	if (me->flags & BFL_HOMING)
+	if (me->flags&BFL_HOMING)
 	{
 		me->target=LockOn3(me->x >> FIXSHIFT, me->y >> FIXSHIFT,1200,me->friendly);
 		if (!GetGuyPos(me->target, &mapx, &mapy))
@@ -3360,8 +3421,14 @@ void RenderBullet(bullet_t *me)
 			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_YELWAVE:
-			curSpr = bulletSpr->GetSprite(SPR_WAVE + (me->facing));
+			curSpr = bulletSpr->GetSprite(SPR_WAVE + (me->facing)%8);
 			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
+			for (v = 0; v < 3; v++)
+			{
+				x = me->x - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
+				y = me->y - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
+				SprDrawBulletOffXY(x,y,me,curSpr,0,0);
+			}
 			break;
 		case BLT_BIGSHELL:
 			curSpr=bulletSpr->GetSprite(SPR_BOOM);
@@ -3554,6 +3621,10 @@ void RenderBullet(bullet_t *me)
 			SprDraw(me->x>>FIXSHIFT,me->y>> FIXSHIFT,0,255,me->bright,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
 			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,DISPLAY_DRAWME);
 			break;
+		case BLT_SPOREBALL:
+			curSpr=bulletSpr->GetSprite(SPR_GRENADE);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
+			break;
 	}
 }
 
@@ -3603,6 +3674,22 @@ byte HasGravity(bullet_t* me) {
 		case BLT_SHARK:
 		case BLT_SQUIRT:
 			return 1;
+	}
+}
+
+byte LikesToWave(bullet_t* me) {
+	switch(me->type)
+	{
+		default:
+			return 0;
+	}
+}
+
+byte LikesToCurve(bullet_t* me) {
+	switch(me->type)
+	{
+		default:
+			return 0;
 	}
 }
 
@@ -3663,15 +3750,16 @@ void CheckRecolor(bullet_t *me){
 			RecolorBullet(me, 1, 7);
 			break;
 		case BLT_SPOREBALL:
-			RecolorBullet(me, 4, 1);
+			RecolorBullet(me, 5, 1);
+			break;
 		default:
 			UncolorBullet(me);
 			break;
 	}
 }
 
-// Easy way to set initial bullet variables
-void SetBulletVars(bullet_t* me, int dx, int dy, int dz, int z, int timer, byte type) {
+// Easy way to set initial bullet variables.
+void SetBulletVars(bullet_t* me, int speed, int dz, int z, int timer, byte type) {
 	byte f;
 	switch (type) {
 	default:
@@ -3686,11 +3774,21 @@ void SetBulletVars(bullet_t* me, int dx, int dy, int dz, int z, int timer, byte 
 	}
 	CheckRecolor(me);
 	me->anim = 0;
-	me->dx = Cosine(f) * dx;
-	me->dy = Sine(f) * dy;
+	me->dx = Cosine(f) * speed;
+	me->dy = Sine(f) * speed;
+	me->speed = speed;
 	me->dz = dz;
 	me->z = z;
 	me->timer = timer;
+
+	if(HasGravity(me) && !(me->flags & BFL_GRAVITY))
+		me->flags |= BFL_GRAVITY;
+
+	if (LikesToWave(me) && !(me->flags & BFL_WAVY))
+		me->flags |= BFL_WAVY;
+
+	if (LikesToCurve(me) && !(me->flags & BFL_CURVY))
+		me->flags |= BFL_CURVY;
 }
 
 void SetMissileFacing(byte &facing){
@@ -3721,11 +3819,13 @@ void SetMissileOffset(int &x, int &y){
 	y += ((Random(17) - 8) << FIXSHIFT);
 }
 
+// Gives flame bullets a shaking effect.
 void SetFlameOffset(int &x, int &y, byte facing){
 	x += ((Random(3) - 1) << FIXSHIFT) + Cosine(facing * 32) * 5;
 	y += ((Random(3) - 1) << FIXSHIFT) + Sine(facing * 32) * 5;
 }
 
+// Gives laser bullets a shaking effect.
 void SetLaserOffset(int &x, int &y){
 	x+=((Random(3)-1)<<FIXSHIFT)+FIXAMT/2-Random(FIXAMT);
 	y+=((Random(3)-1)<<FIXSHIFT)+FIXAMT/2-Random(FIXAMT);
@@ -3749,35 +3849,37 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 	switch(me->type)
 	{
 		case BLT_HOLESHOT:
-			SetBulletVars(me,8,8,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_COMET:
-			SetBulletVars(me,0,0,-FIXAMT*50,400*FIXAMT+Random(300*FIXAMT),255,BD_NONE);
+			SetBulletVars(me,0,-FIXAMT*50,400*FIXAMT+Random(300*FIXAMT),255,BD_NONE);
 			me->anim=(byte)Random(8);
 			break;
 		case BLT_SLIME:
-			SetBulletVars(me,0,0,0,0,12*16,BD_NONE);
+			SetBulletVars(me,0,0,0,12*16,BD_NONE);
 			break;
 		case BLT_LIQUIFY:
-			SetBulletVars(me,0,0,0,0,6,BD_NONE);
+			SetBulletVars(me,0,0,0,6,BD_NONE);
 			break;
 		case BLT_ICEBEAM:
-			SetBulletVars(me,0,0,0,FIXAMT*20,5,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*20,5,BD_NONE);
 			break;
 		case BLT_DEATHBEAM:
 			z=FIXAMT*45;
 			if(me->facing==32*0 || me->facing==32*4)
 				z=FIXAMT*50;
-			SetBulletVars(me,0,0,0,z,5,BD_NONE);
+			SetBulletVars(me,0,0,z,5,BD_NONE);
 			break;
 		case BLT_DEATHBEAM2:
-			SetBulletVars(me,0,0,0,FIXAMT*40,8,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*40,8,BD_NONE);
 			break;
 		case BLT_BIGYELLOW:
-			SetBulletVars(me,4,4,0,FIXAMT*30,30*10,BD_NONE);
+			SetBulletVars(me,4,0,FIXAMT*30,30*10,BD_NONE);
 			break;
 		case BLT_YELWAVE:
-			SetBulletVars(me,10,10,0,FIXAMT*2,60,BD_EIGHT);
+			me->flags |= BFL_WAVY;
+			SetTallFreq(me);
+			SetBulletVars(me,8,0,FIXAMT*2,60,BD_EIGHT);
 			break;
 		case BLT_COIN:
 		case BLT_BIGCOIN:
@@ -3791,58 +3893,58 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_SCANSHOT:
 			me->facing=Random(256);
-			SetBulletVars(me,4,4,0,me->z,60,BD_NONE);
+			SetBulletVars(me,4,0,me->z,60,BD_NONE);
 			break;
 		case BLT_SCANNER:
 			//me->dx=Cosine(facing*32)*16;
 			//me->dy=Sine(facing*32)*16;
 			me->facing=facing*32;
-			SetBulletVars(me,16,16,0,me->z,60,BD_NONE);
+			SetBulletVars(me,16,0,me->z,60,BD_NONE);
 			break;
 		case BLT_SWAP:
 			me->facing=facing*32;
-			SetBulletVars(me,10,10,0,me->z,120,BD_NONE);
+			SetBulletVars(me,10,0,me->z,120,BD_NONE);
 			break;
 		case BLT_REFLECT:
-			SetBulletVars(me,0,0,0,0,9,BD_NONE);
+			SetBulletVars(me,0,0,0,9,BD_NONE);
 			break;
 		case BLT_BOOM:
-			SetBulletVars(me,0,0,0,0,7,BD_NONE);
+			SetBulletVars(me,0,0,0,7,BD_NONE);
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,1800);
 			break;
 		case BLT_BALLLIGHTNING:
 		case BLT_BADLIGHTNING:
-			SetBulletVars(me,11,11,0,FIXAMT*20,30,BD_EIGHT);
+			SetBulletVars(me,11,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_HAMMER:
 		case BLT_HAMMER2:
-			SetBulletVars(me,12,12,me->dz,FIXAMT*20,30,BD_EIGHT);
+			SetBulletVars(me,12,me->dz,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_LUNA:
 		case BLT_LUNA2:
 		case BLT_FIREBALL:
 		case BLT_FIREBALL2:
-			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
+			SetBulletVars(me,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_CHEESEHAMMER:
-			SetBulletVars(me,14,14,0,FIXAMT*15,50,BD_EIGHT);
+			SetBulletVars(me,14,0,FIXAMT*15,50,BD_EIGHT);
 			break;
 		case BLT_EVILHAMMER:
-			SetBulletVars(me,12,12,FIXAMT*10,FIXAMT*20,30,BD_EIGHT);
+			SetBulletVars(me,12,FIXAMT*10,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BADLUNA:
 		case BLT_BADLUNA2:
-			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
+			SetBulletVars(me,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BADFBALL:
 			RecolorBullet(me,5,0);
-			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_EIGHT);
+			SetBulletVars(me,12,0,FIXAMT*20,30,BD_EIGHT);
 			break;
 		case BLT_BOMB:
-			SetBulletVars(me,8,8,FIXAMT*5,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,8,FIXAMT*5,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_IGNITE:
-			SetBulletVars(me,12,12,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,12,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_MISSILE:
 		case BLT_MAGICMISSILE:
@@ -3850,7 +3952,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->target=65535;
 			SetMissileFacing(me->facing);
 			SetMissileOffset(me->x,me->y);
-			SetBulletVars(me,4,4,0,FIXAMT*20,60,BD_SIXTEEN);
+			SetBulletVars(me,4,0,FIXAMT*20,60,BD_SIXTEEN);
 			MakeSound(SND_MISSILELAUNCH,me->x,me->y,SND_CUTOFF,1100);
 			break;
 		case BLT_TORPEDO:
@@ -3873,25 +3975,25 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 		case BLT_ACID:
 		case BLT_SHARK:
 		case BLT_FREEZE2:
-			SetBulletVars(me,10,10,FIXAMT*4,FIXAMT*10,30,BD_NONE);
+			SetBulletVars(me,10,FIXAMT*4,FIXAMT*10,30,BD_NONE);
 			SetSplatFacing(me->facing);
 			break;
 		case BLT_FREEZE:
-			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*10,30,BD_NONE);
+			SetBulletVars(me,8,FIXAMT*4,FIXAMT*10,30,BD_NONE);
 			SetSplatFacing(me->facing);
 			break;
 		case BLT_SQUIRT:
-			SetBulletVars(me,10,10,FIXAMT*4,FIXAMT*10,20,BD_NONE);
+			SetBulletVars(me,10,FIXAMT*4,FIXAMT*10,20,BD_NONE);
 			SetSplatFacing(me->facing);
 			break;
 		case BLT_QUEENACID:
-			SetBulletVars(me,10,10,FIXAMT*8,FIXAMT*10,60,BD_NONE);
+			SetBulletVars(me,10,FIXAMT*8,FIXAMT*10,60,BD_NONE);
 			SetSplatFacing(me->facing);
 			break;
 		case BLT_FLAME:
 		case BLT_FLAME2:
 			SetFlameOffset(me->x,me->y,me->facing);
-			SetBulletVars(me,10,10,-FIXAMT/2,FIXAMT*20,24-Random(4),BD_EIGHT);
+			SetBulletVars(me,10,-FIXAMT/2,FIXAMT*20,24-Random(4),BD_EIGHT);
 			if(Random(5)==0)
 				MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,1100);
 			break;
@@ -3899,14 +4001,14 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->anim = 4;
 			me->facing = Random(256);
 			SetFlameOffset(me->x,me->y,me->facing);
-			SetBulletVars(me,1,1,FIXAMT/2,FIXAMT*20,24-Random(4),BD_NONE);
+			SetBulletVars(me,1,FIXAMT/2,FIXAMT*20,24-Random(4),BD_NONE);
 			break;
 		case BLT_SITFLAME:
 		case BLT_BADSITFLAME:
 			me->facing = Random(256);
 			SetFlameOffset(me->x,me->y,me->facing);
 			f=Random(FIXAMT*6)+FIXAMT;
-			SetBulletVars(me,f/FIXAMT,f/FIXAMT,Random(FIXAMT*4)+FIXAMT,FIXAMT*20,30+Random(30*15),BD_NONE);
+			SetBulletVars(me,f/FIXAMT,Random(FIXAMT*4)+FIXAMT,FIXAMT*20,30+Random(30*15),BD_NONE);
 			MakeSound(SND_FLAMEGO, me->x, me->y, SND_CUTOFF, 1100);
 			break;
 		case BLT_LASER:
@@ -3933,7 +4035,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->target = 255 + 255 * 256;
 			break;
 		case BLT_ENERGY:
-			SetBulletVars(me,8,8,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_MEGABEAM:
 			me->anim=0;
@@ -3953,53 +4055,53 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->dz=0;
 			break;
 		case BLT_SPORE:
-			SetBulletVars(me,4,4,0,FIXAMT*16,16,BD_NONE);
+			SetBulletVars(me,4,0,FIXAMT*16,16,BD_NONE);
 			break;
 		case BLT_SHROOM:
-			SetBulletVars(me,8,8,0,FIXAMT*32,60,BD_EIGHT);
+			SetBulletVars(me,8,0,FIXAMT*32,60,BD_EIGHT);
 			break;
 		case BLT_GRENADE:
 			f=Random(12)+1;
-			SetBulletVars(me,f,f,FIXAMT*20,FIXAMT*80,255,BD_NONE);
+			SetBulletVars(me,f,FIXAMT*20,FIXAMT*80,255,BD_NONE);
 			break;
 		case BLT_ALIENEGG:
 			f=Random(12)+1;
-			SetBulletVars(me,f,f,FIXAMT*10,FIXAMT*80,60,BD_NONE);
+			SetBulletVars(me,f,FIXAMT*10,FIXAMT*80,60,BD_NONE);
 			break;
 		case BLT_SHOCKWAVE:
 		case BLT_GOODSHOCK:
-			SetBulletVars(me,0,0,0,0,7,BD_NONE);
+			SetBulletVars(me,0,0,0,7,BD_NONE);
 			break;
 		case BLT_SNOWBALL:
-			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
+			SetBulletVars(me,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
 			break;
 		case BLT_BIGSNOW:
-			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
+			SetBulletVars(me,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
 			break;
 		case BLT_ICESPIKE:
 		case BLT_DIRTSPIKE:
-			SetBulletVars(me,0,0,0,0,9,BD_NONE);
+			SetBulletVars(me,0,0,0,9,BD_NONE);
 			break;
 		case BLT_ROCK:
-			SetBulletVars(me,6,6,FIXAMT*8,FIXAMT*20,60,BD_EIGHT);
+			SetBulletVars(me,6,FIXAMT*8,FIXAMT*20,60,BD_EIGHT);
 			break;
 		case BLT_SPINE:
-			SetBulletVars(me,8,8,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*20,60,BD_NONE);
 			me->facing/=16;
 			break;
 		case BLT_BIGSHELL:
-			SetBulletVars(me,12,12,-FIXAMT*3,FIXAMT*50,30,BD_NONE);
+			SetBulletVars(me,12,-FIXAMT*3,FIXAMT*50,30,BD_NONE);
 			break;
 		case BLT_MINIFBALL:
-			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,12,0,FIXAMT*20,30,BD_NONE);
 			me->facing/=16;
 			break;
 		case BLT_ICECLOUD:
-			SetBulletVars(me,1,1,-FIXAMT/2,FIXAMT*10,16,BD_NONE);
+			SetBulletVars(me,1,-FIXAMT/2,FIXAMT*10,16,BD_NONE);
 			MakeSound(SND_FLAMEGO, me->x, me->y, SND_CUTOFF, 1100);
 			break;
 		case BLT_BIGAXE:
-			SetBulletVars(me,11,11,0,FIXAMT*20,90,BD_EIGHT);
+			SetBulletVars(me,11,0,FIXAMT*20,90,BD_EIGHT);
 			break;
 		case BLT_LIGHTNING:
 		case BLT_LIGHTNING2:
@@ -4007,46 +4109,46 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_SPEAR:
 		case BLT_BADSPEAR:
-			SetBulletVars(me,9,9,FIXAMT*6,FIXAMT*20,60,BD_EIGHT);
+			SetBulletVars(me,9,FIXAMT*6,FIXAMT*20,60,BD_EIGHT);
 			break;
 		case BLT_HARPOON:
-			SetBulletVars(me,12,12,FIXAMT,FIXAMT*10,90,BD_EIGHT);
+			SetBulletVars(me,12,FIXAMT,FIXAMT*10,90,BD_EIGHT);
 			break;
 		case BLT_SLASH:
-			SetBulletVars(me,0,0,0,FIXAMT*20,10,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*20,10,BD_NONE);
 			break;
 		case BLT_MINE:
 			me->facing=2;
-			SetBulletVars(me,0,0,0,0,50,BD_NONE);
+			SetBulletVars(me,0,0,0,50,BD_NONE);
 			if(curMap->flags&MAP_UNDERWATER)
 				me->z=FIXAMT*10;
 			break;
 		case BLT_GREEN:
 		case BLT_BADGREEN:
-			SetBulletVars(me,8,8,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_ORBITER:
-			SetBulletVars(me,0,0,0,FIXAMT*20,40,BD_EIGHT);
+			SetBulletVars(me,0,0,FIXAMT*20,40,BD_EIGHT);
 			me->anim=15;
 			me->dx=Cosine(me->facing*32)*8+Sine(me->facing*32)*4;
 			me->dy=Sine(me->facing*32)*8+Cosine(me->facing*32)*4;
 			me->target=65535;
 			break;
 		case BLT_ORBITER2:
-			SetBulletVars(me,0,0,0,FIXAMT*20,10,BD_EIGHT);
+			SetBulletVars(me,0,0,FIXAMT*20,10,BD_EIGHT);
 			me->anim=15;
 			me->dx=Cosine(me->facing*32)*8+Sine(me->facing*32)*4;
 			me->dy=Sine(me->facing*32)*8+Cosine(me->facing*32)*4;
 			me->target=65535;
 			break;
 		case BLT_MINDWIPE:
-			SetBulletVars(me,10,10,0,FIXAMT*20,40,BD_NONE);
+			SetBulletVars(me,10,0,FIXAMT*20,40,BD_NONE);
 			break;
 		case BLT_PAPER:
-			SetBulletVars(me,9,9,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,9,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_BUBBLE:
-			SetBulletVars(me,5,5,FIXAMT*4,FIXAMT*20,40+Random(30),BD_NONE);
+			SetBulletVars(me,5,FIXAMT*4,FIXAMT*20,40+Random(30),BD_NONE);
 			break;
 		case BLT_LILBOOM:
 		case BLT_LILBOOM2:
@@ -4058,38 +4160,38 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->timer=10;
 			break;
 		case BLT_EVILFACE:
-			SetBulletVars(me, 0, 0, 0, FIXAMT * 40, 300, BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*40,300,BD_NONE);
 			me->dx=-FIXAMT+Random(FIXAMT*2);
 			me->dy=-FIXAMT-Random(FIXAMT*2);
 			break;
 		case BLT_ENERGY2:
-			SetBulletVars(me,8,8,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_BIGSHOT:
-			SetBulletVars(me,6,6,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,6,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_FLAMEWALL:
-			SetBulletVars(me,0,0,0,0,12,BD_NONE);
+			SetBulletVars(me,0,0,0,12,BD_NONE);
 			MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,600);
 			break;
 		case BLT_FLAMESHOT:
-			SetBulletVars(me,7,7,0,0,60,BD_NONE);
+			SetBulletVars(me,7,0,0,60,BD_NONE);
 			me->anim=3;
 			MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,600);
 			break;
 		case BLT_EARTHSPIKE:
 		case BLT_EARTHSPIKE2:
-			SetBulletVars(me,0,0,0,0,30,BD_NONE);
+			SetBulletVars(me,0,0,0,30,BD_NONE);
 			break;
 		case BLT_GASBLAST:
-			SetBulletVars(me,4,4,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,4,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_MEGABOOM:
 			MakeSound(SND_BIGBOOM,me->x,me->y,SND_CUTOFF,1200);
-			SetBulletVars(me,0,0,0,FIXAMT*20,10,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*20,10,BD_NONE);
 			break;
 		case BLT_WHOOPEE:
-			SetBulletVars(me,2,2,0,FIXAMT*20,120,BD_NONE);
+			SetBulletVars(me,2,0,FIXAMT*20,120,BD_NONE);
 			break;
 		case BLT_FARLEYGAS: // unsure how to condense this
 			me->anim=0;
@@ -4101,56 +4203,56 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			me->dz=0;
 			break;
 		case BLT_CROAKERGAS:
-			SetBulletVars(me,4,4,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,4,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_CACTUS:
-			SetBulletVars(me,16,16,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,16,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_ICESHARD:
-			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,12,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_BOOMERANG:
 			me->target=-1;
-			SetBulletVars(me,8,8,0,FIXAMT*20,100,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*20,100,BD_NONE);
 			break;
 		case BLT_ICEWAND:
 		case BLT_ICEWAND2:
 			me->target=0;
-			SetBulletVars(me,12,12,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,12,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_ICEWOLFICE:
 			me->target=0;
-			SetBulletVars(me,10,10,0,FIXAMT*20,70,BD_NONE);
+			SetBulletVars(me,10,0,FIXAMT*20,70,BD_NONE);
 			break;
 		case BLT_BATSHOT:
-			SetBulletVars(me,12,12,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,12,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_WOLFSHOT:
-			SetBulletVars(me,16,16,0,FIXAMT*20,30,BD_NONE);
+			SetBulletVars(me,16,0,FIXAMT*20,30,BD_NONE);
 			break;
 		case BLT_BIGBOOM:
 			MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,1200);
-			SetBulletVars(me,0,0,0,FIXAMT*20,5,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*20,5,BD_NONE);
 			break;
 		case BLT_SWAMPGAS:
 		case BLT_SWAMPGAS2:
-			SetBulletVars(me,0,0,0,FIXAMT*2,3,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*2,3,BD_NONE);
 			break;
 		case BLT_ROCKETSMOKE:
-			SetBulletVars(me,0,0,0,FIXAMT*2,7,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*2,7,BD_NONE);
 			break;
 		case BLT_HOTPANTS:
-			SetBulletVars(me,8,8,0,FIXAMT*2,35,BD_NONE);
+			SetBulletVars(me,8,0,FIXAMT*2,35,BD_NONE);
 			me->target=LockOn3(me->x,me->y,600,me->friendly);
 			MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,600);
 			break;
 		case BLT_HOTDOGFIRE:
-			SetBulletVars(me,7,7,0,0,25,BD_NONE);
+			SetBulletVars(me,7,0,0,25,BD_NONE);
 			MakeSound(SND_FLAMEGO,me->x,me->y,SND_CUTOFF,600);
 			break;
 		case BLT_ROCKET:
 		case BLT_WIND:
-			SetBulletVars(me,0,0,0,FIXAMT*20,60,BD_NONE);
+			SetBulletVars(me,0,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_ORBGRENADE:
 			me->anim=0;
@@ -4166,7 +4268,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_FOUNTAIN:
 			MakeSound(SND_WATERSPURT,me->x,me->y,SND_CUTOFF,200);
-			SetBulletVars(me,0,0,0,0,15,BD_NONE);
+			SetBulletVars(me,0,0,0,15,BD_NONE);
 			break;
 		case BLT_WATER:
 			me->z=0;
@@ -4197,7 +4299,10 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			}
 			break;
 		case BLT_CLAW:
-			SetBulletVars(me,12,12,0,FIXAMT*20,150,BD_NONE);
+			SetBulletVars(me,12,0,FIXAMT*20,150,BD_NONE);
+			break;
+		case BLT_SPOREBALL:
+			SetBulletVars(me,6,0,FIXAMT*50,150,BD_NONE);
 			break;
 	}
 }
@@ -4775,7 +4880,11 @@ void ChangeBullet(byte fx,int x,int y,int type,int newtype,int friendly)
 							continue;
 				}
 
-				int dx = bullet[i].dx, dy = bullet[i].dy, f = bullet[i].facing;
+				int dx = bullet[i].dx,
+					dy = bullet[i].dy,
+					f = bullet[i].facing,
+					s = bullet[i].speed,
+					fl = bullet[i].flags;
 
 				if (type == BLT_LASER)
 					f /= 2;
@@ -4790,6 +4899,8 @@ void ChangeBullet(byte fx,int x,int y,int type,int newtype,int friendly)
 				FireMe(&bullet[i],bullet[i].x,bullet[i].y,f,newtype,bullet[i].friendly);
 				bullet[i].dx = dx;
 				bullet[i].dy = dy;
+				bullet[i].speed = s;
+				bullet[i].flags = fl;
 				if (fx)
 					BlowSmoke(bullet[i].x, bullet[i].y, 0, FIXAMT/8);
 			}

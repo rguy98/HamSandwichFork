@@ -6,7 +6,7 @@
 #include "display.h"
 
 #define PART_NONE		0
-#define PART_SNOW2		1	// speedy snow particles, just like hammer particles but white
+#define PART_SNOW2		1	// quick snow particles, just like hammer particles but white
 #define PART_SNOW		2
 #define PART_DIRT		3
 #define PART_HAMMER		5

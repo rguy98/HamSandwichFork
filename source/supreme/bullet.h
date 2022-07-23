@@ -145,6 +145,7 @@
 #define BLT_ALIENEGG		125
 #define BLT_SPOREBALL		126
 #define BLT_SQUIRT			127
+#define MAX_BULLETS			128
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1
@@ -153,8 +154,9 @@
 #define HMR_ATTRACT	8
 
 #define BFL_GRAVITY 1
-#define BFL_HOMING 	2
-#define BFL_WAVY	4
+#define BFL_WAVY	2
+#define BFL_CURVY	4
+#define BFL_HOMING	8
 
 #define CHT_ULTRA 	1
 #define CHT_JESUS 	2
@@ -168,9 +170,9 @@ typedef struct bullet_t
 {
 	int x,y,z;
 	int dx,dy,dz; // destination x/y/z
-	int ox,oy; // origin points (for calculating waviness)
 	int timer; // how many frames left - stops at 0
 	int frms; // how many frames so far - goes up
+	byte speed; // sets a speed!
 	word target;
 	byte anim;
 	byte facing;
@@ -179,6 +181,9 @@ typedef struct bullet_t
 	byte friendly;
 	byte flags;
 	byte fromColor,toColor;
+
+	// for wavy/circular bullets
+	byte tall,freq,curve;
 } bullet_t;
 
 void InitBullets(void);
@@ -211,13 +216,16 @@ void RemoveOrbiters(int n,byte f,byte t);
 void FireScanShots(Guy *victim);
 void MakeRadar(int rx,int ry,byte w);
 byte GetBulletAttackType(void);
+
 byte HasGravity(bullet_t* me);
+byte LikesToWave(bullet_t* me);
+byte LikesToCurve(bullet_t* me);
 int GetGravityAmt(bullet_t* me);
 
 void FireBullet(int x, int y, byte facing, byte type, byte friendly, word target);
 bullet_t *GetFireBullet(int x, int y, byte facing, byte type, byte friendly);
 void RecolorBullet(bullet_t *me, byte from, byte to);
-void SetBulletVars(bullet_t* me, int dx, int dy, int dz, int z, int timer, byte type);
+void SetBulletVars(bullet_t* me, int speed, int dz, int z, int timer, byte type);
 
 int CountBullets(byte type); // For specials to check orbiters
 int CountBulletsInRect(byte type,int x,int y,int x2,int y2); // for specials to check for bullets

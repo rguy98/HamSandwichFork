@@ -75,7 +75,7 @@ class Guy
 		byte strong;	// steelskin defense - increased resistance (dark grey)
 		byte confuse;	// confusion - inverted movement controls (light pink)
 		byte garlic;	// now applicable to more enemies - kills vampires quick!
-		byte speedy;	// now applicable to more enemies!
+		byte quick;	// now applicable to more enemies!
 		byte specialFlags;	// special flags (rainbow, white flash)
 
 		int aiType;
@@ -89,7 +89,7 @@ class Guy
 
 #define GSF_NEWAI		1	// New AI - avoids pre-mod conflict
 #define GSF_LOONY		2	// Rainbow - like a loonykey!
-#define GSF_FASTFWD		4	// 2x speed (stacks with speedy - BEWARE!)
+#define GSF_FASTFWD		4	// 2x speed (stacks with quick - BEWARE!)
 #define NUM_MONSFLAGS	3
 
 #define GEF_POISON	0

@@ -393,8 +393,9 @@ static char bulletName[][20]={
 	"Evil Boomerang",
 	"Queen's Acid",
 	"Alien Egg",
+	"Spore Ball",
+	"Soaker Water",
 };
-#define MAX_BULLETS (BLT_ALIENEGG + 1)
 
 static void SetupTriggerButtons(int t,int y);
 static void SetupEffectButtons(int t,int y);

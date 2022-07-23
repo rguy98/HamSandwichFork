@@ -1894,12 +1894,16 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			x+=Cosine(i)*48;
 			y+=Sine(i)*32;
 			i=(me->facing*32-16+Random(33))&255;
-			FireExactBullet(x,y,FIXAMT*64,Cosine(i)*12,Sine(i)*12,0,0,16,i,BLT_SPORE,me->friendly);
+			b=FireExactBullet(x,y,FIXAMT*64,Cosine(i)*8,Sine(i)*8,0,0,32,i,BLT_ENERGY,me->friendly);
 			MakeSound(SND_MUSHSPORES,me->x,me->y,SND_CUTOFF,600);
 			me->reload=1;
 		}
 		if(me->seq==ANIM_A1 && me->frm==16)
+		{
+			FaceGoodguy3(me,goodguy);
+
 			me->frmAdvance=64;	// slow the animation for the recovery part
+		}
 		if(me->seq==ANIM_ATTACK && me->frm==1 && me->reload==0)
 		{
 			x=me->x+Cosine(me->facing*32)*72;
@@ -1907,10 +1911,30 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			i=(me->facing*32+64)&255;
 			x+=Cosine(i)*48;
 			y+=Sine(i)*32;
-			b=GetFireBullet(x,y,me->facing,BLT_ROCKET,me->friendly);
+			b=GetFireBullet(x,y,me->facing*32,BLT_SPOREBALL,me->friendly);
 			if(b){
-				RecolorBullet(b,6,4);
+				b->flags |= BFL_WAVY;
+				b->tall = 6;
+				b->freq = 8;
+				b->speed = 4;
 				MakeSound(SND_MUSHMISSILE, me->x, me->y, SND_CUTOFF, 1000);
+			}
+			me->reload=5;
+		}
+		if(me->seq==ANIM_A2 && me->frm==4 && me->reload==0)
+		{
+			for(i=0;i<8;i++)
+			{
+				x=me->x+Cosine(i*32)*72;
+				y=me->y+Sine(i*32)*64;
+				b=GetFireBullet(x,y,i,BLT_YELWAVE,me->friendly);
+				if(b){
+					b->flags |= BFL_WAVY;
+					b->tall = 12;
+					b->freq = 16;
+					b->speed = 6;
+					b->timer *= 2;
+				}
 			}
 			me->reload=5;
 		}
@@ -1937,18 +1961,7 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		{
 			if(RangeToTarget(me,goodguy)<256*FIXAMT || me->ouch>0)
 			{
-				// get mad!
-				MakeSound(SND_MUSHMAD,me->x,me->y,SND_CUTOFF,1200);
-				me->seq=ANIM_A2;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
-				me->mind=2;		// destroy bouapha
-				me->facing=2;	// angry animation ONLY works from forward (memory saver)
+				me->mind=2;
 			}
 		}
 	}
@@ -1956,23 +1969,10 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	{
 		if(goodguy)
 		{
-			if(RangeToTarget(me,goodguy)<(256*FIXAMT) && Random(32)==0)
+			if(RangeToTarget(me,goodguy)<(384*FIXAMT) && Random(32)==0)
 			{
 				// get him! (fire shroom cannon)
 				me->seq=ANIM_ATTACK;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
-				return;
-			}
-			if(RangeToTarget(me,goodguy)<(256*FIXAMT) && Random(28)==0)
-			{
-				// get him! (fire sporegun)
-				me->seq=ANIM_A1;
 				me->frm=0;
 				me->frmTimer=0;
 				me->frmAdvance=256;
@@ -1982,8 +1982,31 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				me->reload=0;
 				return;
 			}
+			if(RangeToTarget(me,goodguy)<(384*FIXAMT) && Random(28)==0)
+			{
+				i=1;
+				if(me->hp < me->maxHP/2)
+					i++;
+				if(me->hp < me->maxHP/4)
+					i++;
+				me->mind2=Random(2)+i;
+			}
+			if(RangeToTarget(me,goodguy)<(384*FIXAMT) && Random(128)==0)
+			{
+				// get mad!
+				MakeSound(SND_MUSHMAD,me->x,me->y,SND_CUTOFF,1200);
+				me->facing=2;
+				me->seq=ANIM_A2;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				me->reload=0;
+				return;
+			}
 			FaceGoodguy2(me,goodguy);
-
 			me->dx=0;
 			me->dy=0;
 			if(me->seq!=ANIM_IDLE)
@@ -1991,9 +2014,9 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				me->seq=ANIM_IDLE;
 				me->frm=0;
 				me->frmTimer=0;
-				me->frmAdvance=128;
+				me->frmAdvance=192;
 			}
-			if(RangeToTarget(me,goodguy)>(256*FIXAMT))
+			if(RangeToTarget(me,goodguy)>(384*FIXAMT))
 			{
 				// chase him down!
 				me->mind=1;
@@ -2010,14 +2033,14 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		{
 			FaceGoodguy2(me,goodguy);
 
-			me->dx=Cosine(me->facing*32)*12;
-			me->dy=Sine(me->facing*32)*12;
+			me->dx=Cosine(me->facing*32)*4;
+			me->dy=Sine(me->facing*32)*4;
 			if(me->seq!=ANIM_MOVE)
 			{
 				me->seq=ANIM_MOVE;
 				me->frm=0;
 				me->frmTimer=0;
-				me->frmAdvance=192;
+				me->frmAdvance=64;
 			}
 			if(RangeToTarget(me,goodguy)<200*FIXAMT)
 				me->mind=2;	// in range, start killin'
@@ -2025,10 +2048,140 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		else
 			me->mind=0;
 	}
+
+	if(me->mind2>0)
+	{
+		// get him! (fire sporegun)
+		me->seq=ANIM_A1;
+		me->frm=0;
+		me->frmTimer=0;
+		me->frmAdvance=256;
+		me->action=ACTION_BUSY;
+		me->dx=0;
+		me->dy=0;
+		me->reload=0;
+		me->mind2--;
+			return;
+	}
+}
+
+void AI_GreatPumpkin(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y,i;
+	Guy *g;
+	byte f;
+
+	int pumpkins[5][2] = {{-64,40},{-32,40},{0,40},{32,40},{64,40}};
+
+	if(me->reload)
+		me->reload--;
+
+	if(me->ouch==4)
+	{
+		if(me->hp>0)
+			MakeSound(SND_GREATPKOUCH,me->x,me->y,SND_CUTOFF,1200);
+		else
+			MakeSound(SND_GREATPKDIE,me->x,me->y,SND_CUTOFF,1200);
+	}
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_ATTACK && me->frm==6 && me->frmTimer<32)
+		{
+			if(me->specialFlags & GSF_NEWAI)
+				i=Random(10);
+			else
+				i=0;
+
+			if(i<8)
+			{
+				for (i = 0; i < 5; i++)
+				{
+					g = AddBaby(me->x + FIXAMT * pumpkins[i][0], me->y + FIXAMT * pumpkins[i][1], 0, MONS_PUMPKIN, me);
+					if (g && (!g->CanWalk(g->x, g->y, map, world)))
+						RemoveGuy(g);
+					else if (g)
+					{
+						g->mind = 1;
+						g->mind1 = 120;
+					}
+				}
+			}
+			else
+			{
+				for (i = 0; i < 5; i+=2)
+				{
+					g = AddBaby(me->x + FIXAMT * pumpkins[i][0], me->y + FIXAMT * pumpkins[i][1], 0, MONS_PUMPKIN2, me);
+					if (g && (!g->CanWalk(g->x, g->y, map, world)))
+						RemoveGuy(g);
+					else if (g)
+					{
+						g->mind = 1;
+						g->mind1 = 120;
+					}
+				}
+			}
+			me->reload=60;
+			MakeSound(SND_GREATPKVOMIT,me->x,me->y,SND_CUTOFF,1100);
+		}
+
+		if(me->seq==ANIM_DIE)
+		{
+			x=me->x>>FIXSHIFT;
+			y=me->y>>FIXSHIFT;
+			BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,2);
+			BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
+					  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
+					  me->z,FIXAMT);
+			ShakeScreen(10);
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind>0)
+		me->mind--;
+
+	if(goodguy)
+		FaceGoodguy(me,goodguy);
+
+	if(me->mind==8)
+	{
+		// left eye fires
+		f=(me->facing*32-32+me->mind1)&255;
+
+		FireExactBullet(me->x-64*FIXAMT,me->y+32*FIXAMT,me->z+80*FIXAMT,
+					Cosine(f)*8,Sine(f)*8,-3*FIXAMT,0,30,me->facing,BLT_ENERGY2,me->friendly);
+	}
+	if(!me->mind)
+	{
+		// right eye fires
+		f=(me->facing*32+32-me->mind1)&255;
+		// can't fire backwards
+
+		if(f>128)
+			f=f<192?128:0;
+
+		FireExactBullet(me->x+64*FIXAMT,me->y+32*FIXAMT,me->z+80*FIXAMT,
+					Cosine(f)*8,Sine(f)*8,-3*FIXAMT,0,30,me->facing,BLT_ENERGY2,me->friendly);
+		me->mind=16;
+		me->mind1+=8;
+		if(me->mind1>=64)
+			me->mind1=0;
+	}
+
+	if(me->reload==0 && Random(20)==0)
+	{
+		me->seq=ANIM_ATTACK;
+		me->frm=0;
+		me->frmTimer=0;
+		me->frmAdvance=64;
+		me->action=ACTION_BUSY;
+	}
 }
 
 void AI_Voltage(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
+	bullet_t* b;
 	int x,y;
 
 	if(me->dx==0 && me->dy==0)
@@ -2056,7 +2209,14 @@ void AI_Voltage(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			x+=256;
 		if(x>255)
 			x-=256;
-		FireBullet(me->x,me->y,x,BLT_BADLIGHTNING,me->friendly);
+		b = GetFireBullet(me->x,me->y,x,BLT_BADLIGHTNING,me->friendly);
+		if(b)
+		{
+			b->flags |= BFL_WAVY;
+			b->tall = 8;
+			b->freq = 16;
+			b->speed = 8;
+		}
 	}
 	else
 		me->mind2--;
