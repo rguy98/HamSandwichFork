@@ -119,8 +119,3 @@ byte TurnToward(byte faceNow, byte newFace, byte spd)
 	else
 		return ((faceNow + spd * dir) & 255);
 }
-
-int CirclePi(int i)
-{
-	return (int)((float)i / DEGREES * 3.14159)*FIXAMT;
-}

@@ -168,7 +168,9 @@ typedef struct bullet_t
 {
 	int x,y,z;
 	int dx,dy,dz; // destination x/y/z
-	int timer; // how many frames left
+	int ox,oy; // origin points (for calculating waviness)
+	int timer; // how many frames left - stops at 0
+	int frms; // how many frames so far - goes up
 	word target;
 	byte anim;
 	byte facing;

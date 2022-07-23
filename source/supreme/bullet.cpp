@@ -334,6 +334,7 @@ void Splat(bullet_t* me)
 			Remove(me);
 			break;
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			MakeSound(SND_ACIDSPLAT, me->x, me->y, SND_CUTOFF, 950);
 			ExplodeParticles(PART_WATER, me->x, me->y, me->z, 6);
 			Remove(me);
@@ -439,6 +440,11 @@ void Splat(bullet_t* me)
 			ExplodeParticles(PART_WATER,me->x,me->y,me->z,8);
 			Remove(me);
 			break;
+		case BLT_SPOREBALL:
+			MakeSound(SND_ENERGYBONK, me->x, me->y, SND_CUTOFF, 950);
+			ExplodeParticles(PART_SLIME, me->x, me->y, me->z, 8);
+			Remove(me);
+			break;
 		default:
 			Remove(me);
 			break;
@@ -460,6 +466,7 @@ void InteractWithWall(bullet_t *me, Map* map, world_t* world)
 		case BLT_ACID:
 		case BLT_QUEENACID:
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 		case BLT_ENERGY:
 		case BLT_ENERGY2:
 		case BLT_GREEN:
@@ -569,6 +576,7 @@ byte OnHitWall(bullet_t* me)
 		case BLT_YELWAVE:
 		case BLT_ACID:
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 		case BLT_ENERGY:
 		case BLT_ENERGY2:
 		case BLT_GREEN:
@@ -626,6 +634,7 @@ byte OnHitWall(bullet_t* me)
 		case BLT_FLAME:
 		case BLT_FLAME2:
 		case BLT_FLAME3:
+		case BLT_SPOREBALL:
 			return 4; // pushes back, and that's all
 		default:
 			return 0; // does nothing
@@ -678,12 +687,6 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 				if (me->dx < 0)
 					me->facing = (me->facing + 128) & 255;
 				break;
-			case BLT_FLAME:
-			case BLT_FLAME2:
-			case BLT_FLAME3:
-				me->dy=((3-Random(7))<<FIXSHIFT);
-				Dampen(&me->dx,FIXAMT/2);
-				break;
 			case BLT_CACTUS:
 				me->facing=(byte)(84+Random(89));
 				if(me->dx<0)
@@ -692,7 +695,18 @@ void BulletHitWallX(bullet_t *me,Map *map,world_t *world)
 		}
 	}
 	else if(OnHitWall(me)==4)
+	{
 		me->x-=me->dx;
+		switch(me->type)
+		{
+			case BLT_FLAME:
+			case BLT_FLAME2:
+			case BLT_FLAME3:
+				me->dy=((3-Random(7))<<FIXSHIFT);
+				Dampen(&me->dx,FIXAMT/2);
+				break;
+		}
+	}
 		
 	InteractWithWall(me,map,world);
 
@@ -745,12 +759,6 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 				if (me->dy > 0)
 					me->facing += 128;
 				break;
-			case BLT_FLAME:
-			case BLT_FLAME2:
-			case BLT_FLAME3:
-				me->dx=((3-Random(7))<<FIXSHIFT);
-				Dampen(&me->dy,FIXAMT/2);
-				break;
 			case BLT_CACTUS:
 				me->facing=(byte)(20+Random(89));
 				if(me->dy>0)
@@ -759,7 +767,18 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 		}
 	}
 	else if(OnHitWall(me)==4)
+	{
 		me->y-=me->dy;
+		switch(me->type)
+		{
+			case BLT_FLAME:
+			case BLT_FLAME2:
+			case BLT_FLAME3:
+				me->dx=((3-Random(7))<<FIXSHIFT);
+				Dampen(&me->dy,FIXAMT/2);
+				break;
+		}
+	}
 
 	InteractWithWall(me,map,world);
 
@@ -905,6 +924,7 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_ACID:
 		case BLT_QUEENACID:
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			Splat(me);
 			break;
 		case BLT_SHROOM:
@@ -1062,6 +1082,14 @@ void BulletRanOut(bullet_t *me,Map *map,world_t *world)
 				}
 			}
 			Remove(me);
+			break;
+		case BLT_SPOREBALL:
+			for(i=0;i<256;i+=16)
+			{
+				FireExactBullet(me->x,me->y,me->z,Cosine(i)*12,Sine(i)*12,0,0,16,i,BLT_SPORE,me->friendly);
+			}
+			Remove(me);
+			MakeSound(SND_MISSILEBOOM,me->x,me->y,SND_CUTOFF,1000);
 			break;
 	}
 }
@@ -1474,6 +1502,15 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 				Inflict(GetLastGuyHit(), GEF_WEAK, 16);
 				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
 				ExplodeParticles(PART_SLIME,me->x,me->y,me->z,6);
+				Remove(me);
+			}
+			break;
+		case BLT_SQUIRT:
+			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,10,me->dx,me->dy,4,map,world,me->friendly))
+			{
+				Inflict(GetLastGuyHit(), GEF_BURN, -16);
+				MakeSound(SND_ACIDSPLAT,me->x,me->y,SND_CUTOFF,1000);
+				ExplodeParticles(PART_WATER,me->x,me->y,me->z,4);
 				Remove(me);
 			}
 			break;
@@ -1895,6 +1932,20 @@ void RepositionMissile(bullet_t* me)
 		me->facing -= 16;
 }
 
+// Adds waviness to bullets by modifying their dx and dy variables.
+// Credit to SpaceManiac for helping with the math!!
+void AddWaviness(bullet_t *me,int tall,int freq,int spd)
+{
+	byte f = me->facing;
+
+	int ux = spd * Cosine(freq),
+		uy = tall * Sine(me->frms * freq),
+		vx = Cosine(f)*ux - Sine(f)*uy,
+		vy = Sine(f)*ux + Cosine(f)*uy;
+	me->dx = vx/256;
+	me->dy = vy/256;
+}
+
 void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 {
 	int mapx,mapy;
@@ -1916,6 +1967,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	activeBulDY=me->dy;
 	b=0;
 
+	//AddWaviness(me, 4, 8, 4); (this is a pretty good preset O_O)
 	if (me->type == BLT_LASERBEAM)
 	{
 		me->x += me->dx;
@@ -1964,6 +2016,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 	me->timer--;
 	if(!me->timer)
 		BulletRanOut(me,map,world);
+	me->frms++;
 
 	if(!me->type)
 		return;
@@ -2204,6 +2257,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			break;
 		case BLT_ACID:
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			me->anim++;
 			if(me->anim>6)
 				me->anim=0;
@@ -3153,6 +3207,7 @@ void RenderBullet(bullet_t *me)
 			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			v=me->facing*7+me->anim+SPR_ACID;
 			curSpr=bulletSpr->GetSprite(v);
 			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
@@ -3546,6 +3601,7 @@ byte HasGravity(bullet_t* me) {
 		case BLT_FLAME3:
 		case BLT_ORBGRENADE:
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			return 1;
 	}
 }
@@ -3562,6 +3618,7 @@ int GetGravityAmt(bullet_t *me)
 		case BLT_ACID:
 		case BLT_QUEENACID:
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			return 2;
 	}
 }
@@ -3598,12 +3655,15 @@ void CheckRecolor(bullet_t *me){
 			RecolorBullet(me, 4, 0);
 			break;
 		case BLT_SHARK:
+		case BLT_SQUIRT:
 			RecolorBullet(me, 1, 3);
 			break;
 		case BLT_FREEZE:
 		case BLT_FREEZE2:
 			RecolorBullet(me, 1, 7);
 			break;
+		case BLT_SPOREBALL:
+			RecolorBullet(me, 4, 1);
 		default:
 			UncolorBullet(me);
 			break;
@@ -3684,6 +3744,7 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 	me->fromColor=255;
 	me->toColor=0;
 	me->flags=0;
+	me->frms=0;
 
 	switch(me->type)
 	{
@@ -3817,6 +3878,10 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_FREEZE:
 			SetBulletVars(me,8,8,FIXAMT*4,FIXAMT*10,30,BD_NONE);
+			SetSplatFacing(me->facing);
+			break;
+		case BLT_SQUIRT:
+			SetBulletVars(me,10,10,FIXAMT*4,FIXAMT*10,20,BD_NONE);
 			SetSplatFacing(me->facing);
 			break;
 		case BLT_QUEENACID:
@@ -4161,6 +4226,7 @@ void QuadMissile(int x,int y,byte facing,byte friendly)
 			me->dz=0;
 			me->target=65535;
 			me->flags=0;
+			me->frms=0;
 			me->x+=Cosine(me->facing*16)*10;
 			me->y+=Sine(me->facing*16)*10;
 			me->dx=Cosine(me->facing*16)*4;
@@ -4329,6 +4395,7 @@ void FireExactBullet(int x,int y,int z,int dx,int dy,int dz,byte anim,byte timer
 			bullet[i].facing=facing;
 			bullet[i].type=type;
 			bullet[i].target=65535;
+			bullet[i].frms=0;
 			bullet[i].flags=0;
 			CheckRecolor(&bullet[i]);
 			break;
@@ -4445,10 +4512,10 @@ void HappyFire(int x,int y,byte facing)
 {
 	byte happyList[]={BLT_HAMMER,BLT_HAMMER2,BLT_MISSILE,BLT_FLAME,BLT_LASER,BLT_BOMB,
 					  BLT_BALLLIGHTNING,BLT_BIGSHELL,BLT_BIGAXE,BLT_LIGHTNING,BLT_SPEAR,BLT_SLASH,
-					  BLT_GREEN,BLT_TORPEDO,BLT_BUBBLE,BLT_LUNA,BLT_FIREBALL,BLT_ROCKET};
+					  BLT_GREEN,BLT_TORPEDO,BLT_BUBBLE,BLT_LUNA,BLT_FIREBALL,BLT_ROCKET,BLT_BOOMERANG};
 	byte b;
 
-	b=happyList[Random(16)];
+	b=happyList[Random(17)];
 	if(b==BLT_BOMB || b==BLT_GREEN || b==BLT_BIGSHELL || b==BLT_BUBBLE)
 		facing*=32;
 	FireBullet(x,y,facing,b,1);
@@ -4869,11 +4936,15 @@ static const byte bulletFacingType[] = {
 	255,	
 	255,	
 	255,	
-	7,  	// BLT_LUNA	55
+	7,  	// evil luna
 	7,		// fireball
 	7,  	
 	255,  	
-	7,  	
+	7,  	// evil luna 2
+	255,  	
+	255,  	
+	255,  	
+	255,	// squirt gun  	
 };
 
 byte BulletFacingType(byte type)
