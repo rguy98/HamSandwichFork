@@ -3465,6 +3465,7 @@ void RenderBullet(bullet_t *me)
 			break;
 		case BLT_SPARKSHOT:
 			curSpr=bulletSpr->GetSprite(SPR_SCANSHOT+me->anim);
+			RecolorBullet(me,1,5);
 			SprDrawBullet(me, curSpr, 0, 0);
 			break;
 		case BLT_SCANLOCK:
@@ -3750,6 +3751,10 @@ void CheckRecolor(bullet_t *me){
 			RecolorBullet(me, 5, 1);
 			break;
 		case BLT_ENERGYPSN:
+		case BLT_SPARKSHOT:
+			RecolorBullet(me, 1, 5);
+			break;
+		case BLT_SONIC:
 			RecolorBullet(me, 1, 5);
 			break;
 		default:
@@ -4251,6 +4256,9 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_ROCKET:
 		case BLT_WIND:
+			me->target=65535;
+			SetMissileFacing(me->facing);
+			SetMissileOffset(me->x,me->y);
 			SetBulletVars(me,0,0,FIXAMT*20,60,BD_NONE);
 			break;
 		case BLT_ORBGRENADE:

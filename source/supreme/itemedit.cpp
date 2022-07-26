@@ -154,7 +154,21 @@ static char wpnName[64][64]={
 	"Scanner",
 	"Mini-Sub",
 	"Freeze Ray",
-	"Stopwatch"
+	"Stopwatch",
+	"Flamebringer",
+	"Lightreaver",
+	"Planetsmasher",
+	"Sparkthrower",
+	"Earsplitter",
+	"Bonecrusher",
+	"Rocket Launcher",
+	"Snowblower",
+	"Confuse Ray",
+	"Death Ray",
+	"B.F.G.",
+	"Torpedos",
+	"Super Soaker",
+	"Cucurbinator"
 };
 
 static char colorName[8][16]={

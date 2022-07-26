@@ -20,7 +20,43 @@ byte tportclock;
 int pStartX=-1,pStartY=-1;
 static byte oldControls,newControls,checkTheControls;
 
-int maxAmmo[MAX_WEAPONS]={1000,20,99,5,50,1000,15,40,20,30,8,3,1,40,10,3,50,5,1000,5,10,2,25,2,15,20,5,50,1,1,5,40,20,5};
+int maxAmmo[MAX_WEAPONS]={
+	1000, // n/a
+	20, // missiles
+	99, // ak
+	5, // bombs
+	50, // toaster
+	1000, // power armor
+	15, // big axe
+	40, // zap wand
+	20, // spears
+	30, // machete
+	8, // mines
+	3, // turrets
+	1, // mind control
+	40, // reflect
+	10, // jetpack
+	3, // swapgun
+	50, // torch
+	5, // scanner
+	1000, // minisub
+	5, // freeze ray
+	10, // stopwatch
+	5, // flamebringer
+	25, // lightreaver
+	2, // planetsmasher
+	15, // sparkthrower
+	20, // earsplitter
+	5, // bonecrusher
+	10, // rocket launcher
+	50, // snowblower
+	2, // confuse ray
+	1, // death ray
+	25, // BFG
+	20, // torpedos
+	40, // super soaker
+	5 // cucurbinator
+};
 
 void ShouldCheckControls(byte n)
 {
@@ -91,13 +127,11 @@ void InitPlayer(byte level,const char *fname)
 	playerGlow=0;
 	player.pushPower=0;
 	player.vehicle=0;
-	player.garlic=0; // todo: remove!
-	player.speed=0; // todo: remove!
 	player.rageClock=0;
 	player.rage=0;
 	player.varbar=0;
 	player.varbarMax=0;
-	player.invisibility=0;
+	player.invisibility=0; // Todo: remove
 	player.jetting=0;
 	player.clock=0;
 	player.combo=0;
@@ -138,7 +172,6 @@ void ExitPlayer(void)
 {
 	player.playAs=profile.playAs;
 	player.shield=0;
-	player.speed=0;
 	player.invisibility=0;
 	SaveProfile();
 }
@@ -760,8 +793,8 @@ byte FakeGetControls(void)
 
 void PlayerFireWeapon(Guy *me)
 {
-	byte c;
-	int i;
+	byte c,f;
+	int i,x,y;
 
 	if(player.life==0)
 		return;	// no shooting when you're dead
@@ -1048,95 +1081,121 @@ void PlayerFireWeapon(Guy *me)
 			}
 			break;
 		case WPN_IGNITE:
-			FireBullet(me->x,me->y,me->facing*32,BLT_IGNITE,me->friendly);
+			if (curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				FireBullet(me->x,me->y,me->facing*32,BLT_IGNITE,me->friendly);
+				player.wpns[player.curSlot].ammo--;
+			}
 			player.wpnReload=5;
 			break;
 		case WPN_PORTAL:
-			FireBullet(me->x,me->y,me->facing*32,BLT_HOLESHOT,me->friendly);
+			if (curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				FireBullet(me->x,me->y,me->facing*32,BLT_HOLESHOT,me->friendly);
+				player.wpns[player.curSlot].ammo--;
+			}
 			player.wpnReload=15;
 			break;
 		case WPN_REFLECT:
-			MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
-			FireBullet(me->x,me->y,me->facing,BLT_REFLECT,1);
-			if(Random(20)<5 && goodguy->hp<goodguy->maxHP)
+			if (curAmmo)
 			{
-				HealGoodguy(1);
+				ScoreEvent(SE_SHOOT,1);
+				MakeSound(SND_LIGHTSON, me->x, me->y, SND_CUTOFF, 1200);
+				FireBullet(me->x, me->y, me->facing, BLT_REFLECT, 1);
+				if (Random(20) < 5 && goodguy->hp < goodguy->maxHP)
+				{
+					HealGoodguy(16);
+				}
+				player.shield = 6;
+				player.wpns[player.curSlot].ammo--;
 			}
-
-			c=FakeGetControls();
-			player.shield=4;
-			if(c&CONTROL_B2)	// fire is held
+			c = FakeGetControls();
+			if (c & CONTROL_B2)	// fire is held
 			{
-				player.wpnReload=0;
+				player.wpnReload = 0;
 			}
 			else
 			{
-				player.wpnReload=10;
+				player.wpnReload = 10;
 			}
 			break;
 		case WPN_SPARKS:
-			MakeSound(SND_CACTONSHOOT,me->x,me->y,SND_CUTOFF,200);
-			for(i=0;i<(5/2)+1;i++)
-				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*24,me->facing*32,BLT_SCANSHOT,me->friendly);
-
-			me->z+=FIXAMT*Random(4);
-			me->dx+=FIXAMT/2-Random(FIXAMT);
-			me->dy+=FIXAMT/2-Random(FIXAMT);
-			c=FakeGetControls();
-			if(c&CONTROL_B2)	// fire is held
+			if (curAmmo)
 			{
-				player.wpnReload=2;
-				me->frmTimer=0;
+				ScoreEvent(SE_SHOOT,1);
+				MakeSound(SND_CACTONSHOOT, me->x, me->y, SND_CUTOFF, 200);
+				for (i = 0; i < (5 / 2) + 1; i++)
+					FireBullet(me->x + Cosine(me->facing * 32) * 32, me->y + Sine(me->facing * 32) * 24, me->facing * 32, BLT_SPARKSHOT, me->friendly);
+
+				me->z += FIXAMT * Random(4);
+				me->dx += FIXAMT / 2 - Random(FIXAMT);
+				me->dy += FIXAMT / 2 - Random(FIXAMT);
+			}
+			c = FakeGetControls();
+			if (c & CONTROL_B2)	// fire is held
+			{
+				player.wpnReload = 2;
+				me->frmTimer = 0;
 				me->frm--;
 			}
 			else
 			{
-				player.wpnReload=5;
+				player.wpnReload = 5;
 			}
 			DoPlayerFacing(c,me);
 			break;
 		case WPN_SONIC:
-			FireBullet(me->x+Cosine(me->facing*32)*10,me->y+Sine(me->facing*32)*10,me->facing*32,BLT_BIGAXE,me->friendly);
-			MakeSound(SND_SDZLSPIT,me->x,me->y,SND_CUTOFF,1200);
+			if (curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				FireBullet(me->x + Cosine(me->facing * 32) * 10, me->y + Sine(me->facing * 32) * 10, me->facing * 32, BLT_SONIC, me->friendly);
+				MakeSound(SND_BOBBYSLASH, me->x, me->y, SND_CUTOFF, 1200);
+			}
 			player.wpnReload=30;
 			break;
 		case WPN_BONEHEAD:
-			Guy* g;
-			g=GetGuyOfType(MONS_GOODBONE);
-			if(g)
+			if (curAmmo)
 			{
-				byte a;
-
-				a=Random(256);
-				g->type=MONS_NONE;
-				MakeSound(SND_BOMBBOOM,g->x,g->y,SND_CUTOFF,400);
-				for(i=0;i<8;i++)
-					FireBullet(g->x,g->y,(a+(256*i)/8)&255,BLT_GREEN,g->friendly);
-			}
-			g=AddGuy(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
-				FIXAMT*10,MONS_GOODBONE,1);
-			if(g==NULL || !g->CanWalk(g->x,g->y,curMap,&curWorld))
-			{
-				MakeSound(SND_TURRETBZZT,me->x,me->y,SND_CUTOFF,1200);
+				ScoreEvent(SE_SHOOT, 1);
+				Guy* g;
+				g=GetGuyOfType(MONS_GOODBONE);
 				if(g)
 				{
+					byte a;
+
+					a=Random(256);
 					g->type=MONS_NONE;
-					curAmmo+=1;
+					MakeSound(SND_BOMBBOOM,g->x,g->y,SND_CUTOFF,400);
+					for(i=0;i<8;i++)
+						FireBullet(g->x,g->y,(a+(256*i)/8)&255,BLT_GREEN,g->friendly);
+				}
+				g=AddGuy(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
+					FIXAMT*10,MONS_GOODBONE,1);
+				if(g==NULL || !g->CanWalk(g->x,g->y,curMap,&curWorld))
+				{
+					MakeSound(SND_TURRETBZZT,me->x,me->y,SND_CUTOFF,1200);
+					if(g)
+					{
+						g->type=MONS_NONE;
+						curAmmo+=1;
+					}
+				}
+				else
+				{
+					MakeSound(SND_SKELALIVE,me->x,me->y,SND_CUTOFF,1200);
+					g->seq=ANIM_A4;
+					g->frm=0;
+					g->frmTimer=0;
+					g->frmAdvance=128;
+					g->facing=me->facing;
+					g->action=ACTION_BUSY;
+					g->dx=Cosine(g->facing*32)*8;
+					g->dy=Sine(g->facing*32)*8;
 				}
 			}
-			else
-			{
-				MakeSound(SND_SKELALIVE,me->x,me->y,SND_CUTOFF,1200);
-				g->seq=ANIM_A4;
-				g->frm=0;
-				g->frmTimer=0;
-				g->frmAdvance=128;
-				g->facing=me->facing;
-				g->action=ACTION_BUSY;
-				g->dx=Cosine(g->facing*32)*8;
-				g->dy=Sine(g->facing*32)*8;
-			}
-			player.wpnReload=30;
+			player.wpnReload = 30;
 			break;
 		case WPN_ROCKETS:
 			if(curAmmo)
@@ -1148,6 +1207,145 @@ void PlayerFireWeapon(Guy *me)
 					profile.progress.shotsFired++;
 			}
 			player.wpnReload=2;
+			break;
+		case WPN_SNOWBLOWER:
+			if(curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				if(curMap->flags&MAP_UNDERWATER||curMap->flags&MAP_LAVA)
+				{
+					if(Random(2)==0)
+					{
+						FireBullet(me->x,me->y,(me->facing*32-6+Random(13))&255,BLT_SQUIRT,me->friendly);
+					}
+				}
+				else
+				{
+					if(Random(12)==0)
+					{
+						ScoreEvent(SE_SHOOT,3);
+						player.wpns[player.curSlot].ammo-=4;
+						FireBullet(me->x,me->y,(me->facing*32-6+Random(13))&255,BLT_SNOWBALL,me->friendly);
+					}
+					else
+					{
+						player.wpns[player.curSlot].ammo--;
+						FireBullet(me->x,me->y,(me->facing*32-6+Random(13))&255,BLT_SNOWBALL,me->friendly);
+					}
+				}
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			c=GetControls();
+			if(c&CONTROL_B2)	// fire is held
+			{
+				player.wpnReload=2;
+				me->frmTimer=0;
+			}
+			else
+				player.wpnReload=5;
+			DoPlayerFacing(c,me);
+			break;
+		case WPN_CONFUSERAY:
+			if (curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				MakeSound(SND_MINDWIPE,me->x,me->y,SND_CUTOFF,1200);
+				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
+					me->facing,BLT_MINDWIPE,me->friendly);
+				player.wpns[player.curSlot].ammo--;
+				player.wpnReload=10;
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			break;
+		case WPN_DEATHRAY:
+			if (curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,10);
+				MakeSound(SND_BOBBYLAUGH,me->x,me->y,SND_CUTOFF,1200);
+				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
+					me->facing,BLT_MINDWIPE,me->friendly);
+				if(goodguy)
+				{
+					goodguy->dx=Cosine(goodguy->facing)*8;
+					goodguy->dy=Sine(goodguy->facing)*8;
+				}
+				player.wpns[player.curSlot].ammo--;
+				player.wpnReload=30;
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			break;
+		case WPN_BFG:
+			if(curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,5);
+				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
+				FireBullet(me->x,me->y,me->facing,BLT_HAMMER,me->friendly);
+				player.wpns[player.curSlot].ammo--;
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			c=GetControls();
+			if(c&CONTROL_B2)	// fire is held
+			{
+				player.wpnReload=5;
+				me->frmTimer=0;
+			}
+			else
+				player.wpnReload=15;
+			DoPlayerFacing(c,me);
+			break;
+		case WPN_TORPEDOS:
+			if(curAmmo)
+			{
+				x=me->x+Cosine(me->facing*32)*24;
+				y=me->y+Sine(me->facing*32)*24;
+				ScoreEvent(SE_SHOOT,1);
+				f = me->facing * 32 - 64;
+				MakeSound(SND_SUBSHOOT,me->x,me->y,SND_CUTOFF,1200);
+				FireBullet(x-Cosine(f)*8,y-Sine(f)*8,me->facing,BLT_TORPEDO,1);
+				FireBullet(x+Cosine(f)*8,y+Sine(f)*8,me->facing,BLT_TORPEDO,1);
+				player.wpns[player.curSlot].ammo--;
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			player.wpnReload=2;
+			break;
+		case WPN_WATERGUN:
+			if(curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				FireBullet(me->x,me->y,me->facing*32-8+Random(17),BLT_SQUIRT,me->friendly);
+				player.wpns[player.curSlot].ammo--;
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			me->z+=FIXAMT*Random(4);
+			me->dx+=FIXAMT/2-Random(FIXAMT);
+			me->dy+=FIXAMT/2-Random(FIXAMT);
+			c=GetControls();
+			if(c&CONTROL_B2)	// fire is held
+			{
+				player.wpnReload=1;
+				me->frmTimer=0;
+			}
+			else
+			{
+				player.wpnReload=4;
+			}
+			DoPlayerFacing(c,me);
+			break;
+		case WPN_PUMPKINS:
+			if (curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				MakeSound(SND_MUSHMISSILE,me->x,me->y,SND_CUTOFF,1200);
+				FireBullet(me->x, me->y, me->facing, BLT_ALIENEGG, me->friendly);
+				player.ammo--;
+				player.wpnReload = 20;
+			}
 			break;
 	}
 	if(player.ammoCrate)

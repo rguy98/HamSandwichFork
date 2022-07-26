@@ -244,6 +244,21 @@ byte Walkable(Guy *me,int x,int y,Map *map,world_t *world)
 		if(m->wall)
 			result=0;
 	}
+	else
+	{
+		if(m->wall && (!(MonsterFlags(me->type,me->aiType)&MF_WALLWALK)))
+		{
+			if(me->type==MONS_BALL && m->wall && (world->terrain[m->floor].flags&TF_PUSHON))
+			{
+				m->wall=0;
+				m->floor=(byte)MGL_random(3);
+				MakeSound(SND_BOMBBOOM,(x*TILE_WIDTH)<<FIXSHIFT,(y*TILE_HEIGHT)<<FIXSHIFT,SND_CUTOFF,1500);
+				ExplodeParticles(PART_DIRT,(x*TILE_WIDTH+TILE_WIDTH/2)<<FIXSHIFT,(y*TILE_HEIGHT+TILE_HEIGHT/2)<<FIXSHIFT,FIXAMT*10,20);
+			}
+
+			result=0;
+		}
+	}
 
 	if(!result)	// bumped a wall, see if that triggers a special
 	{

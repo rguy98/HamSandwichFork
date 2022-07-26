@@ -75,7 +75,7 @@ class Guy
 		byte strong;	// steelskin defense - increased resistance (dark grey)
 		byte confuse;	// confusion - inverted movement controls (light pink)
 		byte garlic;	// now applicable to more enemies - kills vampires quick!
-		byte quick;	// now applicable to more enemies!
+		byte quick;		// now applicable to more enemies - makes you go fast
 		byte specialFlags;	// special flags (rainbow, white flash)
 
 		int aiType;

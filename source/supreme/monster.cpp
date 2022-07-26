@@ -538,6 +538,7 @@ inline void FaceGoodguy(Guy *me,Guy *goodguy)
 	}
 }
 
+// Not in use, intended for node facing whenever pathfinding gets implemented...
 inline void FaceNode(Guy* me, node_t* node)
 {
 	if (node->x < me->x - FIXAMT * 16)
@@ -2628,6 +2629,7 @@ void AI_Voltage(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 	
 }
+
 
 // here be the AIs for each monster type
 //--------------------------------------------------------------------------------------

@@ -99,8 +99,6 @@ typedef struct player_t
 	byte pushPower;	// for pushing pushy blocks
 	byte hammerFlags, cheatFlags;
 	byte vehicle;
-	byte garlic; // remove
-	byte speed;	// remove
 	byte rageClock;
 	word rage;
 	word varbar, varbarMax;
