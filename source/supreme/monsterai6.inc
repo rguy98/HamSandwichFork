@@ -1910,7 +1910,7 @@ void AI_BatGuard(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		if(me->seq==ANIM_A1 && me->frm<6 && me->reload==0)
 		{
 			FireBullet(me->x,me->y,me->mind,BLT_ENERGY,me->friendly);
-			MakeSound(SND_MATTIESHOOT,me->x,me->y,SND_CUTOFF,200);
+			MakeSound(SND_MATTIESHOOT,me->x,me->y,SND_CUTOFF,100);
 			me->reload=2;
 		}
 		if(me->seq==ANIM_A1  &&me->frm==5 && me->parent && me->parent->mind2!=0)
@@ -1923,16 +1923,17 @@ void AI_BatGuard(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	{
 		goodguy->GetShot(Cosine(me->facing*32)*8,Sine(me->facing*32)*8,4,map,world);
 	}
-	if(me->parent && me->parent->mind2>0)
-	{
-		MakeSound(SND_BATDIVE,me->x,me->y,SND_CUTOFF,200);
-		me->seq=ANIM_A1;
-		me->frm=0;
-		me->frmTimer=0;
-		me->frmAdvance=128;
-		me->action=ACTION_BUSY;
-		return;
-	}
+	if(me->parent)
+		if(me->parent->mind2>0)
+		{
+			MakeSound(SND_BATDIVE,me->x,me->y,SND_CUTOFF,200);
+			me->seq=ANIM_A1;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+			me->action=ACTION_BUSY;
+			return;
+		}
 	if(me->seq!=ANIM_MOVE)
 	{
 		me->seq=ANIM_MOVE;

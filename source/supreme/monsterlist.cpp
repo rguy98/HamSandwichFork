@@ -5086,7 +5086,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,1,2,3,4,5,6,255},	// attack
 				{0,1,2,3,4,5,6,255},	// attack
 			}},
-		{"Iso-dope",0,1,2,AI_SuperZombie,
+		{"Iso-dope",0,1,2,AI_Isodope,
 		 36,38,250,2500,"graphics/suprzmbe.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_MINIBOSS|MT_SPOOKY|MT_ZOMBIE,
 			{
@@ -5095,8 +5095,8 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{17,18,19,20,21,22,23,24,25,255},	// attack=punch
 				{9,10,11,12,13,14,15,15,15,15,15,15,255},	// die
 				{7,8,9,10,11,11,11,12,12,13,13,13,14,14,14,15,16,16,255},	// A1=leap
-				{26,27,28,29,30,255},	// A2=attempted grab
-				{27,31,32,33,34,35,34,36,37,36,34,35,34,36,37,36,34,35,34,33,31,27,255},	//A3= grab n' pound
+				{26,27,28,29,30,31,32,33,34,35,34,36,37,36,34,35,34,33,31,27,255},	//A2= grab n' pound
+				{17,18,19,20,21,22,23,24,25,255},	// A3=punch
 				{0,255},
 				{0,255},
 			}},
@@ -5462,6 +5462,20 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{254,254,254,255},	// move
 				{254,254,254,255},	// move
 				{254,254,254,255},	// move
+			}},
+		{"Mighty Moss",1,4,2,AI_MightyMoss,
+		 15,17,40,25,"graphics/moss.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_FREEWALK|MF_ENEMYWALK|MF_WALLWALK|MF_NOSHADOW,
+		 MT_EVIL|MT_VEGGIE,
+			{
+				{0,255},	// idle
+				{1,2,3,2,1,255},	// move=grow vertically
+				{4,5,6,5,4,255},	// attack=grow horizontally
+				{7,8,9,10,11,12,13,14,15,16,255},	// die
+				{4,5,6,5,4,255},	// attack=grow horizontally
+				{4,5,6,5,4,255},	// attack=grow horizontally
+				{4,5,6,5,4,255},	// attack=grow horizontally
+				{0,255},
+				{0,255},
 			}},
 		{"Xeno Empress",255,255,0,AI_EmpressHead, //add attacks and make it move right
 		 36,5,500,1000,"graphics/queenskull.jsp",0,MF_NOMOVE|MF_ONEFACE|MF_FREEWALK|MF_ENEMYWALK|MF_NOGRAV,

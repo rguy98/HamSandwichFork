@@ -439,13 +439,14 @@
 #define MONS_PAYLOAD		395 // like the payload from tf2
 #define MONS_PUSHERH		396 // pushes anything not blocked by a wall
 #define MONS_PUSHERV		397 // ditto, but vertically
-#define MONS_EMPRESS		398
-#define MONS_EMPRESSBODY	399
-#define MONS_EMPRESSTAIL	400
-#define MONS_SUPERSHROOM	401 // Shtupid Shroom's true form
-#define MONS_VOLTAGE	402 // Electric Jack Frost
+#define MONS_WEAKMOSS		398 // moss that does weakness
+#define MONS_EMPRESS		399
+#define MONS_EMPRESSBODY	400
+#define MONS_EMPRESSTAIL	401
+#define MONS_SUPERSHROOM	402 // Shtupid Shroom's true form
+#define MONS_VOLTAGE	403 // Electric Jack Frost
 
-#define NUM_MONSTERS  403    // Can grow as needed
+#define NUM_MONSTERS  404    // Can grow as needed
 #define NUM_PROFILE_MONSTERS 248 // Do not change without redoing the profile format
 
 // fake monster codes
@@ -875,6 +876,7 @@ void AI_BufferBot(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_CaptainSeal(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Voltage(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_SuperShroom(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_Isodope(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 //Matilda's AIs
 void AI_MiniMattie(Guy *me,Map *map,world_t *world,Guy *goodguy);
@@ -895,5 +897,6 @@ void AI_LunaMecha(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_LunaChick(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Dummy(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Pusher(Guy* me, Map* map, world_t* world, Guy* goodguy);
+void AI_MightyMoss(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 #endif

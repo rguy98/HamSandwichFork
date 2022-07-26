@@ -1029,19 +1029,13 @@ void AI_MattieClaw(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	if(me->reload>0)
 		me->reload--;
 
-	if(!me->parent || me->parent->type==MONS_NONE)
-	{
-		me->type=MONS_NONE;	// can't exist alone
-		return;
-	}
-
-	if(me->aiType==MONS_MATCLAW1)
+	if(CheckParent(me,me->aiType==MONS_MATCLAW1))
 	{
 		me->x=me->parent->x-45*FIXAMT;
 		me->y=me->parent->y+12*FIXAMT;
 		me->z=me->parent->z-12*FIXAMT;
 	}
-	else	// MONS_MATCLAW2
+	else if(CheckParent(me,me->aiType==MONS_MATCLAW2)	// MONS_MATCLAW2
 	{
 		me->x=me->parent->x+45*FIXAMT;
 		me->y=me->parent->y+12*FIXAMT;
@@ -1100,14 +1094,14 @@ void AI_MattieClaw(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	// make their idle weird and wiggly
 	me->frmAdvance=Random(128)+1;
 
-	if(me->parent->mind1>32)	// she is scared, block!!
+	if(CheckParent(me,me->parent->mind1>32))	// she is scared, block!!
 	{
 		me->action=ACTION_BUSY;
 		me->seq=ANIM_A1;
 		me->frm=0;
 		me->frmTimer=0;
 		me->frmAdvance=48;
-	}
+	}	
 }
 
 void AI_MattieTail(Guy *me,Map *map,world_t *world,Guy *goodguy)
@@ -1117,15 +1111,12 @@ void AI_MattieTail(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	short shootXTable[9]={-134,-124,-101,-57,0,67,113,134,143};
 	short shootYTable[9]={-51,-43,-24,-7,-11,-15,-29,-41,-46};
 
-	if(!me->parent || me->parent->type==MONS_NONE)
+	if(me->parent)
 	{
-		me->type=MONS_NONE;	// can't exist alone
-		return;
+		me->x=me->parent->x;
+		me->y=me->parent->y-104*FIXAMT;
+		me->z=me->parent->z;
 	}
-
-	me->x=me->parent->x;
-	me->y=me->parent->y-104*FIXAMT;
-	me->z=me->parent->z;
 
 	if(me->action==ACTION_BUSY)
 	{
@@ -1139,7 +1130,7 @@ void AI_MattieTail(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			b+=16-Random(33);
 			FireExactBullet(x,y,me->z+32*FIXAMT,Cosine(b)*6,Sine(b)*6,-FIXAMT/2,
 				0,60,b,BLT_ENERGY,me->friendly);
-			if(me->parent->aiType==MONS_MATBRAIN)
+			if(GetParentAI(me)==MONS_MATBRAIN)
 			{
 				b+=16-Random(33);
 				FireExactBullet(x,y,me->z+32*FIXAMT,Cosine(b)*6,Sine(b)*6,-FIXAMT/2,
@@ -1162,10 +1153,10 @@ void AI_MattieTail(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		me->action=ACTION_BUSY;
 		if(me->mind==0)
 		{
-			if(me->parent->aiType!=MONS_MATBRAIN)
-				me->mind=80;
-			else
+			if(GetParentAI(me)==MONS_MATBRAIN)
 				me->mind=30;
+			else
+				me->mind=80;
 		}
 	}
 
@@ -1214,16 +1205,14 @@ void AI_MattieBody(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	byte b;
 
-	if(!me->parent || me->parent->type==MONS_NONE)
-	{
-		me->type=MONS_NONE;	// can't exist alone
-		return;
-	}
-
 	// unlike other components, this one tells the head itself where to be
-	me->parent->x=me->x;
-	me->parent->y=me->y+40*FIXAMT;
-	me->parent->z=me->z+32*FIXAMT;
+
+	if(me->parent)
+	{
+		me->parent->x=me->x;
+		me->parent->y=me->y+40*FIXAMT;
+		me->parent->z=me->z+32*FIXAMT;
+	}
 
 	if(goodguy)
 	{

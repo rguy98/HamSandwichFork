@@ -1,7 +1,74 @@
 #include "monsnotes.h"
 #include "monster.h"
 
-char monsNotes[NUM_MONSTERS][512]={
+static monsnotes_t notes[] = {
+	{0,
+	"If you're reading this, something is wrong."},
+	{MONS_BOUAPHA,
+	"The world's best gourdslayer and situation"
+	"handler. His name is actually a mispelling"
+	"of a Laotian surname, thus his real name"
+	"is up for debate. Bouapha first debuted "
+	"in the DOS game \"SPISPOPD\" in 1994 - a"
+	"precursor to Dr.Lunatic.Many sound effects"
+	"and concepts were taken from SPIPSOPD,"
+	"such as the infamous pumpkins."
+	},
+	{MONS_BONEHEAD,
+	"Cleverly named and classic enemies. Boneheads appear in"
+	"at least six Hamumu games in some capacity, the first being"
+	"Spooky Castle. The head comes from a model Jamul downloaded"
+	"and put fangs on; this model is also used for Richie Lich"
+	"and other skeleton-based enemies. I think the model gives"
+	"them an uncanny look which works in their favor."
+	},
+	{MONS_PUMPKIN,
+	"While pumpkins are normally orange, the 256-color limit "
+	"of Dr. Lunatic's engine required Jamul to improvise. Their "
+	"inclusion lead to the implementation of keychains and secret "
+	"levels. The four keychains represent common SPISPOPD motifs, "
+	"such as Bouapha's nifty space rocket. Make sure to put "
+	"keychains in your levels!"
+	},
+	{MONS_CRAZYBONE,
+	"(bby)The first of the recolored Boneheads. They have "
+	"about a 30% chance (two 1/6 rolls) of reviving "
+	"upon death... unless someone stands on top of "
+	"them, in which it becomes 0%. What makes it crazy "
+	"is its bigger, badder bullets."
+	},
+	{MONS_LAZYBONE,
+	"The first monster made for Supreme With Cheese. They "
+	"wake up whenever attacked or bothered, making them "
+	"nuisances to deal with in confined areas. LazyBones "
+	"always rotate in a clockwise fashion."
+	},
+	{MONS_SPATULA,
+	"Originally a Countess clone, now recolored so you can "
+	"tell them apart. Her bat guards absorb most bullets - "
+	"you'll want to try using piercing attacks to breach her "
+	"defenses. The guards also spawn a ton of bullets"
+	"themselves."
+	},
+	{MONS_BATGUARD,
+	"The bat guard for Lady Von Spatula. This monster will "
+	"not function properly without a parent monster, thus "
+	"it is advised not to use it alone unless you know "
+	"what you're doing."
+	},
+	{MONS_VOLTAGE,
+	"Based on a fake screenshot I made back in 2008 for "
+	"laughs. Voltage makes for a deadly foe whether alone "
+	"or accompanied by minions - his thunder attack targets "
+	"the closest enemy within his reach! Make sure the player "
+	"can escape his thundrous wrath... and check out his "
+	"cool wavy bullet attacks!"
+	},
+	{NUM_MONSTERS,
+	"No notes!"},
+};
+
+/*char monsNotes[NUM_MONSTERS][512] = {
 	// NULL
 	"No notes!",
 	// Bouapha
@@ -1448,9 +1515,16 @@ char monsNotes[NUM_MONSTERS][512]={
 	"He's nipping at your nose!  He does that by firing freeze bolts at random.  For a mini-boss, this guy is pretty harmless. "
 	"But if you want to make him tough, put him in fairly tight quarters with Bouapha and some other enemies!  That makes his "
 	"ice shots hard to avoid, and greatly improves his odds of getting a swipe at you on his highly predictable journey.",
-};
+};*/
 
-char *MonsterNotes(dword type)
+byte NotMonster(dword selected, dword desired)
 {
-	return monsNotes[type];
+	return selected != NUM_MONSTERS && selected != desired;
+}
+
+const char *MonsterNotes(dword type)
+{
+	int i;
+	for (i=0; NotMonster(notes[i].monster,type); i++);
+	return notes[i].notes;
 }

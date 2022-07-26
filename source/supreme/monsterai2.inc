@@ -3173,23 +3173,28 @@ void AI_LoonyGun(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				  me->z,FIXAMT);
 		return;
 	}
-	if(!me->parent || me->parent->mind==0)
-		return;
 
 	me->recty+=60;
 	me->recty2+=60;
 
 	me->z=FIXAMT*48;
 	me->dz=0;
-	if(me->mind3==0)
+
+	if(me->parent)
 	{
-		me->x=me->parent->x-87*FIXAMT;
-		me->y=me->parent->y;
-	}
-	else
-	{
-		me->x=me->parent->x+92*FIXAMT;
-		me->y=me->parent->y;
+		if(me->parent->aiType == MONS_LOONYBOT && me->parent->mind==0)
+			return;
+
+		if(me->mind3==0)
+		{
+			me->x=me->parent->x-87*FIXAMT;
+			me->y=me->parent->y;
+		}
+		else
+		{
+			me->x=me->parent->x+92*FIXAMT;
+			me->y=me->parent->y;
+		}
 	}
 
 	if(!goodguy)

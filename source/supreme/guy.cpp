@@ -2673,7 +2673,7 @@ byte MossCheck(int x,int y)
 
 	for(i=0;i<maxGuys;i++)
 		if((guys[i]) && ((guys[i]->aiType==MONS_MOSS) || (guys[i]->aiType==MONS_MOSSGRANDE) ||
-			(guys[i]->aiType==MONS_MOSS2))
+			(guys[i]->aiType==MONS_MOSS2) || (guys[i]->aiType==MONS_WEAKMOSS))
 			&& (guys[i]->hp>0) && ((guys[i]->x>>FIXSHIFT)/TILE_WIDTH==x) &&
 				((guys[i]->y>>FIXSHIFT)/TILE_HEIGHT==y))
 				return 1;	// moss is in the way

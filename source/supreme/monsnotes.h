@@ -3,6 +3,11 @@
 
 #include "mgldraw.h"
 
-char *MonsterNotes(dword type);
+typedef struct monsnotes_t {
+	dword monster;
+	const char* notes;
+} monsnotes_t;
+
+const char *MonsterNotes(dword type);
 
 #endif

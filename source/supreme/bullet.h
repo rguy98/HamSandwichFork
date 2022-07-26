@@ -130,21 +130,21 @@
 #define BLT_WOLFSHOT	112
 #define BLT_WOLFSHOCK	113
 #define BLT_CLAW		114
-#define BLT_CROAKERGAS	115
-#define BLT_HOTDOGFIRE	116
-#define BLT_ICEWOLFICE	117
-#define BLT_FARLEYGAS	118
+#define BLT_FARLEYGAS	115
 
 // Operation SCARE
-#define BLT_BADLUNA			119
-#define BLT_BADFBALL		120
-#define BLT_BADLIGHTNING	121
-#define BLT_BADBOOMERANG	122
-#define BLT_BADLUNA2		123
-#define BLT_QUEENACID		124
-#define BLT_ALIENEGG		125
-#define BLT_SPOREBALL		126
-#define BLT_SQUIRT			127
+#define BLT_BADLUNA			116
+#define BLT_BADFBALL		117
+#define BLT_BADLIGHTNING	118
+#define BLT_BADBOOMERANG	119
+#define BLT_BADLUNA2		120
+#define BLT_QUEENACID		121
+#define BLT_ALIENEGG		122
+#define BLT_SPOREBALL		123
+#define BLT_SQUIRT			124
+#define BLT_ENERGYPSN		125
+#define BLT_SONIC			126
+#define BLT_SPARKSHOT		127
 #define MAX_BULLETS			128
 
 // the special hammer flags for different powerups - player-specific
@@ -201,7 +201,7 @@ void QuadMissile(int x,int y,byte facing,byte friendly);
 void LaunchMegabeam(int x,int y,word owner);
 void FireBullet(int x,int y,byte facing,byte type,byte friendly);
 void FireBulletAfter(int x,int y,byte facing,byte type,bullet_t *thisone,byte friendly);
-void FireExactBullet(int x,int y,int z,int dx,int dy,int dz,byte anim,byte timer,byte facing,byte type,byte friendly);
+bullet_t *FireExactBullet(int x,int y,int z,int dx,int dy,int dz,byte anim,byte timer,byte facing,byte type,byte friendly);
 void HammerLaunch(int x,int y,byte facing,byte count,byte flags);
 byte Bulletable(Map *map,int x,int y);
 void BulletRanOut(bullet_t *me,Map *map,world_t *world);	// prototyped for interior use

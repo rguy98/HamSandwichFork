@@ -1177,6 +1177,20 @@ void OneFaceGoodguy(Guy *me, Guy *goodguy)
 		FaceGoodguy(me,goodguy);
 }
 
+byte CheckParent(Guy* me, byte check)
+{
+	return !me->parent ? 0 : check;
+}
+
+// Returns parent AI type, or 0 if no parent.
+word GetParentAI(Guy* me)
+{
+	if(!me->parent)
+		return 0;
+	else
+		return me->parent->aiType;
+}
+
 void AI_Yeti(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	int x,y;
@@ -1868,6 +1882,337 @@ byte Bounce(Guy *me,byte &chg)
 	return me->mind1>0;
 }
 
+void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int i,j,x,y;
+	bullet_t *b;
+
+	if(me->reload)
+		me->reload--;
+
+	if(me->mind1)
+		me->mind1--;
+
+	BasicAI(me,SND_SZOUCH,SND_SZDIE,map,world,goodguy);
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_A1)	// leaping attack
+		{
+			if(me->frm<3)
+			{
+				me->dx=0;
+				me->dy=0;
+				me->dz=0;
+			}
+			else if(me->frm==3)
+			{
+				me->dx=Cosine(me->facing*32)*12;
+				me->dy=Sine(me->facing*32)*12;
+				me->dz=10*FIXAMT;
+			}
+			else if(me->frm<7)
+			{
+				// stay the course
+				Dampen(&me->dx,FIXAMT/8);
+				Dampen(&me->dy,FIXAMT/8);
+			}
+			else if(me->frm==12 && me->frmTimer<32)
+			{
+				for(i=0;i<256;i+=16)
+				{
+					b=FireExactBullet(me->x,me->y,me->z,Cosine(i)*6,Sine(i)*6,0,0,32,i,BLT_SPORE,me->friendly);
+					RecolorBullet(b,5,1);
+				}
+
+				for(i=0;i<5;i++)
+				{
+					j=(me->facing+(i-2)*32)&255;
+					b=FireExactBullet(me->x,me->y,me->z,Cosine(j)*12,Sine(j)*12,0,0,32,i,BLT_SPORE,me->friendly);
+					RecolorBullet(b,5,1);
+				}
+				MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,1500);
+				ShakeScreen(10,8);
+			}
+			else
+			{
+				Dampen(&me->dx,FIXAMT/2);
+				Dampen(&me->dy,FIXAMT/2);
+			}
+		}
+
+		if(me->mind3)
+		me->mind3--;
+		else
+		{
+			me->mind3=10;
+			if(me->hp<me->maxHP && me->hp>0)
+				me->hp++;
+		}
+
+		if(me->seq==ANIM_A2 && goodguy)
+		{
+			if(!me->mind2)
+				me->mind2 = Random(2);
+
+			if(!me->reload)
+			{
+				x=me->x+Cosine(me->facing*32)*64;
+				y=me->y+Sine(me->facing*32)*48;
+
+				me->reload = 4;
+				b=FireExactBullet(x,y,FIXAMT*48,Cosine(me->facing*32)*6,Sine(me->facing*32)*6,FIXAMT,0,128,me->facing*32,BLT_SPOREBALL,me->friendly);
+				b->flags |= BFL_GRAVITY;
+				MakeSound(SND_MUSHMISSILE, me->x, me->y, SND_CUTOFF|SND_RANDOM, 900);
+
+				if(me->mind2)
+					me->facing = (me->facing+1)&7;
+				else
+					me->facing = (me->facing-1)&7;
+			}
+		}
+		if(me->seq==ANIM_ATTACK && me->frm==5 && me->reload==0)
+		{
+			x=(me->x+Cosine(me->facing*32)*40)>>FIXSHIFT;
+			y=(me->y+Sine(me->facing*32)*40)>>FIXSHIFT;
+			if(me->AttackCheck(30,x,y,goodguy))
+			{
+				goodguy->GetShot(Cosine(me->facing*32)*24,Sine(me->facing*32)*24,10,map,world);
+				Inflict(goodguy,GEF_POISON,128);
+			}
+			me->reload=4;
+		}
+		if(me->seq==ANIM_DIE)
+		{
+			if(me->frm>=8)
+			{
+				x=me->x>>FIXSHIFT;
+				y=me->y>>FIXSHIFT;
+				BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
+				BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
+						  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
+						  me->z,FIXAMT);
+			}
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind2>0)
+		me->mind2=0;
+
+	if(me->mind==0)
+	{
+		if(goodguy)
+		{
+			if(RangeToTarget(me,goodguy)<300*FIXAMT)
+				me->mind=1;
+		}
+		if(me->ouch)
+			me->mind=1;
+	}
+	else if(me->mind==2)		// when mind=2, hold still and go off on Bouapha
+	{
+		if(goodguy)
+		{
+			i=RangeToTarget(me,goodguy);
+			if(i<(96*FIXAMT) && Random(10)==0 && me->reload==0)
+			{
+				// get him! (punch)
+				me->seq=ANIM_ATTACK;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				return;
+			}
+			// spinny poison attack
+			if(i<(256*FIXAMT) && Random(24)==0 && me->reload==0)
+			{
+				// get him! (grab)
+				me->seq=ANIM_A2;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=192;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				me->reload=0;
+				return;
+			}
+			FaceGoodguy2(me,goodguy);
+
+			me->dx=0;
+			me->dy=0;
+			if(me->seq!=ANIM_IDLE)
+			{
+				me->seq=ANIM_IDLE;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+			}
+			if(i>(80*FIXAMT) && me->mind1==0)
+			{
+				// chase him down!
+				me->mind=1;
+				me->mind1=8;
+			}
+		}
+		else
+		{
+			// just sit there
+		}
+	}
+	else if(me->mind==1)	// chase down Bouapha
+	{
+		if(goodguy)
+		{
+			FaceGoodguy2(me,goodguy);
+
+			me->dx=Cosine(me->facing*32)*6;
+			me->dy=Sine(me->facing*32)*6;
+			if(me->seq!=ANIM_MOVE)
+			{
+				me->seq=ANIM_MOVE;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+			}
+			if(RangeToTarget(me,goodguy)<128*FIXAMT && me->mind1==0)
+			{
+				me->mind=2;	// in range, start killin'
+				me->mind1=8;
+			}
+			else if(Random(64)==0)
+			{
+				//leap!
+				me->seq=ANIM_A1;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				me->reload=0;
+			}
+		}
+		else
+			me->mind=0;
+	}
+}
+
+void MossMove(Guy* me, byte seq, int adv, int dx, int dy)
+{
+	me->action = ACTION_BUSY;
+	me->seq = ANIM_ATTACK;
+	me->frm = 0;
+	me->frmTimer = 0;
+	me->frmAdvance = adv;
+	me->dx = dx;
+	me->dy = dy;
+}
+
+void AI_MightyMoss(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y;
+	byte f;
+
+	if(me->mindControl)
+		f=2;
+	else
+		f=me->friendly;
+
+	if(me->reload)
+		me->reload--;
+
+	if(me->mind)
+		me->mind--;
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq!=ANIM_DIE && me->frm==4)
+		{
+			x=((me->x>>FIXSHIFT)/TILE_WIDTH);
+			y=((me->y>>FIXSHIFT)/TILE_HEIGHT);
+			me->x=(x*TILE_WIDTH+TILE_WIDTH/2)<<FIXSHIFT;
+			me->y=(y*TILE_HEIGHT+TILE_HEIGHT/2)<<FIXSHIFT;
+			me->dx=0;
+			me->dy=0;	// you are at your destination
+			me->reload=Random(200)+55;
+
+			// this prevents overlapping ones, in cases of ones getting born near-simultaneously
+			me->aiType=MONS_NONE;	// so it doesn't get counted in the moss check
+			if(MossCheck(x,y))
+			{
+				if(!me->friendly)
+					player.totalEnemies--;
+				return;	// with type=MONS_NONE, so it is dead
+			}
+			me->aiType=MONS_WEAKMOSS;
+		}
+		return;
+	}
+
+	// if goodguy steps on you, hurt him
+	if(goodguy && (!me->mind) && RangeToTarget(me,goodguy)<20*FIXAMT)
+	{
+		goodguy->GetShot(0,0,4,map,world);
+		Inflict(goodguy, GEF_WEAK, 32);
+		me->mind=5;	// so as not to hurt him too often
+	}
+	if(me->reload==0)
+	{
+		me->reload=Random(200)+55;
+		// spawn
+		x=(me->x>>FIXSHIFT)/TILE_WIDTH;
+		y=(me->y>>FIXSHIFT)/TILE_HEIGHT;
+		switch(Random(4))
+		{
+			case 0:
+				// left
+				if(x>0 && map->GetTile(x-1,y)->wall==0 &&
+					(GetTerrain(world,map->GetTile(x-1,y)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
+					!(GetItem(map->GetTile(x-1,y)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
+					&& (!MossCheck(x-1,y)))
+				{
+					MossMove(me,ANIM_ATTACK,64,-(32*FIXAMT)/20,0);
+				}
+				break;
+			case 1:
+				// right
+				if(x<map->width-1 && map->GetTile(x+1,y)->wall==0 &&
+					(GetTerrain(world,map->GetTile(x+1,y)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
+					!(GetItem(map->GetTile(x+1,y)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
+					&& (!MossCheck(x+1,y)))
+				{
+					MossMove(me,ANIM_ATTACK,64,(32*FIXAMT)/20,0);
+				}
+				break;
+			case 2:
+				// up
+				if(y>0 && map->GetTile(x,y-1)->wall==0 &&
+					(GetTerrain(world,map->GetTile(x,y-1)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
+					!(GetItem(map->GetTile(x,y-1)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
+					&& (!MossCheck(x,y-1)))
+				{
+					MossMove(me,ANIM_MOVE,64,0,-(24*FIXAMT)/20);
+				}
+				break;
+			case 3:
+				// down
+				if(y<map->height-1 && map->GetTile(x,y+1)->wall==0 &&
+					(GetTerrain(world,map->GetTile(x,y+1)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
+					!(GetItem(map->GetTile(x,y+1)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
+					&& (!MossCheck(x,y+1)))
+				{
+					MossMove(me,ANIM_MOVE,64,0,(24*FIXAMT)/20);
+				}
+				break;
+		}
+	}
+}
+
 void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	int i,x,y;
@@ -1894,7 +2239,7 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			x+=Cosine(i)*48;
 			y+=Sine(i)*32;
 			i=(me->facing*32-16+Random(33))&255;
-			b=FireExactBullet(x,y,FIXAMT*64,Cosine(i)*8,Sine(i)*8,0,0,32,i,BLT_ENERGY,me->friendly);
+			FireExactBullet(x,y,FIXAMT*64,Cosine(i)*8,Sine(i)*8,0,0,32,i,BLT_ENERGYPSN,me->friendly);
 			MakeSound(SND_MUSHSPORES,me->x,me->y,SND_CUTOFF,600);
 			me->reload=1;
 		}

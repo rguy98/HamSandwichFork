@@ -767,7 +767,7 @@ void PlayerFireWeapon(Guy *me)
 		return;	// no shooting when you're dead
 
 	byte curWpn = player.wpns[player.curSlot].wpn,
-		curAmmo = player.wpns[player.curSlot].ammo;
+		curAmmo = player.wpns[player.curSlot].ammo>0;
 
 	switch(curWpn)
 	{
@@ -775,7 +775,7 @@ void PlayerFireWeapon(Guy *me)
 			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
-				FireBullet(me->x,me->y,me->facing,BLT_MISSILE,1);
+				FireBullet(me->x,me->y,me->facing,BLT_MISSILE,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -786,7 +786,7 @@ void PlayerFireWeapon(Guy *me)
 			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
-				FireBullet(me->x,me->y,me->facing*32,BLT_BOMB,1);
+				FireBullet(me->x,me->y,me->facing*32,BLT_BOMB,me->friendly);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
@@ -798,7 +798,7 @@ void PlayerFireWeapon(Guy *me)
 			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
-				FireBullet(me->x,me->y,me->facing,BLT_LASER,1);
+				FireBullet(me->x,me->y,me->facing,BLT_LASER,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -827,11 +827,11 @@ void PlayerFireWeapon(Guy *me)
 					if(Random(2)==0)
 					{
 						MakeSound(SND_BLOWBUBBLE,me->x,me->y,SND_CUTOFF,1);
-						FireBullet(me->x,me->y,(me->facing*32-6+Random(13))&255,BLT_BUBBLE,1);
+						FireBullet(me->x,me->y,(me->facing*32-6+Random(13))&255,BLT_BUBBLE,me->friendly);
 					}
 				}
 				else
-					FireBullet(me->x,me->y,me->facing,BLT_FLAME,1);
+					FireBullet(me->x,me->y,me->facing,BLT_FLAME,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -850,7 +850,7 @@ void PlayerFireWeapon(Guy *me)
 			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
-				FireBullet(me->x,me->y,me->facing,BLT_BIGAXE,1);
+				FireBullet(me->x,me->y,me->facing,BLT_BIGAXE,me->friendly);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
@@ -862,7 +862,7 @@ void PlayerFireWeapon(Guy *me)
 			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
-				FireBullet(me->x,me->y,me->facing*32,BLT_FREEZE,1);
+				FireBullet(me->x,me->y,me->facing*32,BLT_FREEZE,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -874,7 +874,7 @@ void PlayerFireWeapon(Guy *me)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				// fire lightning
-				FireBullet(me->x,me->y,me->facing,BLT_LIGHTNING,1);
+				FireBullet(me->x,me->y,me->facing,BLT_LIGHTNING,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -896,7 +896,7 @@ void PlayerFireWeapon(Guy *me)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
-				FireBullet(me->x,me->y,me->facing,BLT_SPEAR,1);
+				FireBullet(me->x,me->y,me->facing,BLT_SPEAR,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -909,7 +909,7 @@ void PlayerFireWeapon(Guy *me)
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_SLASH,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
-					me->facing,BLT_SLASH,1);
+					me->facing,BLT_SLASH,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -922,7 +922,7 @@ void PlayerFireWeapon(Guy *me)
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_MINELAY,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x-Cosine(me->facing*32)*32,me->y-Sine(me->facing*32)*32,
-					me->facing,BLT_MINE,1);
+					me->facing,BLT_MINE,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -936,7 +936,7 @@ void PlayerFireWeapon(Guy *me)
 
 				ScoreEvent(SE_SHOOT,1);
 				g=AddGuy(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
-					FIXAMT*10,MONS_GOODTURRET,1);
+					FIXAMT*10,MONS_GOODTURRET,me->friendly);
 				if(g==NULL || !g->CanWalk(g->x,g->y,curMap,&curWorld))
 				{
 					MakeSound(SND_TURRETBZZT,me->x,me->y,SND_CUTOFF,1200);
@@ -959,7 +959,7 @@ void PlayerFireWeapon(Guy *me)
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_MINDWIPE,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
-					me->facing,BLT_MINDWIPE,1);
+					me->facing,BLT_MINDWIPE,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				player.wpnReload=15;
 				if(!editing && !player.cheated && verified)
@@ -971,7 +971,7 @@ void PlayerFireWeapon(Guy *me)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
-				FireBullet(me->x,me->y,me->facing,BLT_REFLECT,1);
+				FireBullet(me->x,me->y,me->facing,BLT_REFLECT,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -1003,7 +1003,7 @@ void PlayerFireWeapon(Guy *me)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
-				FireBullet(me->x,me->y,me->facing,BLT_SWAP,1);
+				FireBullet(me->x,me->y,me->facing,BLT_SWAP,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -1028,7 +1028,7 @@ void PlayerFireWeapon(Guy *me)
 			{
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_LIGHTSON,me->x,me->y,SND_CUTOFF,1200);
-				FireBullet(me->x,me->y,me->facing,BLT_SCANNER,1);
+				FireBullet(me->x,me->y,me->facing,BLT_SCANNER,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -1048,11 +1048,11 @@ void PlayerFireWeapon(Guy *me)
 			}
 			break;
 		case WPN_IGNITE:
-			FireBullet(me->x,me->y,me->facing*32,BLT_IGNITE,1);
+			FireBullet(me->x,me->y,me->facing*32,BLT_IGNITE,me->friendly);
 			player.wpnReload=5;
 			break;
 		case WPN_PORTAL:
-			FireBullet(me->x,me->y,me->facing*32,BLT_HOLESHOT,1);
+			FireBullet(me->x,me->y,me->facing*32,BLT_HOLESHOT,me->friendly);
 			player.wpnReload=15;
 			break;
 		case WPN_REFLECT:
@@ -1077,7 +1077,7 @@ void PlayerFireWeapon(Guy *me)
 		case WPN_SPARKS:
 			MakeSound(SND_CACTONSHOOT,me->x,me->y,SND_CUTOFF,200);
 			for(i=0;i<(5/2)+1;i++)
-				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*24,me->facing*32,BLT_SCANSHOT,1);
+				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*24,me->facing*32,BLT_SCANSHOT,me->friendly);
 
 			me->z+=FIXAMT*Random(4);
 			me->dx+=FIXAMT/2-Random(FIXAMT);
@@ -1096,7 +1096,7 @@ void PlayerFireWeapon(Guy *me)
 			DoPlayerFacing(c,me);
 			break;
 		case WPN_SONIC:
-			FireBullet(me->x+Cosine(me->facing*32)*10,me->y+Sine(me->facing*32)*10,me->facing*32,BLT_BIGAXE,1);
+			FireBullet(me->x+Cosine(me->facing*32)*10,me->y+Sine(me->facing*32)*10,me->facing*32,BLT_BIGAXE,me->friendly);
 			MakeSound(SND_SDZLSPIT,me->x,me->y,SND_CUTOFF,1200);
 			player.wpnReload=30;
 			break;
@@ -1137,6 +1137,17 @@ void PlayerFireWeapon(Guy *me)
 				g->dy=Sine(g->facing*32)*8;
 			}
 			player.wpnReload=30;
+			break;
+		case WPN_ROCKETS:
+			if(curAmmo)
+			{
+				ScoreEvent(SE_SHOOT,1);
+				FireBullet(me->x,me->y,me->facing,BLT_ROCKET,me->friendly);
+				player.wpns[player.curSlot].ammo--;
+				if(!editing && !player.cheated && verified)
+					profile.progress.shotsFired++;
+			}
+			player.wpnReload=2;
 			break;
 	}
 	if(player.ammoCrate)
