@@ -145,7 +145,12 @@
 #define BLT_ENERGYPSN		125
 #define BLT_SONIC			126
 #define BLT_SPARKSHOT		127
-#define MAX_BULLETS			128
+#define BLT_CONFUSION		128
+#define BLT_DEATHRAY		129
+#define BLT_ROCKET2			130
+#define BLT_BFGHAMMER		131
+#define BLT_PUMPKIN			132
+#define MAX_BULLETS			133
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1
@@ -168,8 +173,8 @@
 
 typedef struct bullet_t
 {
-	int x,y,z;
-	int dx,dy,dz; // destination x/y/z
+	int x, y, z;
+	int dx, dy, dz; // destination x/y/z
 	int timer; // how many frames left - stops at 0
 	int frms; // how many frames so far - goes up
 	byte speed; // sets a speed!
@@ -180,10 +185,10 @@ typedef struct bullet_t
 	char bright;
 	byte friendly;
 	byte flags;
-	byte fromColor,toColor;
+	byte fromColor, toColor;
 
 	// for wavy/circular bullets
-	byte tall,freq,curve;
+	byte tall, freq, curve;
 } bullet_t;
 
 void InitBullets(void);

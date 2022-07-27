@@ -58,15 +58,15 @@ void ExitMonsters(void)
 	}
 }
 
-monsterType_t *GetMonsterType(dword type)
-{
-	return &monsType[type];
-}
-
 void ChangeOffColor(dword type,byte from,byte to)
 {
 	monsType[type].fromCol=from;
 	monsType[type].toCol=to;
+}
+
+monsterType_t *GetMonsterType(dword type)
+{
+	return &monsType[type];
 }
 
 void PurgeMonsterSprites(void)

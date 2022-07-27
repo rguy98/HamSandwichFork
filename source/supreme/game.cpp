@@ -321,7 +321,7 @@ TASK(byte) LunaticRun(int *lastTime)
 			{
 				if(windingUp)
 				{
-					CheckBOLSpecials(curMap);
+					CheckBOLSpecials(curMap); // Checks beginning of level specials first.
 					curMap->Update(UPDATE_FADEIN,&curWorld);
 					EditorUpdateGuys(curMap);
 					windingUp--;

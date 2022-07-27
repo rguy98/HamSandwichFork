@@ -7,6 +7,12 @@
 #include "shop.h"
 #include "config.h"
 
+bullet_t *bullet;
+sprite_set_t *bulletSpr;
+byte reflect=0;
+byte attackType;
+int activeBulDX,activeBulDY;
+
 #define SPR_FLAME		0
 #define SPR_LASER		5
 #define SPR_HAMMER		21
@@ -74,12 +80,6 @@
 #define SPR_CLAW		692
 #define SPR_WHOOPEE		708
 #define SPR_ORB			714
-
-bullet_t *bullet;
-sprite_set_t *bulletSpr;
-byte reflect=0;
-byte attackType;
-int activeBulDX,activeBulDY;
 
 void GetBulletDeltas(int *bdx,int *bdy)
 {
@@ -624,6 +624,9 @@ byte OnHitWall(bullet_t* me)
 		case BLT_WIND:
 		case BLT_SHROOM:
 		case BLT_SPOREBALL:
+		case BLT_CONFUSION:
+		case BLT_DEATHRAY:
+		case BLT_PUMPKIN:
 			return 3; // runs out
 		case BLT_GRENADE:
 		case BLT_ICECLOUD:
@@ -640,6 +643,7 @@ byte OnHitWall(bullet_t* me)
 		case BLT_FLAME:
 		case BLT_FLAME2:
 		case BLT_FLAME3:
+		case BLT_ROCKET:
 			return 4; // pushes back, and that's all
 		default:
 			return 0; // does nothing
@@ -904,6 +908,8 @@ void BulletHitFloor(bullet_t *me,Map *map,world_t *world)
 		case BLT_BADFBALL:
 		case BLT_BOMB:
 		case BLT_MINDWIPE:
+		case BLT_CONFUSION:
+		case BLT_DEATHRAY:
 		case BLT_BUBBLE:
 		case BLT_ROCK:
 			MakeSound(SND_HAMMERREFLECT, me->x, me->y, SND_CUTOFF, 850);
@@ -1762,6 +1768,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			}
 			break;
 		case BLT_ROCKET:
+		case BLT_ROCKET2:
 		case BLT_WIND:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,16,me->dx,me->dy,20,map,world,me->friendly))
 			{
@@ -1802,6 +1809,30 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 			{
 				Inflict(GetLastGuyHit(),GEF_POISON,24);
 				Splat(me);
+			}
+			break;
+		case BLT_CONFUSION:
+			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,0,map,world,me->friendly))
+			{
+				if(Inflict(GetLastGuyHit(),GEF_CONFUSE,128))
+				{
+					MakeSound(SND_ROBOBOUAPHAON,me->x,me->y,SND_CUTOFF,1400);
+				}
+				BulletRanOut(me,map,world);
+			}
+			break;
+		case BLT_DEATHRAY:
+			if(FindVictims(me->x >> FIXSHIFT, me->y >> FIXSHIFT, 32, me->dx, me->dy, 128, map, world, me->friendly, 1))
+			{
+				MakeSound(SND_ZAP,me->x,me->y,SND_CUTOFF,1400);
+				me->timer -= 2;
+			}
+			break;
+		case BLT_PUMPKIN:
+			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,12,me->dx,me->dy,10,map,world,me->friendly))
+			{
+				ExplodeParticles2(PART_YELLOW, me->x, me->y, me->z, 10, 8);
+				BulletRanOut(me,map,world);	// detonate, not to mention the 10 damage you already did
 			}
 			break;
 	}
@@ -2754,7 +2785,11 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 			me->anim++;
 			if(me->anim>2)
 				me->anim=0;
-
+			HitBadguys(me,map,world);
+			me->bright=(char)Random(16);
+			break;
+		case BLT_CONFUSION:
+		case BLT_DEATHRAY:
 			HitBadguys(me,map,world);
 			me->bright=(char)Random(16);
 			break;
@@ -2965,6 +3000,7 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 				me->anim++;
 			break;
 		case BLT_ROCKET:
+		case BLT_ROCKET2:
 			BulletFaceGuy2(me,goodguy);
 			me->dx+=Cosine(me->facing)*2;
 			me->dy+=Sine(me->facing)*2;
@@ -3482,6 +3518,16 @@ void RenderBullet(bullet_t *me)
 			curSpr=bulletSpr->GetSprite(SPR_BOOM+me->anim);
 			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
+		case BLT_CONFUSION:
+		case BLT_DEATHRAY:
+			curSpr=bulletSpr->GetSprite(SPR_SCANSHOT+me->anim);
+			for (v = 0; v < 3; v++)
+			{
+				x = me->x - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
+				y = me->y - FIXAMT * 10 + Random(FIXAMT * 20 + 1);
+				SprDrawBulletOffXY(x,y,me,curSpr,DISPLAY_GLOW,0);
+			}
+			break;
 		case BLT_REFLECT:
 			curSpr=bulletSpr->GetSprite(me->anim/2+SPR_YELBOOM);
 			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
@@ -3571,6 +3617,7 @@ void RenderBullet(bullet_t *me)
 					DISPLAY_DRAWME);
 			break;
 		case BLT_ROCKET:
+		case BLT_ROCKET2:
 			curSpr=bulletSpr->GetSprite(me->facing/16+SPR_ROCKET);
 			SprDrawBullet(me, curSpr, DISPLAY_SHADOW, 0);
 			break;
@@ -3614,6 +3661,11 @@ void RenderBullet(bullet_t *me)
 		case BLT_SPOREBALL:
 			curSpr=bulletSpr->GetSprite(SPR_GRENADE);
 			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
+			break;
+		case BLT_PUMPKIN:
+			curSpr = GetMonsterSprite(MONS_PUMPKIN,ANIM_MOVE,me->timer%7,me->facing);
+			SprDraw(me->x>>FIXSHIFT,me->y>> FIXSHIFT,0,255,me->bright,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW); // Display shadow
+			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,DISPLAY_DRAWME);
 			break;
 	}
 }
@@ -3663,6 +3715,7 @@ byte HasGravity(bullet_t* me) {
 		case BLT_ORBGRENADE:
 		case BLT_SHARK:
 		case BLT_SQUIRT:
+		case BLT_PUMPKIN:
 			return 1;
 	}
 }
@@ -4261,6 +4314,13 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetMissileOffset(me->x,me->y);
 			SetBulletVars(me,0,0,FIXAMT*20,60,BD_NONE);
 			break;
+		case BLT_ROCKET2:
+			me->target=65535;
+			SetMissileFacing(me->facing);
+			SetMissileOffset(me->x,me->y);
+			RecolorBullet(me,6,1);
+			SetBulletVars(me,0,0,FIXAMT*20,60,BD_NONE);
+			break;
 		case BLT_ORBGRENADE:
 			me->anim=0;
 			me->timer=120;
@@ -4310,6 +4370,17 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			break;
 		case BLT_SPOREBALL:
 			SetBulletVars(me,6,0,FIXAMT*50,150,BD_NONE);
+			break;
+		case BLT_PUMPKIN:
+			SetBulletVars(me,8,0,FIXAMT*32,60,BD_EIGHT);
+			break;
+		case BLT_CONFUSION:
+			RecolorBullet(me,1,6);
+			SetBulletVars(me,12,0,FIXAMT*20,40,BD_EIGHT);
+			break;
+		case BLT_DEATHRAY:
+			RecolorBullet(me,1,4);
+			SetBulletVars(me,8,0,FIXAMT*20,40,BD_EIGHT);
 			break;
 	}
 }

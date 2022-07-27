@@ -1201,7 +1201,7 @@ void PlayerFireWeapon(Guy *me)
 			if(curAmmo)
 			{
 				ScoreEvent(SE_SHOOT,1);
-				FireBullet(me->x,me->y,me->facing,BLT_ROCKET,me->friendly);
+				FireBullet(me->x,me->y,me->facing,BLT_ROCKET2,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -1252,7 +1252,7 @@ void PlayerFireWeapon(Guy *me)
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_MINDWIPE,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
-					me->facing,BLT_MINDWIPE,me->friendly);
+					me->facing,BLT_CONFUSION,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				player.wpnReload=10;
 				if(!editing && !player.cheated && verified)
@@ -1265,7 +1265,7 @@ void PlayerFireWeapon(Guy *me)
 				ScoreEvent(SE_SHOOT,10);
 				MakeSound(SND_BOBBYLAUGH,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x+Cosine(me->facing*32)*32,me->y+Sine(me->facing*32)*32,
-					me->facing,BLT_MINDWIPE,me->friendly);
+					me->facing,BLT_DEATHRAY,me->friendly);
 				if(goodguy)
 				{
 					goodguy->dx=Cosine(goodguy->facing)*8;
@@ -1282,7 +1282,7 @@ void PlayerFireWeapon(Guy *me)
 			{
 				ScoreEvent(SE_SHOOT,5);
 				MakeSound(SND_BOMBTHROW,me->x,me->y,SND_CUTOFF,1200);
-				FireBullet(me->x,me->y,me->facing,BLT_HAMMER,me->friendly);
+				FireBullet(me->x,me->y,me->facing,BLT_BFGHAMMER,me->friendly);
 				player.wpns[player.curSlot].ammo--;
 				if(!editing && !player.cheated && verified)
 					profile.progress.shotsFired++;
@@ -1896,6 +1896,8 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			{
 				me->z=FIXAMT*8;	// hover while spinning feet in the air before plunging into water
 				me->dz=FIXAMT;
+				if(GetMonsterType(me->type)->flags&MF_ONEFACE && me->frm%2==0)
+					me->facing = (me->facing+1)&7;
 			}
 			else
 			{
@@ -2107,6 +2109,7 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 
 	if(player.reload)
 		player.reload--;
+
 	if(player.wpnReload)
 		player.wpnReload--;
 
@@ -2120,8 +2123,10 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 		tportclock--;
 
 	if(me->poison)
-		// can't be poisoned in armor
-		me->poison=0;
+		me->poison=0; // can't be poisoned
+
+	if (me->ignited)
+		me->ignited = 0; // can't be burnt
 
 	// ice is not slippery for armor
 	Dampen(&me->dx,PLYR_DECEL);

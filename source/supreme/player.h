@@ -86,7 +86,6 @@ typedef struct player_t
 	int  boredom;
 	byte hammers;
 	byte hamSpeed;
-	byte weapon; // todo: remove
 	byte lastWeapon;
 	int  ammo;
 	byte reload;
