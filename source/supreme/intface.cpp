@@ -16,7 +16,7 @@
 #define SPR_WPNNAME		22
 
 #define SPR_KEYS		(SPR_WPNNAME+MAX_WEAPONS)
-#define SPR_HAMMER		(SPR_KEYS+4)
+#define SPR_HAMMER		(SPR_KEYS+3)
 #define SPR_PANTS		(SPR_HAMMER+1)
 #define SPR_SPRING		(SPR_HAMMER+2)
 #define SPR_REVERSE		(SPR_HAMMER+3)
@@ -774,7 +774,7 @@ void UpdateInterface(Map *map)
 		intf[INTF_POCKETS].ty = 80;
 	}
 	else {
-		intf[INTF_POCKETS].tx = 680;
+		intf[INTF_POCKETS].tx = 718;
 		intf[INTF_POCKETS].ty = 80;
 	}
 

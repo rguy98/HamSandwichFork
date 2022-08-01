@@ -1343,15 +1343,14 @@ void PlayerFireWeapon(Guy *me)
 				ScoreEvent(SE_SHOOT,1);
 				MakeSound(SND_MUSHMISSILE,me->x,me->y,SND_CUTOFF,1200);
 				FireBullet(me->x, me->y, me->facing, BLT_ALIENEGG, me->friendly);
-				player.ammo--;
+				player.wpns[player.curSlot].ammo--;
 				player.wpnReload = 20;
 			}
 			break;
 	}
 	if(player.ammoCrate)
 		player.wpns[player.curSlot].ammo=maxAmmo[curWpn];
-
-	if (!player.wpns[player.curSlot].ammo)
+	else if (!player.wpns[player.curSlot].ammo)
 		WeaponRanOut(player.curSlot);
 
 	GoalFire();
@@ -1426,12 +1425,16 @@ byte FindNextUnusedPocketSlot() {
 }
 
 byte FindNextUsedPocketSlot() {
-	for (int i = player.curSlot+1; i < 4; i++) {
-		if (player.wpns[i].used && player.wpns[i].wpn) {
-			return i+1; // Pocket slot successfully added
-		}
+	byte n=0;
+	int i=player.curSlot+1;
+	while (n<4)
+	{
+		if (player.wpns[i].used && player.wpns[i].wpn)
+			return i; // Pocket slot successfully added
+		i=(i+1)&3;
+		n++;
 	}
-	return 0; // Maxed out on pocket slots
+	return 0; // maxed out on pocket slots
 }
 
 void PlayerFirePowerArmor(Guy *me,byte mode)
