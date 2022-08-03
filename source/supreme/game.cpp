@@ -449,6 +449,7 @@ TASK(byte) LunaticRun(int *lastTime)
 			if(player.rageClock)
 			{
 				player.rageClock--;
+				goodguy->z+=FIXAMT;
 				if(goodguy)
 					goodguy->facing=(goodguy->facing+1)&7;
 			}

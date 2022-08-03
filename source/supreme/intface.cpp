@@ -340,7 +340,7 @@ void ShowEnemyLife(char *name,byte formerLife,byte life,byte alive)
 
 void RenderRage(byte size,MGLDraw *mgl)
 {
-	intfaceSpr->GetSprite(SPR_RAGE+size)->Draw(320,240,mgl);
+	intfaceSpr->GetSprite(SPR_RAGE+size)->Draw(320+Random(9)-4,240+Random(9)-4,mgl);
 }
 
 void DrawBigMeter(int x,int y,int value,int length,MGLDraw *mgl)
@@ -641,23 +641,29 @@ void DrawHammers(int x,int y,MGLDraw *mgl)
 		intfaceSpr->GetSprite(SPR_REVERSE)->Draw(x,y,mgl);
 }
 
+byte GetPocketNum(int i)
+{
+	return (player.curSlot + 1 + i) % NumFilledPockets();
+}
+
 void DrawPockets(int x, int y, MGLDraw* mgl)
 {
-	int p =0 ;
+	int p=0,n;
 	int pockets[3] = { 0,0,0 };
 
-	for (int i = 0; i < NumFilledPockets(); i++)
+	for (int i = 0; i < NumFilledPockets()-1; i++)
 	{
-		if (i == player.curSlot || player.wpns[i].wpn == WPN_NONE || !player.wpns[i].used)
+		n = GetPocketNum(i);
+		if (player.wpns[n].wpn == WPN_NONE || !player.wpns[n].used)
 			continue;
-		pockets[p] = player.wpns[i].wpn;
+		pockets[p] = player.wpns[n].wpn;
 		p++;
 	}
-
 	for(int i = 0; i < 3; i++)
 	{
 		if (pockets[i] == 0)
 			continue;
+		//intfaceSpr->GetSprite(21+pockets[i])->Draw(x+(i%2)*32, y+i*12, mgl);
 		intfaceSpr->GetSprite(21+pockets[i])->Draw(x+(i%2)*32, y+i*12, mgl);
 	}
 }
@@ -1014,20 +1020,19 @@ void RenderInterface(MGLDraw *mgl)
 
 	sprintf(combo,"Combo x%d",curCombo);
 	PrintGlow(240,comboY,combo,0,2);
-
+	/*
 	int camx,camy;
 	GetCamera(&camx, &camy);
 	camx = camx/32-10;
 	camy = camy/24-10;
-	word w=0;
-	if(goodguy)
-	{
-		if(goodguy->parent)
-		w=goodguy->parent->ID;
+	int d[3] = { 0,0,0 };
 
-	}
-	sprintf(debuggy,"Parent: %d",w);
+	for(int i = 0; i < NumFilledPockets()-1; i++)
+		d[i] = GetPocketNum(i);
+
+	sprintf(debuggy,"Parent: %d, %d, %d",d[0],d[1],d[2]);
 	PrintGlow(240, 80, debuggy, 0, 2);
+	*/
 }
 
 void RenderCollectedStuff(int x,int y,MGLDraw *mgl)

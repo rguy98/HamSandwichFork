@@ -1807,7 +1807,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_ENERGYPSN:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,8,me->dx,me->dy,2,map,world,me->friendly))
 			{
-				Inflict(GetLastGuyHit(),GEF_POISON,24);
+				Inflict(GetLastGuyHit(),GEF_POISON,8);
 				Splat(me);
 			}
 			break;
@@ -3716,6 +3716,8 @@ byte HasGravity(bullet_t* me) {
 		case BLT_SHARK:
 		case BLT_SQUIRT:
 		case BLT_PUMPKIN:
+		case BLT_SNOWBALL:
+		case BLT_BIGSNOW:
 			return 1;
 	}
 }

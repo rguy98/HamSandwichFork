@@ -170,6 +170,7 @@ byte FindNextUnusedPocketSlot(void);
 byte FindNextUsedPocketSlot(void);
 void WipeSlot(byte slot,byte isUsed);
 int NumFilledPockets(void);
+//int NumActivePockets(void);
 
 int WeaponMaxAmmo(byte wpn);
 byte PlayerGetWeapon(byte wpn,int x,int y);

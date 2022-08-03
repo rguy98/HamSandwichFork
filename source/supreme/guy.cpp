@@ -2945,6 +2945,8 @@ byte AngerYetis(Guy* me)
 			case MONS_BJORN:
 			case MONS_OLAF:
 				guys[i]->mind2++;
+				LightningBolt(me->x, me->y, guys[i]->x, guys[i]->y);
+				MakeSound(me->friendly ? SND_TURNGOOD : SND_TURNEVIL, me->x, me->y, SND_CUTOFF, 100);
 				result=1;
 				break;
 		}

@@ -81,15 +81,24 @@ byte ControlCheck(byte c)
 	return 0;
 }
 
-void InitPlayer(byte level,const char *fname)
-{
+void ResetLocalStats() {
 	int i;
-	strcpy(player.worldName,fname);
-	player.worldProg=GetWorldProgress(player.worldName);
-
-	player.levelNum=level;
-	player.levelProg=GetLevelProgress(player.worldName,player.levelNum);
-
+	for (i = 0; i < 8; i++)
+		player.var[i] = 0;
+	//For the dynamic water/lava colors
+	for(int i = 0; i < 2; i++)
+	{
+		player.waterDyn[i] = 3;
+		player.lavaDyn[i] = 3;
+	}
+	for(i=1;i<6;i++)
+		player.ability[i]=ItemPurchased(SHOP_ABILITY,i);
+	player.brainTime=30*30;
+	player.brainX=255;
+	player.candleX=255;
+	player.candleTime=30*30;
+	player.spotted=0;
+	player.playAs=profile.playAs;
 	for(i=0;i<4;i++)
 		player.keys[i] = 0;
 
@@ -98,10 +107,6 @@ void InitPlayer(byte level,const char *fname)
 		player.wpns[i].used = i==0?1:0;
 		player.wpns[i].ammo = 0;
 	}
-
-	for(i=0;i<8;i++)
-		player.var[i]=0;
-
 	oldControls=0;
 	newControls=0;
 	player.perfect=1;
@@ -142,37 +147,26 @@ void InitPlayer(byte level,const char *fname)
 	player.cheated=0;
 	player.bestCombo=0;
 	player.cheesePower=0;
-	
-	//For the dynamic water/lava colors
-	for(int i = 0; i < 2; i++)
-	{
-		player.waterDyn[i] = 3;
-		player.lavaDyn[i] = 3;
-	}
-
-	for(i=1;i<6;i++)
-	{
-		player.ability[i]=ItemPurchased(SHOP_ABILITY,i);
-	}
-
-	player.brainTime=30*30;
-	player.brainX=255;
-	player.candleX=255;
-	player.candleTime=30*30;
-	player.spotted=0;
-	player.playAs=profile.playAs;
-
 	player.camera.g=NULL;
 	GetCamera(&player.camera.x,&player.camera.y);
 	player.camera.dx=0;
 	player.camera.dy=0;
 }
 
+void InitPlayer(byte level,const char *fname)
+{
+	int i;
+	strcpy(player.worldName,fname);
+	player.worldProg=GetWorldProgress(player.worldName);
+	player.levelNum=level;
+	player.levelProg=GetLevelProgress(player.worldName,player.levelNum);
+	ResetLocalStats();
+}
+
 void ExitPlayer(void)
 {
+	ResetLocalStats();
 	player.playAs=profile.playAs;
-	player.shield=0;
-	player.invisibility=0;
 	SaveProfile();
 }
 
@@ -262,6 +256,14 @@ int WeaponMaxAmmo(byte wpn)
 	return maxAmmo[wpn];
 }
 
+byte HasFullWeapon(int w){
+	for(int i=0;i<NumFilledPockets();i++)
+	{
+		if(player.wpns[player.curSlot].ammo >= GetAmmoFill(w))
+			return 1;
+	}
+}
+
 byte PlayerGetWeapon(byte wpn,int x,int y)
 {
 	int cx,cy;
@@ -283,22 +285,24 @@ byte PlayerGetWeapon(byte wpn,int x,int y)
 			player.curSlot = FindNextUnusedPocketSlot();
 	}
 
-	if(curWpn==wpn && player.wpns[player.curSlot].ammo>=GetAmmoFill(wpn))
+	if(curWpn==wpn && HasFullWeapon(wpn))
 		return 0;	// don't pick it up if you've already got it
 
 	if(wpn==WPN_PWRARMOR || wpn == WPN_MINISUB)
 	{
-		WeaponAddOrReplace(wpn);
-		goodguy->seq=ANIM_A2;
-		goodguy->frm=0;
-		goodguy->frmTimer=0;
-		goodguy->frmAdvance=64;
-		goodguy->action=ACTION_BUSY;
+		if(WeaponAddOrReplace(wpn))
+		{
+			goodguy->seq=ANIM_A2;
+			goodguy->frm=0;
+			goodguy->frmTimer=0;
+			goodguy->frmAdvance=64;
+			goodguy->action=ACTION_BUSY;
+		}
 	}
 	else
 	{
-		player.lastWeapon=wpn;
-		WeaponAddOrReplace(wpn);
+		if(WeaponAddOrReplace(wpn))
+			player.lastWeapon=wpn;
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -1369,7 +1373,8 @@ void WeaponRanOut(byte slot) {
 		player.wpns[i].ammo = player.wpns[i+1].ammo;
 		WipeSlot(i+1, 1);
 	}
-	player.curSlot=FindNextUsedPocketSlot(); //finds next used slot
+	if (player.wpns[slot].wpn == WPN_NONE)
+		player.curSlot = FindNextUsedPocketSlot();
 }
 
 byte AddPocketSlot(){ // Adds a pocket slot (Max: 4)
@@ -1426,7 +1431,7 @@ byte FindNextUnusedPocketSlot() {
 
 byte FindNextUsedPocketSlot() {
 	byte n=0;
-	int i=player.curSlot+1;
+	int i=(player.curSlot+1)&3;
 	while (n<4)
 	{
 		if (player.wpns[i].used && player.wpns[i].wpn)
@@ -1927,7 +1932,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(!player.jetting)
 		DoPlayerFacing(c,me);
 
-	if (c & CONTROL_B3 && !player.reload) { // switch slots
+	if ((c&CONTROL_B3) && player.reload==0 && NumFilledPockets()>1) { // switch slots
 		switch(player.wpns[player.curSlot].wpn){
 			case WPN_PWRARMOR:
 			case WPN_MINISUB:
@@ -1935,7 +1940,7 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 				break;
 			default:
 				if(player.wpns[1].used) { // Needs at least two slots!
-					player.curSlot = FindNextUsedPocketSlot() ? FindNextUsedPocketSlot() - 1 : 0;
+					player.curSlot = FindNextUsedPocketSlot();
 					MakeNormalSound(SND_WORLDTURN);
 				}
 				break;
