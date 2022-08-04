@@ -217,6 +217,8 @@ static char tempFlagName[][16] = {
 	"Confusion",
 	"Garlic",
 	"TempSpeed",
+	"Shield",
+	"Invis",
 };
 
 static char permFlagName[][16] = {

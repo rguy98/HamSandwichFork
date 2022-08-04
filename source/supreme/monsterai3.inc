@@ -353,17 +353,6 @@ void AI_Mattie2Body(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 }
 
-byte IsBunnyAble(mapTile_t *m,world_t *world)
-{
-	if(!(GetTerrain(world,m->floor)->flags&TF_BUNNY))
-		return 0;
-
-	if(GetItem(m->item)->flags&IF_SOLID)
-		return 0;
-
-	return 1;
-}
-
 void AI_BuddyBunny(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	int x,y;

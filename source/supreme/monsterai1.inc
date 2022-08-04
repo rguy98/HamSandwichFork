@@ -2572,7 +2572,7 @@ void AI_SuperZombie(Guy* me, Map* map, world_t* world, Guy* goodguy)
 		if (me->seq == ANIM_A2 && me->frm == 1 && me->reload == 0 && goodguy)
 		{
 			// can only do the pickup move on Bouapha
-			if (RangeToTarget(me, goodguy) < 70 * FIXAMT && goodguy->hp > 0 && PlayerShield() == 0 && goodguy->aiType == MONS_BOUAPHA &&
+			if (RangeToTarget(me, goodguy) < 70 * FIXAMT && goodguy->hp > 0 && goodguy->shield == 0 && goodguy->aiType == MONS_BOUAPHA &&
 				player.wpns[player.curSlot].wpn != WPN_PWRARMOR && player.wpns[player.curSlot].wpn != WPN_MINISUB)
 			{
 				// got him
@@ -3415,7 +3415,145 @@ void AI_Zomboni(Guy* me, Map* map, world_t* world, Guy* goodguy)
 	}
 }
 
-// sven and bjorn!
+void AI_Yeti(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y;
+
+	BasicAI(me,SND_YETIOUCH,SND_YETIDIE,map,world,goodguy);
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_DIE)
+		{
+			if(DiesForward(me)||IsOneFacing(me))
+			me->facing=2;	// can only die forward
+			if(me->frm>=4)
+			{
+				x=me->x>>FIXSHIFT;
+				y=me->y>>FIXSHIFT;
+				BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,2);
+				BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
+						  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
+						  me->z,FIXAMT);
+			}
+		}
+		if(me->seq==ANIM_ATTACK && me->frm==7 && me->frmTimer<32)
+		{
+			x=me->x+Cosine(me->facing*32)*64;
+			y=me->y+Sine(me->facing*32)*64;
+			x+=Cosine(((me->facing+2)*32)&255)*32;
+			y+=Sine(((me->facing+2)*32)&255)*32;
+			FireExactBullet(x,y,40*FIXAMT,Cosine(me->facing*32)*8,Sine(me->facing*32)*8,4*FIXAMT,0,100,
+							me->facing*32,BLT_BIGSNOW,me->friendly);
+			me->reload=10;
+		}
+		if(me->seq==ANIM_A2 && me->frm>3)
+		{
+			ShakeScreen(3);
+			// snowballs fall all over
+			x=me->x+((320-Random(641))<<FIXSHIFT);
+			y=me->y+((240-Random(481))<<FIXSHIFT);
+			if(Random(3)==0)
+				FireExactBullet(x,y,400*FIXAMT,0,0,0,0,100,me->facing*32,BLT_BIGSNOW,me->friendly);
+			else
+				FireExactBullet(x,y,400*FIXAMT,0,0,0,0,100,me->facing*32,BLT_SNOWBALL,me->friendly);
+		}
+		if(me->seq==ANIM_A1 && (me->frm==5 || me->frm==6))
+		{
+			x=me->x+Cosine(me->facing*32)*64;
+			y=me->y+Sine(me->facing*32)*64;
+			FireBullet(x,y,me->facing,BLT_ICESPIKE,me->friendly);
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind==0)
+	{
+		if((goodguy && RangeToTarget(me,goodguy)<(300*FIXAMT)) || (me->ouch))
+		{
+			me->mind=1;	// start into action
+			me->mind1=0;
+
+			me->seq=ANIM_A3;	// wave hello first
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=64;
+			me->facing=2;
+			me->action=ACTION_BUSY;
+
+			if(me->aiType==MONS_SVEN) // say "Hello, I am Sven"
+				MakeSound(SND_SVENHI,me->x,me->y,SND_CUTOFF,1200);
+			else	// say "Hello, I am Bjorn"
+				MakeSound(SND_BJORNHI,me->x,me->y,SND_CUTOFF,1200);
+		}
+	}
+	else
+	{
+		if(me->mind1)
+			me->mind1--;
+		else
+		{
+			// rotate
+			me->facing=(me->facing-1+Random(3))&7;
+			me->mind1=Random(30)+1;
+		}
+
+		if((!me->reload) && goodguy && Random(20)==0)
+		{
+			// select an attack method
+			x=Random(16);
+
+			if(x<12) // 75% chance of primary weapon
+			{
+				// Sven throws snowballs
+				if(me->aiType==MONS_SVEN)
+				{
+					me->seq=ANIM_ATTACK;
+					me->frm=0;
+					me->frmTimer=0;
+					me->frmAdvance=128;
+					FaceGoodguy(me,goodguy);
+					me->action=ACTION_BUSY;
+				}
+				else
+				{
+					// Bjorn causes stalag-quakes
+					me->seq=ANIM_A1;
+					me->frm=0;
+					me->frmTimer=0;
+					me->frmAdvance=128;
+					FaceGoodguy(me,goodguy);
+					me->action=ACTION_BUSY;
+				}
+			}
+			else	// 25% chance of yodel
+			{
+				MakeSound(SND_YETIYODEL,me->x,me->y,SND_CUTOFF,1500);
+				me->seq=ANIM_A2;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=64;
+				me->facing=2;
+				me->action=ACTION_BUSY;
+			}
+			me->dx=0;
+			me->dy=0;
+			return;
+		}
+
+		me->dx=Cosine(me->facing*32)*3;
+		me->dy=Sine(me->facing*32)*3;
+
+		if(me->seq!=ANIM_MOVE)
+		{
+			me->seq=ANIM_MOVE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+		}
+
+	}
+}
 
 void AI_Geozoid(Guy* me, Map* map, world_t* world, Guy* goodguy)
 {
@@ -4882,74 +5020,7 @@ void AI_Boiler(Guy* me, Map* map, world_t* world, Guy* goodguy)
 	}
 }
 
-// great pumpkin
-
-void AI_Ultrazoid(Guy* me, Map* map, world_t* world, Guy* goodguy)
-{
-	int i;
-
-	if (me->reload)
-		me->reload--;
-
-	if (me->mind1)
-		me->mind1--;
-	if (me->ouch == 4)
-	{
-		if (me->hp > 0)
-			MakeSound(SND_SERPENTOUCH, me->x, me->y, SND_CUTOFF, 1200);
-		else
-			MakeSound(SND_SERPENTDIE, me->x, me->y, SND_CUTOFF, 1200);
-	}
-
-	if (me->action == ACTION_BUSY)
-	{
-		if (me->seq == ANIM_ATTACK && (me->frm == 6 || me->frm == 7) && me->frmTimer < 64)
-		{
-			// dump a wad of zoid projectiles
-				// first a pile of energy bullets
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 4, FIXAMT * 6, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 2, FIXAMT * 8, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, 0, FIXAMT * 9, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 2, FIXAMT * 8, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 4, FIXAMT * 6, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY, me->friendly);
-			// now some fire
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 4, FIXAMT * 16, -FIXAMT * 10, 0, 24, 2, BLT_FLAME2, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, 0, FIXAMT * 18, -FIXAMT * 10, 0, 24, 2, BLT_FLAME2, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 4, FIXAMT * 16, -FIXAMT * 10, 0, 24, 2, BLT_FLAME2, me->friendly);
-			// and some rocks
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 8, FIXAMT * 1, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 4, FIXAMT * 4, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 4, FIXAMT * 4, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 8, FIXAMT * 1, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
-			// and big snowballs
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 5, FIXAMT * 1, -FIXAMT * 2, 0, 40, 2, BLT_BIGSNOW, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, 0, FIXAMT * 6, -FIXAMT * 2, 0, 40, 2, BLT_BIGSNOW, me->friendly);
-			FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 5, FIXAMT * 1, -FIXAMT * 2, 0, 40, 2, BLT_BIGSNOW, me->friendly);
-			// and cactus spines
-			for (i = 108; i > 19; i -= 10)
-				FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, Cosine(i) * 8, Sine(i) * 8, -FIXAMT * 2, 0, 40, i / 16, BLT_SPINE, me->friendly);
-
-			MakeSound(SND_SERPENTSPIT, me->x, me->y, SND_CUTOFF, 1100);
-			me->mind1 = 2;
-		}
-
-		if (me->seq == ANIM_DIE)
-		{
-			ShakeScreen(10);
-		}
-		return;	// can't do nothin' right now
-	}
-
-	if (me->reload == 0)
-	{
-		me->seq = ANIM_ATTACK;
-		me->frm = 0;
-		me->frmTimer = 0;
-		me->frmAdvance = 72;
-		me->action = ACTION_BUSY;
-		me->reload = 90;
-	}
-}
+// ultrazoid
 
 void AI_DrLunatic(Guy* me, Map* map, world_t* world, Guy* goodguy)
 {
@@ -5142,7 +5213,6 @@ void AI_SDZL(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				y = me->y + 10*FIXAMT;
 				FireBullet(x,y,0,BLT_SHOCKWAVE,me->friendly);
 			}
-
 			for(i=0;i<10;i++)
 			{
 				x=me->x+((256-Random(513))<<FIXSHIFT);
