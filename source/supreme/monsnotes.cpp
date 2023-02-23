@@ -30,51 +30,6 @@ static monsnotes_t notes[] = {
 	"such as Bouapha's nifty space rocket. Make sure to put "
 	"keychains in your levels!"
 	},
-	{MONS_MUSH,
-	"Also known as the Shroom King in the eGames versions of "
-	"Kid Mystic. He was planned to star in action games back "
-	"in 2003, though those plans never came to fruition. "
-	"Nevertheless, he's one bad dude you don't want to come "
-	"within firing range of."
-	},
-	{MONS_SPHINX,
-	"The name is likely a portmentau of Sphinx and youngster "
-	"(You can stop laughing now!) His stationary nature makes him "
-	"very situational - cover the sides and back, or the player will "
-	"defeat him with ease. In this mod, Sphinxter gains his own"
-	"sound effects as he previously used the Zombie's."
-	},
-	{MONS_DRL,
-	"Mad scientist. Small-town hero. Elvis impersonator. There's a "
-	"lot more to this pink-haired maniac than meets the eye... "
-	"the lore was never fully expanded upon, sadly. Despite his "
-	"strength as a \"former hero\", Dr. Lunatic never attacks the "
-	"player, choosing to cowardly flee. Unless stopped, he grows "
-	"into a brutish Super Duper Zombie. How he manages to fit all "
-	"those brains through a funnel is beyond me, but who cares?"
-	},
-	{MONS_SDZL,
-	"The final boss of the base game. He's a bit easier than you'd "
-	"expect, although the new AI gives him some trickier attacks. "
-	"His attacks are (almost) exclusively close-range, meaning you "
-	"can cheese him from a distance. His best attack is his loud, "
-	"crunchy sound effects, in my opinion. The SDZ keeps his pants "
-	"for the sake of decency, considering this game is intended "
-	"as family-friendly."
-	},
-	{MONS_MINECART,
-	"Jamul said the Minecart is fun, yet tricky to implement "
-	"without breaking the game... I agree with him fully. They "
-	"can run over most enemies in one fell swoop and move fairly "
-	"quickly. When used right, the Minecart can make for a fun, "
-	"fast-paced level."
-	},
-	{MONS_RAFT,
-	"The Raft travels on water and lava in cardinal directions. "
-	"While originally intended for more complex puzzles, the Raft's "
-	"behavior is limited to merely moving from Point A to B. Still, "
-	"it can help players pass deadly rivers."
-	},
 	{MONS_CRAZYBONE,
 	"(bby)The first of the recolored Boneheads. They have "
 	"about a 30% chance (two 1/6 rolls) of reviving "
@@ -86,11 +41,10 @@ static monsnotes_t notes[] = {
 	"The first monster made for Supreme With Cheese. They "
 	"wake up whenever attacked or bothered, making them "
 	"nuisances to deal with in confined areas. LazyBones "
-	"always rotate in a clockwise fashion, make of that "
-	"what you will."
+	"always rotate in a clockwise fashion."
 	},
 	{MONS_SPATULA,
-	"(bby)Originally a Countess clone, now recolored so you can "
+	"Originally a Countess clone, now recolored so you can "
 	"tell them apart. Her bat guards absorb most bullets - "
 	"you'll want to try using piercing attacks to breach her "
 	"defenses. The guards also spawn a ton of bullets"
@@ -101,33 +55,6 @@ static monsnotes_t notes[] = {
 	"not function properly without a parent monster, thus "
 	"it is advised not to use it alone unless you know "
 	"what you're doing."
-	},
-	{MONS_DEADHEAD,
-	"(bby)Originally, the Deadhead was just a Crazybone with "
-	"a fresh coat of paint. The Deadhead now merely collapses "
-	"on \"death\" with the potential to regenerate if not "
-	"defeated quickly enough. Regardless of skill, they have "
-	"a set number of regenerations before dying for good."
-	},
-	{MONS_MINECARTSLOW,
-	"I find the Minecart moves too quickly to use in certain "
-	"situations. That's why I added a slower version! It was "
-	"a bit tricky to implement but I think it paid off in the "
-	"end. Hopefully someone finds this useful."
-	},
-	{MONS_PAYLOAD,
-	"A strange combination of the Buddy Bunny and Mine Cart, "
-	"inspired by the Payload Cart from Team Fortress. Stand "
-	"nearby and the cart will roll down its path, pushing "
-	"enemies out of the way. You could make some really cool "
-	"levels with this concept!"
-	},
-	{MONS_SUPERSHROOM,
-	"I felt like each of the base playable characters "
-	"deserved a boss variant, so here's Shtupid Shroom's! "
-	"Super Shroom runs slower than Mush, but his bullets "
-	"pack a greater punch. Make sure to provide enough room "
-	"for the player to dodge the spores."
 	},
 	{MONS_VOLTAGE,
 	"Based on a fake screenshot I made back in 2008 for "

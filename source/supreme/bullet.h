@@ -150,8 +150,7 @@
 #define BLT_ROCKET2			130
 #define BLT_BFGHAMMER		131
 #define BLT_PUMPKIN			132
-#define BLT_GOODSPORE		133
-#define MAX_BULLETS			134
+#define MAX_BULLETS			133
 
 // the special hammer flags for different powerups - player-specific
 #define HMR_REVERSE 1

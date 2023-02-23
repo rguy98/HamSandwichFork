@@ -76,8 +76,6 @@ class Guy
 		byte confuse;	// confusion - inverted movement controls (light pink)
 		byte garlic;	// now applicable to more enemies - kills vampires quick!
 		byte quick;		// now applicable to more enemies - makes you go fast
-		byte shield;		// now applicable to more enemies - makes you protected
-		byte invis;		// now applicable to more enemies - makes you invisible
 		byte specialFlags;	// special flags (rainbow, white flash)
 
 		int aiType;
@@ -102,9 +100,7 @@ class Guy
 #define GEF_CONFUSE	5
 #define GEF_GARLIC	6
 #define GEF_SPEEDY	7
-#define GEF_SHIELD	8
-#define GEF_INVIS	9
-#define NUM_CONDITIONS	10
+#define NUM_CONDITIONS	8
 
 extern Guy *goodguy;
 
@@ -127,7 +123,6 @@ word LockOnGood(int x,int y);
 word LockOnGood2(int x,int y);
 word LockOn2(int x,int y,byte friendly);
 word LockOn3(int x,int y,int maxRange, byte friendly);
-word LockOnBuddy(int x,int y,int maxRange, byte friendly);
 byte GetGuyPos(word guy,int *x,int *y);
 byte MonsterExists(int type);
 void HealGoodguy(byte amt);
@@ -218,7 +213,6 @@ byte GetBaseColor(Guy *g);
 byte AngerYetis(Guy* me);
 byte InflictVictims(int x,int y,byte size,int dx,int dy,byte type,byte amt,Map *map,world_t *world,byte friendly,byte slow);
 byte FreezeGuy2(Guy *me,byte amt);
-void HealVictim(Guy *me,byte amt);
 
 void FindMonsterBrain(int myx,int myy);
 void FindMonsterCandle(int myx,int myy);

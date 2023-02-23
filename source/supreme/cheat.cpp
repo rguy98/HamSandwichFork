@@ -161,7 +161,7 @@ void DoCheat(byte w)
 			MakeNormalSound(SND_HEALTHCHEAT);
 			break;
 		case CHEAT_SHIELD:
-			goodguy->shield=255;
+			player.shield=255;
 			MakeNormalSound(SND_SHIELD);
 			break;
 		case CHEAT_BOOM:

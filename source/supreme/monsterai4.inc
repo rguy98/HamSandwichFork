@@ -1313,7 +1313,7 @@ void AI_FollowBunny(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	int x;
 
-	//goodguy=GetGuyOfAIType(MONS_BOUAPHA);
+	goodguy=GetGuyOfAIType(MONS_BOUAPHA);
 	if(!goodguy)
 		return;
 
@@ -2227,7 +2227,7 @@ void AI_Yugo(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				MakeSound(SND_LUNADROWN,x,y,SND_CUTOFF|SND_ONE,65536);
 			else
 				MakeSound(SND_DROWN,x,y,SND_CUTOFF|SND_ONE,65536);
-			if(goodguy->shield)
+			if(player.shield)
 				CompleteGoal(57);	// fell in water while shielded
 			return;
 		}

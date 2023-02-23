@@ -28,7 +28,6 @@
 #define SPR_COINBOX		(SPR_RAGE+5)
 #define SPR_VARBAR		(SPR_COINBOX+2)
 #define SPR_BONUSCHK	(SPR_VARBAR+1)
-#define SPR_POCKETS		(SPR_BONUSCHK+1)
 
 #define SPR_IFHAMMER	1
 #define SPR_MINIGAUGE	2
@@ -162,7 +161,7 @@ intface_t defaultSetup[NUM_INTF]={
 	 0,0,
 	 0},
 	{639,-70,639,9,	// other weapons
-	 SPR_POCKETS,
+	 SPR_WEAPONBOX,
 	 IV_ICONS,0,
 	 0,0,
 	 0,0,
@@ -543,9 +542,9 @@ void DrawPowerupBar(int x,int y,MGLDraw *mgl)
 	byte color[12],tc;
 	int i,swap;
 
-	height[0]=goodguy->shield*64/240;
+	height[0]=player.shield*64/240;
 	color[0]=32*3+16;	// blue for shield
-	height[2]=goodguy->invis*64/255;
+	height[2]=player.invisibility*64/255;
 	color[2]=32*6+14;	// purple for invis
 	height[3]=player.ammoCrate*64/255;
 	color[3]=32*(player.clock/16&7)+20;	// rainbow for ammo!
@@ -651,7 +650,6 @@ void DrawPockets(int x, int y, MGLDraw* mgl)
 {
 	int p=0,n;
 	int pockets[3] = { 0,0,0 };
-	int vals[3] = { 0,0,0 };
 
 	for (int i = 0; i < NumFilledPockets()-1; i++)
 	{
@@ -659,7 +657,6 @@ void DrawPockets(int x, int y, MGLDraw* mgl)
 		if (player.wpns[n].wpn == WPN_NONE || !player.wpns[n].used)
 			continue;
 		pockets[p] = player.wpns[n].wpn;
-		vals[p] = player.wpns[n].ammo;
 		p++;
 	}
 	for(int i = 0; i < 3; i++)
@@ -667,7 +664,7 @@ void DrawPockets(int x, int y, MGLDraw* mgl)
 		if (pockets[i] == 0)
 			continue;
 		//intfaceSpr->GetSprite(21+pockets[i])->Draw(x+(i%2)*32, y+i*12, mgl);
-		intfaceSpr->GetSprite(21+pockets[i])->Draw(x+36, y+i*17, mgl);
+		intfaceSpr->GetSprite(21+pockets[i])->Draw(x+(i%2)*32, y+i*12, mgl);
 	}
 }
 
@@ -684,7 +681,7 @@ void UpdateInterface(Map *map)
 
 	wpn = player.wpns[player.curSlot].wpn;
 
-	if(goodguy->shield || (goodguy && goodguy->garlic) || (goodguy && goodguy->quick) || goodguy->invis || player.ammoCrate ||
+	if(player.shield || (goodguy && goodguy->garlic) || (goodguy && goodguy->quick) || player.invisibility || player.ammoCrate ||
 	  (goodguy && goodguy->poison) || (goodguy && goodguy->ignited) || (goodguy && goodguy->weak) || (goodguy && goodguy->strong) ||
 	  player.cheesePower || (goodguy && goodguy->frozen))
 	{

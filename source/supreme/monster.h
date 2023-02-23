@@ -898,8 +898,5 @@ void AI_LunaChick(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Dummy(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_Pusher(Guy* me, Map* map, world_t* world, Guy* goodguy);
 void AI_MightyMoss(Guy* me, Map* map, world_t* world, Guy* goodguy);
-void AI_Payload(Guy* me, Map* map, world_t* world, Guy* goodguy);
-void AI_Tower2(Guy* me, Map* map, world_t* world, Guy* goodguy);
-void AI_Healer(Guy* me, Map* map, world_t* world, Guy* goodguy);
 
 #endif

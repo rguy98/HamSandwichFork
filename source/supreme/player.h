@@ -151,6 +151,7 @@ void PlayerLoseKey(byte w);
 void PlayerHeal(byte amt);
 void PlayerLoadGame(byte which);
 void PlayerSaveGame(byte which);
+byte PlayerShield(void);
 void SetPlayerGlow(byte v);
 byte GetPlayerGlow(void);
 byte PlayerPushMore(void);;

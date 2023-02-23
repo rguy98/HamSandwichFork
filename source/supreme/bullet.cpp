@@ -588,7 +588,6 @@ byte OnHitWall(bullet_t* me)
 		case BLT_GREEN:
 		case BLT_BADGREEN:
 		case BLT_SPORE:
-		case BLT_GOODSPORE:
 		case BLT_ICESPIKE:
 		case BLT_DIRTSPIKE:
 		case BLT_BIGSHOT:
@@ -745,9 +744,9 @@ void BulletHitWallY(bullet_t *me,Map *map,world_t *world)
 				break;
 			case BLT_CHEESEHAMMER:
 				if(me->facing<128)
-					me->facing=128+me->facing;
+					me->facing=128-me->facing;
 				else
-					me->facing=128-(256-me->facing);
+					me->facing=128+(256-me->facing);
 				break;
 			case BLT_HAMMER2:
 			case BLT_FIREBALL2:
@@ -1441,14 +1440,7 @@ void HitBadguys(bullet_t *me,Map *map,world_t *world)
 		case BLT_SPORE:
 			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,4,me->dx/2,me->dy/2,1,map,world,me->friendly))
 			{
-				Remove(me);
-			}
-			break;
-		case BLT_GOODSPORE:
-			if(FindVictim(me->x>>FIXSHIFT,me->y>>FIXSHIFT,4,me->dx/2,me->dy/2,1,map,world,me->friendly))
-			{
-				ColorDrop(1, me->x, me->y, me->z);
-				HealVictim(GetLastGuyHit(), GetLastGuyHit()->hp * 0.10 + 1);
+				Inflict(GetLastGuyHit(),GEF_POISON,30);
 				Remove(me);
 			}
 			break;
@@ -2423,7 +2415,6 @@ void UpdateBullet(bullet_t *me,Map *map,world_t *world)
 				TriggerItem(NULL, map->GetTile((me->x >> FIXSHIFT) / TILE_WIDTH, ((me->y >> FIXSHIFT) / TILE_HEIGHT)), (me->x >> FIXSHIFT) / TILE_WIDTH, (me->y >> FIXSHIFT) / TILE_HEIGHT);
 			HitBadguys(me,map,world);
 			break;
-		case BLT_GOODSPORE:
 		case BLT_SPORE:
 			me->anim++;
 			if(me->anim>3*4+3)
@@ -3386,7 +3377,6 @@ void RenderBullet(bullet_t *me)
 			SprDrawBullet(me,curSpr,DISPLAY_GLOW,0);
 			break;
 		case BLT_SPORE:
-		case BLT_GOODSPORE:
 			curSpr=bulletSpr->GetSprite(me->anim/4+SPR_SPORE);
 			SprDrawBullet(me,curSpr,0,0);
 			break;
@@ -3430,14 +3420,16 @@ void RenderBullet(bullet_t *me)
 			break;
 		case BLT_DIRTSPIKE:
 			curSpr=bulletSpr->GetSprite(SPR_ICESPIKE+(me->anim));
-			SprDrawOff(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,0,2,me->bright-12,curSpr,
-					DISPLAY_DRAWME|DISPLAY_OFFCOLOR);
+			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
 			break;
 		case BLT_ROCK:
 			if((me->timer<8) && (me->timer&1))
 				return;	// flicker when almost gone
 			curSpr=bulletSpr->GetSprite(SPR_ROCK+(me->anim));
-			SprDrawBullet(me,curSpr,DISPLAY_SHADOW,0);
+			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,0,255,me->bright,curSpr,
+					DISPLAY_DRAWME|DISPLAY_SHADOW);
+			SprDraw(me->x>>FIXSHIFT,me->y>>FIXSHIFT,me->z>>FIXSHIFT,255,me->bright,curSpr,
+					DISPLAY_DRAWME);
 			break;
 		case BLT_SPINE:
 			curSpr=bulletSpr->GetSprite(SPR_SPINE+(me->facing));
@@ -4131,9 +4123,6 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 		case BLT_SPORE:
 			SetBulletVars(me,4,0,FIXAMT*16,16,BD_NONE);
 			break;
-		case BLT_GOODSPORE:
-			SetBulletVars(me,6,0,FIXAMT*16,12,BD_NONE);
-			break;
 		case BLT_SHROOM:
 			SetBulletVars(me,8,0,FIXAMT*32,60,BD_EIGHT);
 			break;
@@ -4150,10 +4139,10 @@ void FireMe(bullet_t *me,int x,int y,byte facing,byte type,byte friendly)
 			SetBulletVars(me,0,0,0,7,BD_NONE);
 			break;
 		case BLT_SNOWBALL:
-			SetBulletVars(me,8,FIXAMT*4,FIXAMT*30,30,BD_NONE);
+			SetBulletVars(me,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
 			break;
 		case BLT_BIGSNOW:
-			SetBulletVars(me,8,FIXAMT*4,FIXAMT*30,30,BD_NONE);
+			SetBulletVars(me,8,FIXAMT*4,FIXAMT*30,7,BD_NONE);
 			break;
 		case BLT_ICESPIKE:
 		case BLT_DIRTSPIKE:

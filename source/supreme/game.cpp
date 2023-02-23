@@ -343,12 +343,9 @@ TASK(byte) LunaticRun(int *lastTime)
 			UpdateParticles(curMap);
 			UpdateMessage();
 
-			if(curMap->flags&MAP_DYWATR||curMap->flags&MAP_DYLAVA)
-			{
-				waterFlip = 1 - waterFlip;
-				if (waterFlip)
-					UpdateWater();
-			}
+			waterFlip = 1 - waterFlip;
+			if (waterFlip)
+				UpdateWater();
 
 			if(curMap->flags&MAP_SNOWING)
 				MakeItSnow(curMap);
