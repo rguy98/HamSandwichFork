@@ -667,6 +667,10 @@ void Guy::Update(Map *map,world_t *world)
 		strong--;
 	if (confuse > 0)
 		confuse--;
+	if (shield > 0)
+		shield--;
+	if (invis > 0)
+		invis--;
 
 	oldx=x;
 	oldy=y;
@@ -880,7 +884,7 @@ void Guy::Update(Map *map,world_t *world)
 					MakeSound(SND_DROWNKM,x,y,SND_CUTOFF|SND_ONE,65536);
 				else
 					MakeSound(SND_DROWN,x,y,SND_CUTOFF|SND_ONE,65536);
-				if(player.shield)
+				if(goodguy->shield)
 					CompleteGoal(57);	// fell in water while shielded
 			}
 		}
@@ -1046,7 +1050,7 @@ void Guy::MonsterControl(Map *map,world_t *world)
 	else
 	{
 		// lose sight of the invisible goodguy
-		if((player.invisibility || player.stealthy) && target==goodguy)
+		if((goodguy->invis || player.stealthy) && target==goodguy)
 		{
 			target=nobody;	// target the randomly moving, invisible, invincible, ghostly, nobody
 		}
@@ -1068,7 +1072,7 @@ void Guy::MonsterControl(Map *map,world_t *world)
 				target=nobody;
 			}
 		}
-		if(target==nobody && !friendly && player.invisibility==0 && player.stealthy==0 && goodguy)
+		if(target==nobody && !friendly && goodguy->invis==0 && player.stealthy==0 && goodguy)
 			target=goodguy;
 	}
 
@@ -1110,7 +1114,7 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 	if(type==0)
 		return;	// shouldn't have a type 0 guy at all
 
-	if(aiType==MONS_BOUAPHA && PlayerShield())
+	if(shield)
 		return; // invincible when shielded
 
 	if(MonsterFlags(type,aiType)&MF_INVINCIBLE)
@@ -1260,6 +1264,8 @@ void Guy::GetShot(int dx,int dy,byte damage,Map *map,world_t *world)
 		confuse=0;
 		weak=0;
 		strong=0;
+		shield=0;
+		invis=0;
 		newHP=0;
 		specialFlags=0;
 		seq=ANIM_DIE;
@@ -1723,6 +1729,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->mind1=0;
 			guys[i]->mind2=0;
 			guys[i]->mind3=0;
+			guys[i]->mind4=0;
+			guys[i]->mind5=0;
 			guys[i]->reload=0;
 			guys[i]->parent=NULL;
 			guys[i]->CalculateRect();
@@ -1734,6 +1742,8 @@ Guy *AddGuy(int x,int y,int z,int type,byte friendly)
 			guys[i]->confuse = 0;
 			guys[i]->garlic = 0;
 			guys[i]->quick = 0;
+			guys[i]->shield = 0;
+			guys[i]->invis = 0;
 			guys[i]->specialFlags = 0;
 			guys[i]->mapx=(guys[i]->x>>FIXSHIFT)/TILE_WIDTH;
 			guys[i]->mapy=(guys[i]->y>>FIXSHIFT)/TILE_HEIGHT;
@@ -2356,7 +2366,7 @@ byte Inflict(Guy* me,byte effect,byte amt)
 			AddToBar(me->poison,amt);
 			return 1;
 		case GEF_FROZEN:
-			if(me->aiType==MONS_BOUAPHA && (me->frozen || player.shield))
+			if(me->aiType==MONS_BOUAPHA && (me->frozen || me->shield))
 				return 0;	// can't freeze bouapha when he's already frozen or shielded
 			while (me->parent) // move up the chain to the top
 				me = me->parent;
@@ -2447,19 +2457,37 @@ byte BuffNearbyAllies(Guy *me, int x,int y,byte size,byte effect,byte amt,Map *m
 				continue;
 			if(RangeToTarget(me,guys[i])<size*FIXAMT)
 			{
-				Inflict(me, effect, amt);
-				if(effect==4)
-				{
-					MakeSound(SND_TURNGOOD,guys[i]->x,guys[i]->y,SND_CUTOFF,600);
-					LightningBolt(me->x,me->y,guys[i]->x,guys[i]->y);
-					MakeColdRingParticle(guys[i]->x,guys[i]->y,guys[i]->z,GetMonsterType(guys[i]->type)->size);
-				}
+				Inflict(guys[i], effect, amt);
+				MakeSound(SND_TURNGOOD, guys[i]->x, guys[i]->y, SND_CUTOFF, 600);
+				LightningBolt(me->x, me->y, guys[i]->x, guys[i]->y);
 				guyHit=guys[i];
 				result=1;
 			}
 		}
 
 	return result;
+}
+
+// Heals victim by X.
+void HealVictim(Guy *me,byte amt)
+{
+	if(me->hp+amt > me->maxHP)
+	{
+		me->maxHP += amt;
+		me->hp += amt;
+	}
+	else
+		me->hp += amt;
+	ShowEnemyLife(me->name,amt*128/me->maxHP,me->hp*128/me->maxHP,1);
+}
+
+byte TargetApplicable(Guy* g)
+{
+	if(MonsterFlags(g->type, g->aiType)&(MF_NOHIT|MF_INVINCIBLE))
+		return 0;
+	if(g->invis>0||(g->aiType==MONS_BOUAPHA&&player.stealthy>0))
+		return 0;
+	return 1;
 }
 
 word LockOnEvil(int x,int y)
@@ -2472,8 +2500,7 @@ word LockOnEvil(int x,int y)
 	bestRange=320+240;
 
 	for(i=0;i<maxGuys;i++)
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==0) &&
-			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==0) && TargetApplicable(guys[i]))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
 			if((range<bestRange) || (range<320+240 && Random(32)==0))
@@ -2494,8 +2521,7 @@ word LockOnEvil2(int x,int y)
 	for(j=0;j<128;j++)
 	{
 		i=Random(maxGuys);
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==0) &&
-			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==0) && TargetApplicable(guys[i]))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
 			if(range<160+120)
@@ -2515,8 +2541,7 @@ word LockOn2(int x,int y,byte friendly)
 	for(j=0;j<128;j++)
 	{
 		i=Random(maxGuys);
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) &&
-			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) && TargetApplicable(guys[i]))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
 			if(range<160+120)
@@ -2539,8 +2564,30 @@ word LockOn3(int x,int y,int maxRange, byte friendly)
 	bestRange=maxRange;
 
 	for(i=0;i<maxGuys;i++)
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) &&
-			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))))
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly!=friendly) && TargetApplicable(guys[i]))
+		{
+			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
+			if((range<bestRange) || (range<maxRange && Random(32)==0))
+			{
+				bestguy=i;
+				bestRange=range;
+			}
+		}
+
+	return bestguy;
+}
+
+word LockOnBuddy(int x,int y,int maxRange, byte friendly)
+{
+	int i;
+	int bestRange,range;
+	word bestguy;
+
+	bestguy=65535;
+	bestRange=maxRange;
+
+	for(i=0;i<maxGuys;i++)
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==friendly) && TargetApplicable(guys[i]))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
 			if((range<bestRange) || (range<maxRange && Random(32)==0))
@@ -2563,9 +2610,7 @@ word LockOnGood(int x,int y)
 	bestRange=320+240;
 
 	for(i=0;i<maxGuys;i++)
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==1) &&
-			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&(MF_NOHIT|MF_INVINCIBLE))) && (guys[i]->aiType!=MONS_BOUAPHA ||
-			(player.invisibility==0 && player.stealthy==0)))
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==1) && TargetApplicable(guys[i]))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
 			if((range<bestRange) || (range<320+240 && Random(32)==0))
@@ -2586,8 +2631,7 @@ word LockOnGood2(int x,int y)
 	for(j=0;j<128;j++)
 	{
 		i=Random(maxGuys);
-		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==1) &&
-			(!(MonsterFlags(guys[i]->type,guys[i]->aiType)&MF_NOHIT)))
+		if(guys[i]->type && guys[i]->hp && (guys[i]->friendly==1) && TargetApplicable(guys[i]))
 		{
 			range=abs(x-(guys[i]->x>>FIXSHIFT))+abs(y-(guys[i]->y>>FIXSHIFT));
 			if(range<160+120)
@@ -3552,6 +3596,12 @@ void SetMonsterTempCondition(byte fx, int x, int y, int type, int cond, int amt)
 			case 7:
 				AddAfflictionSpecial(guys[i]->quick, amt, fx);
 				break;
+			case 8:
+				AddAfflictionSpecial(guys[i]->shield, amt, fx);
+				break;
+			case 9:
+				AddAfflictionSpecial(guys[i]->invis, amt, fx);
+				break;
 			}
 		}
 	}
@@ -4485,6 +4535,8 @@ void ChangeMonsterAI(byte fx,int x,int y,int type,int newtype)
 			guys[i]->mind1=0;
 			guys[i]->mind2=0;
 			guys[i]->mind3=0;
+			guys[i]->mind4=0;
+			guys[i]->mind5=0;
 			guys[i]->reload=0;
 			guys[i]->dx=0;
 			guys[i]->dy=0;
@@ -5354,6 +5406,8 @@ void ResetGuy(Guy* g)
 	g->mind1 = 0;
 	g->mind2 = 0;
 	g->mind3 = 0;
+	g->mind4 = 0;
+	g->mind5 = 0;
 	g->reload = 0;
 	g->parent = NULL;
 	g->CalculateRect();

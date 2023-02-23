@@ -128,7 +128,6 @@ void ResetLocalStats() {
 	player.hammerFlags=0;
 	player.cheatFlags=0;
 	player.life=128;
-	player.shield=0;
 	playerGlow=0;
 	player.pushPower=0;
 	player.vehicle=0;
@@ -136,7 +135,6 @@ void ResetLocalStats() {
 	player.rage=0;
 	player.varbar=0;
 	player.varbarMax=0;
-	player.invisibility=0; // Todo: remove
 	player.jetting=0;
 	player.clock=0;
 	player.combo=0;
@@ -173,11 +171,6 @@ void ExitPlayer(void)
 void PlayerRenderInterface(MGLDraw *mgl)
 {
 	RenderInterface(mgl);
-}
-
-byte PlayerShield(void)
-{
-	return player.shield;
 }
 
 byte PlayerHasHammer(void)
@@ -259,9 +252,13 @@ int WeaponMaxAmmo(byte wpn)
 byte HasFullWeapon(int w){
 	for(int i=0;i<NumFilledPockets();i++)
 	{
-		if(player.wpns[player.curSlot].ammo >= GetAmmoFill(w))
+		if(player.wpns[i].wpn!=w)
+			continue;
+
+		if(player.wpns[i].ammo >= GetAmmoFill(w))
 			return 1;
 	}
+	return 0;
 }
 
 byte PlayerGetWeapon(byte wpn,int x,int y)
@@ -285,7 +282,7 @@ byte PlayerGetWeapon(byte wpn,int x,int y)
 			player.curSlot = FindNextUnusedPocketSlot();
 	}
 
-	if(curWpn==wpn && HasFullWeapon(wpn))
+	if(curWpn==wpn || HasFullWeapon(wpn))
 		return 0;	// don't pick it up if you've already got it
 
 	if(wpn==WPN_PWRARMOR || wpn == WPN_MINISUB)
@@ -339,7 +336,7 @@ byte PlayerPowerup(char powerup)
 				player.hammerFlags|=HMR_REFLECT;
 				break;
 			case PU_SHIELD:
-				player.shield=240;
+				goodguy->shield=240;
 				break;
 			case PU_GARLIC:
 				AddAffliction(goodguy->garlic,255);
@@ -348,7 +345,7 @@ byte PlayerPowerup(char powerup)
 				AddAffliction(goodguy->quick,255);
 				break;
 			case PU_INVISO:
-				player.invisibility=255;
+				goodguy->invis=255;
 				break;
 			case PU_AMMO:
 				if(player.wpns[player.curSlot].wpn==0)
@@ -396,7 +393,7 @@ byte PlayerPowerup(char powerup)
 				player.hammerFlags^=HMR_REFLECT;
 				break;
 			case PU_SHIELD:
-				player.shield=0;
+				goodguy->shield=0;
 				break;
 			case PU_GARLIC:
 				goodguy->garlic=0;
@@ -405,7 +402,7 @@ byte PlayerPowerup(char powerup)
 				goodguy->quick=0;
 				break;
 			case PU_INVISO:
-				player.invisibility=0;
+				goodguy->invis=0;
 				break;
 			case PU_AMMO:
 				player.ammoCrate=0;
@@ -424,10 +421,10 @@ byte PlayerPowerup(char powerup)
 				goodguy->ignited=0;
 				break;
 			case PU_WEAKNESS:
-				goodguy->ignited=0;
+				goodguy->weak=0;
 				break;
 			case PU_STRENGTH:
-				goodguy->ignited=0;
+				goodguy->strong=0;
 				break;
 			case PU_CONFUSION:
 				goodguy->confuse=0;
@@ -466,7 +463,7 @@ void PlayerRadioactiveFood(void)
 			break;
 		case 5:
 			NewMessage("Atomic Inviso-Power!",75,0);
-			player.invisibility=255;
+			goodguy->invis=255;
 			break;
 	}
 }
@@ -1112,7 +1109,7 @@ void PlayerFireWeapon(Guy *me)
 				{
 					HealGoodguy(16);
 				}
-				player.shield = 6;
+				goodguy->shield = 6;
 				player.wpns[player.curSlot].ammo--;
 			}
 			c = FakeGetControls();
@@ -1546,8 +1543,8 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(player.rageClock && GetGameMode()!=GAMEMODE_RAGE)
 		DoRage(me);
 
-	if(player.invisibility)
-		player.invisibility--;
+	if(goodguy->invis)
+		goodguy->invis--;
 
 	if(player.cheesePower)
 		player.cheesePower--;
@@ -1605,8 +1602,8 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 					me->z+FIXAMT*40,FIXAMT*2);
 	}
 
-	if(player.shield)
-		player.shield--;
+	if(goodguy->shield)
+		goodguy->shield--;
 
 	if(player.pushPower)
 		player.pushPower--;
@@ -1955,8 +1952,8 @@ void PlayerControlMe(Guy *me,mapTile_t *mapTile,world_t *world)
 			profile.progress.rages++;
 		player.rage=0;
 		player.rageClock=15;
-		if(player.shield==0)
-			player.shield=30;
+		if(goodguy->shield==0)
+			goodguy->shield=30;
 		EnterRage();
 	}
 	if((c&CONTROL_B1) && player.reload==0)	// pushed hammer throw button
@@ -2121,8 +2118,8 @@ void PlayerControlPowerArmor(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(player.wpnReload)
 		player.wpnReload--;
 
-	if(player.shield)
-		player.shield=0;
+	if(goodguy->shield)
+		goodguy->shield=0;
 
 	if(player.pushPower)
 		player.pushPower--;
@@ -2295,8 +2292,8 @@ void PlayerControlMiniSub(Guy *me,mapTile_t *mapTile,world_t *world)
 	if(player.wpnReload)
 		player.wpnReload--;
 
-	if(player.shield)
-		player.shield=0;
+	if(goodguy->shield)
+		goodguy->shield=0;
 
 	if(player.pushPower)
 		player.pushPower--;

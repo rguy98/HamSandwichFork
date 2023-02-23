@@ -282,14 +282,6 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 	{
 		if(type==MONS_BOUAPHA && PlayerHasHammer())
 			v+=8*monsType[type].framesPerDir;
-		shld=PlayerShield();
-		if((shld<16) && (shld&2))	// it blinks when there is 1/2 second left
-			shld=0;
-		curSpr=monsType[MONS_BOUAPHA].spr->GetSprite(464+(shld&7));
-		if(curSpr==NULL)
-			return;
-		if(shld)
-			SprDraw(x>>FIXSHIFT,(y>>FIXSHIFT)+1,1+(z>>FIXSHIFT),255,bright,curSpr,DISPLAY_DRAWME|DISPLAY_GLOW);
 		if(g->frozen)
 		{
 			curSpr=set->GetSprite(v);
@@ -368,7 +360,7 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 				SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,2,bright-4,curSpr,DISPLAY_DRAWME); // brown
 			return;
 		}
-		else if(player.invisibility)
+		else if(g->invis)
 		{
 			curSpr=set->GetSprite(v);
 			if(!curSpr)
@@ -393,7 +385,7 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 	if(!curSpr)
 		return;
 
-	if(!(monsType[type].flags&MF_NOSHADOW))
+	if(!(g->invis && !g->friendly)&&!(monsType[type].flags&MF_NOSHADOW))
 		SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,0,255,0,curSpr,DISPLAY_DRAWME|DISPLAY_SHADOW);
 
 	if(g->ouch==0)
@@ -404,6 +396,10 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright+16,curSpr,DISPLAY_DRAWME);
 		else if(g->poison)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,1,bright,curSpr,DISPLAY_DRAWME);
+		else if (g->invis) {
+			if (g->friendly)
+				SprDraw(x >> FIXSHIFT, y >> FIXSHIFT, z >> FIXSHIFT, 255, bright, curSpr, DISPLAY_DRAWME | DISPLAY_GLOW);
+		}
 		else if(g->confuse)
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,6,bright+4,curSpr,DISPLAY_DRAWME);
 		else if (g->strong)
@@ -455,6 +451,15 @@ void MonsterDraw(int x,int y,int z,dword type,dword aiType,byte seq,byte frm,byt
 		else
 			SprDraw(x>>FIXSHIFT,y>>FIXSHIFT,z>>FIXSHIFT,4,bright,curSpr,DISPLAY_DRAWME);
 	}
+
+	shld = g->shield;
+	if ((shld < 16) && (shld & 2))	// it blinks when there is 1/2 second left
+		shld = 0;
+	curSpr = monsType[MONS_BOUAPHA].spr->GetSprite(464 + (shld & 7));
+	if (curSpr == NULL)
+		return;
+	if (shld)
+		SprDraw(x >> FIXSHIFT, (y >> FIXSHIFT) + 1, 1 + (z >> FIXSHIFT), 255, bright, curSpr, DISPLAY_DRAWME | DISPLAY_GLOW);
 }
 
 void InstaRenderMonster(int x,int y,dword type,char bright,MGLDraw *mgl)
@@ -576,6 +581,17 @@ int RangeToTarget(Guy *me,Guy *goodguy)
 int RangeToPoint(Guy* me, int x, int y)
 {
 	return abs(me->x - x) + abs(me->y - y);
+}
+
+void BigBoom(Guy* me)
+{
+	int x,y;
+	x=me->x>>FIXSHIFT;
+	y=me->y>>FIXSHIFT;
+	BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
+	BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
+		(y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
+		me->z,FIXAMT);
 }
 
 // this version doesn't insta-face, it rotates toward the right facing, and it has much
@@ -996,154 +1012,6 @@ void SelectDestination(Guy *me,Guy *goodguy,Map *map,byte repeat)
 // here be the AIs for each monster type
 //--------------------------------------------------------------------------------------
 
-void AI_Frozombie(Guy *me,Map *map,world_t *world,Guy *goodguy)
-{
-	int x,y;
-	bullet_t *b;
-
-	if(me->reload)
-		me->reload--;
-
-	if(me->ouch==4)
-	{
-		if(me->hp>0)
-			MakeSound(SND_ZOMBIEOUCH,me->x,me->y,SND_CUTOFF,1200);
-		else
-			MakeSound(SND_ZOMBIEDIE,me->x,me->y,SND_CUTOFF,1200);
-	}
-
-	if(me->action==ACTION_BUSY)
-	{
-		if(me->seq==ANIM_A1 && me->frm==7 && me->reload==0 && goodguy)
-		{
-			// only fire if the range is good
-			if(RangeToTarget(me,goodguy)<800*FIXAMT)
-			{
-				x=me->x+Cosine(me->facing*32)*32;
-				y=me->y+Sine(me->facing*32)*32;
-				b=GetFireBullet(x,y,me->facing*32,BLT_BIGSNOW,me->friendly);
-				if(b)
-				{
-					b->dx=Cosine(b->facing)*4;
-					b->dy=Sine(b->facing)*4;
-					b->z=FIXAMT*30;
-				}
-			}
-			me->reload=5;
-			me->mind1=1;
-		}
-		if(me->seq==ANIM_ATTACK && me->frm==5)
-		{
-			me->dx=Cosine(me->facing*32)*8;
-			me->dy=Sine(me->facing*32)*8;
-		}
-		if(me->seq==ANIM_ATTACK && me->frm>6)
-		{
-			Dampen(&me->dx,FIXAMT/2);
-			Dampen(&me->dy,FIXAMT/2);
-		}
-		if(me->seq==ANIM_ATTACK && me->frm>=7 && me->frm<13 && me->reload==0 && goodguy)
-		{
-			x=me->x+Cosine(me->facing*32)*16;
-			y=me->y+Sine(me->facing*32)*16;
-			if(me->AttackCheck(8,x>>FIXSHIFT,y>>FIXSHIFT,goodguy))
-			{
-				goodguy->GetShot(Cosine(me->facing*32)*4,Sine(me->facing*32)*4,1,map,world);
-				me->reload=2;
-			}
-		}
-		if(me->seq==ANIM_DIE)
-		{
-			me->frmAdvance = 128;
-			for(x=0;x<8;x++)
-				SpecialSnow(me->x+((-16+Random(33))<<FIXSHIFT),
-							me->y+((-16+Random(33))<<FIXSHIFT));
-		}
-		return;	// can't do nothin' right now
-	}
-
-	if(me->mind==0)		// when mind=0, singlemindedly lumber towards Bouapha
-	{
-		if(goodguy)
-		{
-			if(RangeToTarget(me,goodguy)<(64*FIXAMT) && Random(8)==0)
-			{
-				// get him!
-				MakeSound(SND_ZOMBIELEAP,me->x,me->y,SND_CUTOFF,1200);
-				me->seq=ANIM_ATTACK;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
-				return;
-			}
-			FaceGoodguy(me,goodguy);
-
-			me->dx=Cosine(me->facing*32)*2;
-			me->dy=Sine(me->facing*32)*2;
-			if(me->seq!=ANIM_MOVE)
-			{
-				me->seq=ANIM_MOVE;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-			}
-			if(Random(64)==0)
-			{
-				me->mind=1;		// occasionally wander
-				me->mind1=1;
-			}
-		}
-		else
-		{
-			me->mind=1;	// if there's no goodguy, get random
-			me->mind1=1;
-		}
-	}
-	else if(me->mind==1)	// random wandering
-	{
-		if(goodguy)
-		{
-			if(RangeToTarget(me,goodguy)<(512*FIXAMT) && Random(32)==0)
-			{
-				// throw a snowball
-				MakeSound(SND_SNOWTHROW,me->x,me->y,SND_CUTOFF,1100);
-				me->seq=ANIM_A1;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=64;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
-				FaceGoodguy(me,goodguy);
-				return;
-			}
-		}
-		if(!(me->mind1--))	// time to get a new direction
-		{
-			if((goodguy) && Random(3)==0)
-				me->mind=0;	// get back on track
-			else
-				me->facing=(byte)Random(8);
-			me->mind1=Random(40)+1;
-		}
-
-		me->dx=Cosine(me->facing*32)*2;
-		me->dy=Sine(me->facing*32)*2;
-		if(me->seq!=ANIM_MOVE)
-		{
-			me->seq=ANIM_MOVE;
-			me->frm=0;
-			me->frmTimer=0;
-			me->frmAdvance=128;
-		}
-	}
-}
-
 byte DiesForward(Guy *me){
 	switch (me->type)
 	{
@@ -1192,247 +1060,16 @@ word GetParentAI(Guy* me)
 		return me->parent->aiType;
 }
 
-void AI_Yeti(Guy *me,Map *map,world_t *world,Guy *goodguy)
+byte IsBunnyAble(mapTile_t *m,world_t *world)
 {
-	int x,y;
+	if(!(GetTerrain(world,m->floor)->flags&TF_BUNNY))
+		return 0;
 
-	BasicAI(me,SND_YETIOUCH,SND_YETIDIE,map,world,goodguy);
+	if(GetItem(m->item)->flags&IF_SOLID)
+		return 0;
 
-	if(me->action==ACTION_BUSY)
-	{
-		if(me->seq==ANIM_DIE)
-		{
-			if(DiesForward(me)||IsOneFacing(me))
-			me->facing=2;	// can only die forward
-			if(me->frm>=4)
-			{
-				x=me->x>>FIXSHIFT;
-				y=me->y>>FIXSHIFT;
-				BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,2);
-				BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
-						  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
-						  me->z,FIXAMT);
-			}
-		}
-		if(me->seq==ANIM_ATTACK && me->frm==7 && me->frmTimer<32)
-		{
-			x=me->x+Cosine(me->facing*32)*64;
-			y=me->y+Sine(me->facing*32)*64;
-			x+=Cosine(((me->facing+2)*32)&255)*32;
-			y+=Sine(((me->facing+2)*32)&255)*32;
-			FireExactBullet(x,y,40*FIXAMT,Cosine(me->facing*32)*8,Sine(me->facing*32)*8,4*FIXAMT,0,100,
-							me->facing*32,BLT_BIGSNOW,me->friendly);
-			me->reload=10;
-		}
-		if(me->seq==ANIM_A2 && me->frm>3)
-		{
-			ShakeScreen(3);
-			// snowballs fall all over
-			x=me->x+((320-Random(641))<<FIXSHIFT);
-			y=me->y+((240-Random(481))<<FIXSHIFT);
-			if(Random(3)==0)
-				FireExactBullet(x,y,400*FIXAMT,0,0,0,0,100,me->facing*32,BLT_BIGSNOW,me->friendly);
-			else
-				FireExactBullet(x,y,400*FIXAMT,0,0,0,0,100,me->facing*32,BLT_SNOWBALL,me->friendly);
-		}
-		if(me->seq==ANIM_A1 && (me->frm==5 || me->frm==6))
-		{
-			x=me->x+Cosine(me->facing*32)*64;
-			y=me->y+Sine(me->facing*32)*64;
-			FireBullet(x,y,me->facing,BLT_ICESPIKE,me->friendly);
-		}
-		return;	// can't do nothin' right now
-	}
-
-	if(me->mind==0)
-	{
-		if((goodguy && RangeToTarget(me,goodguy)<(300*FIXAMT)) || (me->ouch))
-		{
-			me->mind=1;	// start into action
-			me->mind1=0;
-
-			me->seq=ANIM_A3;	// wave hello first
-			me->frm=0;
-			me->frmTimer=0;
-			me->frmAdvance=64;
-			me->facing=2;
-			me->action=ACTION_BUSY;
-
-			if(me->aiType==MONS_SVEN) // say "Hello, I am Sven"
-				MakeSound(SND_SVENHI,me->x,me->y,SND_CUTOFF,1200);
-			else	// say "Hello, I am Bjorn"
-				MakeSound(SND_BJORNHI,me->x,me->y,SND_CUTOFF,1200);
-		}
-	}
-	else
-	{
-		if(me->mind1)
-			me->mind1--;
-		else
-		{
-			// rotate
-			me->facing=(me->facing-1+Random(3))&7;
-			me->mind1=Random(30)+1;
-		}
-
-		if((!me->reload) && goodguy && Random(20)==0)
-		{
-			// select an attack method
-			x=Random(16);
-
-			if(x<12) // 75% chance of primary weapon
-			{
-				// Sven throws snowballs
-				if(me->aiType==MONS_SVEN)
-				{
-					me->seq=ANIM_ATTACK;
-					me->frm=0;
-					me->frmTimer=0;
-					me->frmAdvance=128;
-					FaceGoodguy(me,goodguy);
-					me->action=ACTION_BUSY;
-				}
-				else
-				{
-					// Bjorn causes stalag-quakes
-					me->seq=ANIM_A1;
-					me->frm=0;
-					me->frmTimer=0;
-					me->frmAdvance=128;
-					FaceGoodguy(me,goodguy);
-					me->action=ACTION_BUSY;
-				}
-			}
-			else	// 25% chance of yodel
-			{
-				MakeSound(SND_YETIYODEL,me->x,me->y,SND_CUTOFF,1500);
-				me->seq=ANIM_A2;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=64;
-				me->facing=2;
-				me->action=ACTION_BUSY;
-			}
-			me->dx=0;
-			me->dy=0;
-			return;
-		}
-
-		me->dx=Cosine(me->facing*32)*3;
-		me->dy=Sine(me->facing*32)*3;
-
-		if(me->seq!=ANIM_MOVE)
-		{
-			me->seq=ANIM_MOVE;
-			me->frm=0;
-			me->frmTimer=0;
-			me->frmAdvance=128;
-		}
-
-	}
+	return 1;
 }
-
-void AI_Dummy(Guy* me, Map* map, world_t* world, Guy* goodguy)
-{
-	int x,y;
-
-	BasicAI(me,SND_ZOMBIE2OUCH,SND_ZOMBIE2DIE,map,world,goodguy);
-	if(me->action==ACTION_BUSY)
-	{
-		if(me->seq==ANIM_ATTACK && me->frm==5)
-		{
-			me->dx=Cosine(me->facing*32)*8;
-			me->dy=Sine(me->facing*32)*8;
-		}
-		if(me->seq==ANIM_ATTACK && me->frm>6)
-		{
-			Dampen(&me->dx,FIXAMT/2);
-			Dampen(&me->dy,FIXAMT/2);
-		}
-		if(me->seq==ANIM_ATTACK && me->frm>=7 && me->frm<13 && me->reload==0 && goodguy)
-		{
-			x=me->x+Cosine(me->facing*32)*16;
-			y=me->y+Sine(me->facing*32)*16;
-			if(me->AttackCheck(8,x>>FIXSHIFT,y>>FIXSHIFT,goodguy))
-			{
-				goodguy->GetShot(Cosine(me->facing*32)*4,Sine(me->facing*32)*4,2,map,world);
-				me->reload=2;
-			}
-		}
-		if(me->seq==ANIM_DIE && me->frmTimer<32 && me->frm==2)
-		{
-			if(me->parent)
-				me->parent->mind2--;
-		}
-		return;	// can't do nothin' right now
-	}
-
-	if(me->mind==0)		// when mind=0, singlemindedly lumber towards Bouapha
-	{
-		if(goodguy)
-		{
-			if(RangeToTarget(me,goodguy)<(128*FIXAMT) && Random(32)==0)
-			{
-				// get him!
-				MakeSound(SND_ZOMBIE2LEAP,me->x,me->y,SND_CUTOFF,1200);
-				me->seq=ANIM_ATTACK;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=96;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
-				return;
-			}
-
-			FaceGoodguy(me,goodguy);
-			
-			me->dx=Cosine(me->facing*32)*2;
-			me->dy=Sine(me->facing*32)*2;
-			if(me->seq!=ANIM_MOVE)
-			{
-				me->seq=ANIM_MOVE;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=64;
-			}
-			if(Random(64)==0)
-			{
-				me->mind=1;		// occasionally wander
-				me->mind1=1;
-			}
-		}
-		else
-		{
-			me->mind=1;	// if there's no goodguy, get random
-			me->mind1=1;
-		}
-	}
-	else if(me->mind==1)	// random wandering
-	{
-		if(!(me->mind1--))	// time to get a new direction
-		{
-			if((goodguy) && Random(3)==0)
-				me->mind=0;	// get back on track
-			else
-				me->facing=(byte)Random(8);
-			me->mind1=Random(40)+1;
-		}
-		
-		me->dx=Cosine(me->facing*32)*1;
-		me->dy=Sine(me->facing*32)*1;
-		
-		if(me->seq!=ANIM_MOVE)
-		{
-			me->seq=ANIM_MOVE;
-			me->frm=0;
-			me->frmTimer=0;
-			me->frmAdvance=96;
-		}
-	}
-}
-
 
 byte Bounce(Guy *me,byte &chg)
 {
@@ -1495,6 +1132,504 @@ byte Bounce(Guy *me,byte &chg)
 	return me->mind1>0;
 }
 
+void AI_Healer(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y,i,j;
+	Guy *g;
+
+	BasicAI(me,SND_MUSHOUCH,SND_MUSHDIE,map,world,goodguy);
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_ATTACK && me->frm>=6 && me->frm<=8 && me->reload==0)
+		{
+			if(me->frm==6)
+				MakeSound(SND_SKELSHOOT,me->x,me->y,SND_CUTOFF,1200);
+			i=(me->facing*32-32+me->frm)&255;
+			for(j=-32+me->frm;j<33;j+=me->frm*2)
+			{
+				x=me->x+Cosine(i)*32;
+				y=me->y+Sine(i)*24;
+				FireExactBullet(x,y,FIXAMT*20,Cosine(i)*8,Sine(i)*8,0,0,16,i,BLT_GOODSPORE,me->friendly);
+				i=(i+me->frm*2)&255;
+			}
+			me->reload=1;
+		}
+		if(me->seq==ANIM_DIE && me->frm==1 && me->frmTimer<64)
+		{
+			for(i=0;i<30;i++)
+				BlowSmoke(me->x-32*FIXAMT+Random(64*FIXAMT),
+					  	 me->y-32*FIXAMT+Random(64*FIXAMT),
+								Random(64)<<FIXSHIFT,Random(FIXAMT*4));
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind==0)		// when mind=0, charge towards Bouapha
+	{
+		if(goodguy)
+		{
+			if(RangeToTarget(me,goodguy)<(128*FIXAMT) && Random(8)==0)
+			{
+				// get him!
+				me->seq=ANIM_ATTACK;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				return;
+			}
+			FaceGoodguy2(me,goodguy);
+
+			me->dx=Cosine(me->facing*32)*4;
+			me->dy=Sine(me->facing*32)*4;
+			if(me->seq!=ANIM_MOVE)
+			{
+				me->seq=ANIM_MOVE;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+			}
+			if(Random(256)==0)
+			{
+				me->mind=1;		// occasionally rest
+				me->mind1=(byte)Random(100);
+			}
+		}
+	}
+	else if(me->mind==1)	// random wandering
+	{
+		if(goodguy && RangeToTarget(me,goodguy)<(128*FIXAMT) && Random(8)==0)
+		{
+			// get him!
+			me->seq=ANIM_ATTACK;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+			me->action=ACTION_BUSY;
+			me->dx=0;
+			me->dy=0;
+			return;
+		}
+		FaceGoodguy2(me,goodguy);
+
+		if(!(me->mind1--))	// time to get a new direction
+		{
+			me->mind=0;	// get back on track
+		}
+
+		me->dx=0;
+		me->dy=0;
+		if(me->seq!=ANIM_IDLE)
+		{
+			me->seq=ANIM_IDLE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=64;
+		}
+	}
+}
+
+void AI_BufferBot(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y;
+
+	if(me->reload)
+		me->reload--;
+
+	if(me->ouch==4)
+	{
+		if(me->hp>0)
+			MakeSound(SND_ROBOOUCH,me->x,me->y,SND_CUTOFF,1200);
+		else
+			MakeSound(SND_ROBODIE,me->x,me->y,SND_CUTOFF,1200);
+	}
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_ATTACK && me->frm==3 && me->reload==0)
+		{
+			MakeSound(SND_FACTORYGO, me->x, me->y, SND_CUTOFF, 1200);
+			MakeColdRingParticle(me->x,me->y,me->z,GetMonsterType(me->type)->size);
+			BuffNearbyAllies(me,me->x,me->y,120,4,128,map,world,me->friendly,0);
+			me->reload=2;
+		}
+		if(me->seq==ANIM_DIE && me->frm>3 && me->frmTimer<63)
+		{
+			x=me->x>>FIXSHIFT;
+			y=me->y>>FIXSHIFT;
+			BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind==0)		// when mind=0, singlemindedly roll towards the player
+	{
+		if(goodguy)
+		{
+			FaceGoodguy3(me,goodguy);
+			if(RangeToTarget(me,goodguy)<(512*FIXAMT) && Random(72)==0)
+			{
+				// shoot at him
+				me->seq=ANIM_ATTACK;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				me->reload=0;
+				return;
+			}
+			me->dx=Cosine(me->facing*32)*6;
+			me->dy=Sine(me->facing*32)*6;
+			if(me->seq!=ANIM_MOVE)
+			{
+				me->seq=ANIM_MOVE;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+			}
+			if(Random(48)==0)
+			{
+				me->mind=1;		// occasionally wander
+				me->mind1=1;
+			}
+		}
+	}
+	else if(me->mind==1)	// random wandering
+	{
+		if(goodguy)
+		{
+			if(RangeToTarget(me,goodguy)<(512*FIXAMT) && Random(144)==0)
+			{
+				// shoot at him
+				me->seq=ANIM_ATTACK;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=192;
+				me->action=ACTION_BUSY;
+				me->dx=0;
+				me->dy=0;
+				me->reload=0;
+				FaceGoodguy(me,goodguy);
+				return;
+			}
+		}
+		if(!(me->mind1--))	// time to get a new direction
+		{
+			if((goodguy) && Random(3)==0)
+				me->mind=0;	// get back on track
+			else
+				me->facing=(byte)Random(8);
+			me->mind1=Random(40)+1;
+		}
+
+		me->dx=Cosine(me->facing*32)*6;
+		me->dy=Sine(me->facing*32)*6;
+		if(me->seq!=ANIM_MOVE)
+		{
+			me->seq=ANIM_MOVE;
+			me->frm=0;
+			me->frmTimer=0;
+			me->frmAdvance=128;
+		}
+	}
+}
+
+void AI_Tower2(Guy *me,Map *map,world_t *world,Guy *goodguy)
+{
+	int x,y,i;
+
+	if(me->reload)
+		me->reload--;
+
+	BasicAI(me,SND_TOWEROUCH,SND_TOWERDIE,map,world,goodguy);
+
+	if(me->ouch==4)
+	{
+		if(me->hp>0)
+			MakeSound(SND_TOWEROUCH,me->x,me->y,SND_CUTOFF,1200);
+		else
+			MakeSound(SND_TOWERDIE,me->x,me->y,SND_CUTOFF,1200);
+	}
+
+	if(me->action==ACTION_BUSY)
+	{
+		if(me->seq==ANIM_ATTACK)	// leaping attack
+		{
+			if(me->frm<4)
+			{
+				me->dx=0;
+				me->dy=0;
+				me->dz=0;
+			}
+			else if(me->frm==4)
+			{
+				me->dx=Cosine(me->facing*32)*8;
+				me->dy=Sine(me->facing*32)*8;
+				me->dz=10*FIXAMT;
+			}
+			else if(me->frm<8)
+			{
+				// stay the course
+				Dampen(&me->dx,FIXAMT/8);
+				Dampen(&me->dy,FIXAMT/8);
+			}
+			else if(me->frm==12 && me->frmTimer<32)
+			{
+				for(i=0;i<4;i++)
+					FireBullet(me->x,me->y-FIXAMT,(me->facing+i*64)&255,BLT_EARTHSPIKE,me->friendly);
+				MakeSound(SND_SDZLPOUND,me->x,me->y,SND_CUTOFF,1500);
+				ShakeScreen(10);
+			}
+			else
+			{
+				Dampen(&me->dx,FIXAMT/2);
+				Dampen(&me->dy,FIXAMT/2);
+			}
+		}
+		if(me->seq==ANIM_DIE)
+		{
+			if(me->frm>=4)
+			{
+				x=me->x>>FIXSHIFT;
+				y=me->y>>FIXSHIFT;
+				BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
+				BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
+						  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
+						  me->z,FIXAMT);
+			}
+		}
+		return;	// can't do nothin' right now
+	}
+
+	if(me->mind==0)
+	{
+		if(goodguy)
+		{
+			if(RangeToTarget(me,goodguy)<300*FIXAMT)
+				me->mind=1;
+		}
+		if(me->ouch)
+			me->mind=1;
+	}
+	else	// chase down Kid Mystic
+	{
+		if(goodguy)
+		{
+			if(me->mind1)
+				{
+					me->facing=(me->facing+3+Random(3))&7;
+					me->mind1=0;
+				}
+				else
+					FaceGoodguy2(me,goodguy);
+			me->dx=Cosine(me->facing*32)*6;
+			me->dy=Sine(me->facing*32)*6;
+			if(me->seq!=ANIM_MOVE)
+			{
+				me->seq=ANIM_MOVE;
+				me->frm=0;
+				me->frmTimer=0;
+				me->frmAdvance=128;
+			}
+			if(Random(32)==0)
+				DoMove(me,ANIM_ATTACK,128,1,0,0);
+		}
+		else
+			me->mind=0;
+	}
+}
+
+void AI_Payload(Guy* me, Map* map, world_t* world, Guy* goodguy)
+{
+	int x,y;
+	byte ok[4];
+	int diff,dir;
+	static byte noiseLoop=0;
+
+
+	if(RangeToTarget(me,goodguy)<144*FIXAMT)
+	{
+		if(!me->mind4)
+			MakeSound(SND_ROBOBOUAPHAON,me->x,me->y,SND_CUTOFF,900);
+		me->mind4 = 30;
+	}
+
+	if (!me->mind4) {
+		Dampen(&me->dx, FIXAMT / 2);
+		Dampen(&me->dy, FIXAMT / 2);
+	}
+
+	if (!goodguy || !me->mind4)
+		return;
+
+	me->facing = me->mind2 / 32;	// mind2 holds the 'true' visual facing 0-255
+
+	noiseLoop++;
+	if (noiseLoop >= 28)
+	{
+		noiseLoop = 0;
+		MakeSound(SND_MINECART, goodguy->x, goodguy->y, SND_CUTOFF, 1200);
+	}
+
+	// mind2 is the visual facing, mind3 is the actual facing,
+		// so rotate mind2 towards mind3
+	if (me->mind3 > me->mind2)
+	{
+		diff = me->mind3 - me->mind2;
+		if (diff > 128)
+		{
+			dir = -1;
+			diff = 256 - diff;
+		}
+		else
+			dir = 1;
+	}
+	else if (me->mind3 < me->mind2)
+	{
+		diff = me->mind2 - me->mind3;
+		if (diff > 128)
+		{
+			dir = 1;
+			diff = 256 - diff;
+		}
+		else
+			dir = -1;
+	}
+	else
+	{
+		diff = 0;
+		dir = 0;
+	}
+
+	if (me->mind == 0)
+	{
+		// turn quickly if sitting still
+		if (diff > 32)
+			diff = 32;
+	}
+	else
+	{
+		if (diff > 8)
+			diff = 8;
+	}
+
+	if (me->mind1)
+	{
+		me->mind1 = 0;
+		if (me->aiType == MONS_FRIENDLY)
+			me->mind3 = Random(4) * 64;
+		me->mind = 30;	// wait 1 seconds before trying again
+		me->dx = 0;
+		me->dy = 0;
+		me->frm = 0;
+		me->seq = ANIM_IDLE;
+		me->frmTimer = 0;
+		me->frmAdvance = 128;
+		return;
+	}
+
+	if (me->mind > 0)
+	{
+		// countdown to try for a path again, in case the map has changed under you
+		me->mind--;
+		if (me->mind == 0)
+		{
+			me->oldx = me->x + 1;
+		}
+		return;
+	}
+	me->mind2 = (me->mind2 + diff * dir) & 255;
+
+	// if you've reached the center of a tile, time to decide where to go
+	x = (me->mapx * TILE_WIDTH + TILE_WIDTH / 2) * FIXAMT;
+	y = (me->mapy * TILE_HEIGHT + TILE_HEIGHT / 2) * FIXAMT;
+	if ((me->x <= x && me->oldx > x) || (me->x >= x && me->oldx < x) ||
+		(me->y <= y && me->oldy > y) || (me->y >= y && me->oldy < y))
+	{
+		//	me->x=x;
+		//	me->y=y;
+			// figure out which directions are valid bunny paths
+		if (me->mapx < map->width - 1 && IsBunnyAble(&map->map[me->mapx + 1 + me->mapy * map->width], world))
+			ok[0] = 1;
+		else
+			ok[0] = 0;
+		if (me->mapy < map->height - 1 && IsBunnyAble(&map->map[me->mapx + (me->mapy + 1) * map->width], world))
+			ok[1] = 1;
+		else
+			ok[1] = 0;
+		if (me->mapx > 0 && IsBunnyAble(&map->map[me->mapx - 1 + me->mapy * map->width], world))
+			ok[2] = 1;
+		else
+			ok[2] = 0;
+		if (me->mapy > 0 && IsBunnyAble(&map->map[me->mapx + (me->mapy - 1) * map->width], world))
+			ok[3] = 1;
+		else
+			ok[3] = 0;
+
+		ok[(((me->mind3 / 32) + 4) & 7) / 2] = 0;
+
+		// count how many directions are available
+		y = 0;
+		for (x = 0; x < 4; x++)
+			if (ok[x])
+				y++;
+
+		if (y == 0)	// no directions to go!
+		{
+			if (me->aiType == MONS_FRIENDLY)
+				me->mind3 = Random(4) * 64;
+			me->mind = 30;	// wait 1 second before trying again
+			DoMove(me, ANIM_IDLE, 0, 0);
+			return;
+		}
+		else
+		{
+			if (y == 1)
+			{
+				// face the only valid direction
+				for (x = 0; x < 4; x++)
+					if (ok[x])
+						me->mind3 = x * 64;
+			}
+			else
+			{
+				if (!ok[me->mind3 / 64])
+					// if you can continue ahead, then go on and enjoy
+				{
+					// in the case of multiple directions, we must pick randomly
+					x = Random(4);
+					if (ok[x])	// the direction you're facing is ok
+						me->mind3 = x * 64;
+					else if (ok[(x + 1) & 3])	// direction to your left
+						me->mind3 = ((x + 1) & 3) * 64;
+					else if (ok[(x + 5) & 3])	// direction to your right (same as x-1)
+						me->mind3 = ((x + 5) & 3) * 64;
+					else
+						me->mind3 = ((x + 2) & 3) * 64;	// behind you as a last resort
+				}
+			}
+		}
+	}
+
+	// move forward at that pace
+	me->dx = Cosine(me->mind3) * 3;
+	me->dy = Sine(me->mind3) * 3;
+	me->mind4--;
+
+	if(me->seq!=ANIM_MOVE)
+	{
+		me->seq=ANIM_MOVE;
+		me->frm=0;
+		me->frmTimer=0;
+	}
+	me->frmAdvance=128;
+}
+
 void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
 {
 	int i,j,x,y;
@@ -1535,14 +1670,14 @@ void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
 				for(i=0;i<256;i+=16)
 				{
 					b=FireExactBullet(me->x,me->y,me->z,Cosine(i)*6,Sine(i)*6,0,0,32,i,BLT_SPORE,me->friendly);
-					RecolorBullet(b,5,1);
+					//RecolorBullet(b,5,1);
 				}
 
 				for(i=0;i<5;i++)
 				{
-					j=(me->facing+(i-2)*32)&255;
+					j=(me->facing*32+(i-2)*32)&255;
 					b=FireExactBullet(me->x,me->y,me->z,Cosine(j)*12,Sine(j)*12,0,0,32,i,BLT_SPORE,me->friendly);
-					RecolorBullet(b,5,1);
+					//RecolorBullet(b,5,1);
 				}
 				MakeSound(SND_BOMBBOOM,me->x,me->y,SND_CUTOFF,1500);
 				ShakeScreen(10,8);
@@ -1566,17 +1701,18 @@ void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		if(me->seq==ANIM_A2 && goodguy)
 		{
 			if(!me->mind2)
+			{
 				me->mind2 = Random(2);
-
+				me->mind4 = 0;
+			}
 			if(!me->reload)
 			{
 				x=me->x+Cosine(me->facing*32)*64;
 				y=me->y+Sine(me->facing*32)*48;
 
-				me->reload = 4;
-				b=FireExactBullet(x,y,FIXAMT*48,Cosine(me->facing*32)*6,Sine(me->facing*32)*6,FIXAMT,0,128,me->facing*32,BLT_SPOREBALL,me->friendly);
-				b->flags |= BFL_GRAVITY;
-				MakeSound(SND_MUSHMISSILE, me->x, me->y, SND_CUTOFF|SND_RANDOM, 900);
+				me->reload = 8;
+				b=FireExactBullet(x,y,FIXAMT*48,Cosine(me->facing*32)*(6+me->mind4),Sine(me->facing*32)*(6+me->mind4),FIXAMT*2,0,128,me->facing*32,BLT_GRENADE,me->friendly);
+				MakeSound(SND_MUSHMISSILE, me->x, me->y, SND_CUTOFF, 700);
 
 				if(me->mind2)
 					me->facing = (me->facing+1)&7;
@@ -1598,14 +1734,7 @@ void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
 		if(me->seq==ANIM_DIE)
 		{
 			if(me->frm>=8)
-			{
-				x=me->x>>FIXSHIFT;
-				y=me->y>>FIXSHIFT;
-				BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,1);
-				BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
-						  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
-						  me->z,FIXAMT);
-			}
+				BigBoom(me);
 		}
 		return;	// can't do nothin' right now
 	}
@@ -1631,40 +1760,20 @@ void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			if(i<(96*FIXAMT) && Random(10)==0 && me->reload==0)
 			{
 				// get him! (punch)
-				me->seq=ANIM_ATTACK;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
+				DoMove(me,ANIM_ATTACK,128,1,0,0);
 				return;
 			}
 			// spinny poison attack
 			if(i<(256*FIXAMT) && Random(24)==0 && me->reload==0)
 			{
-				// get him! (grab)
-				me->seq=ANIM_A2;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=192;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
+				DoMove(me,ANIM_A2,192,1,0,0);
 				return;
 			}
 			FaceGoodguy2(me,goodguy);
-
 			me->dx=0;
 			me->dy=0;
 			if(me->seq!=ANIM_IDLE)
-			{
-				me->seq=ANIM_IDLE;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-			}
+				DoMove(me,ANIM_IDLE,128,0,0,0);
 			if(i>(80*FIXAMT) && me->mind1==0)
 			{
 				// chase him down!
@@ -1700,129 +1809,11 @@ void AI_Isodope(Guy *me,Map *map,world_t *world,Guy *goodguy)
 			else if(Random(64)==0)
 			{
 				//leap!
-				me->seq=ANIM_A1;
-				me->frm=0;
-				me->frmTimer=0;
-				me->frmAdvance=128;
-				me->action=ACTION_BUSY;
-				me->dx=0;
-				me->dy=0;
-				me->reload=0;
+				DoMove(me,ANIM_A1,128,1,0,0);
 			}
 		}
 		else
 			me->mind=0;
-	}
-}
-
-void MossMove(Guy* me, byte seq, int adv, int dx, int dy)
-{
-	me->action = ACTION_BUSY;
-	me->seq = ANIM_ATTACK;
-	me->frm = 0;
-	me->frmTimer = 0;
-	me->frmAdvance = adv;
-	me->dx = dx;
-	me->dy = dy;
-}
-
-void AI_MightyMoss(Guy *me,Map *map,world_t *world,Guy *goodguy)
-{
-	int x,y;
-	byte f;
-
-	if(me->mindControl)
-		f=2;
-	else
-		f=me->friendly;
-
-	if(me->reload)
-		me->reload--;
-
-	if(me->mind)
-		me->mind--;
-
-	if(me->action==ACTION_BUSY)
-	{
-		if(me->seq!=ANIM_DIE && me->frm==4)
-		{
-			x=((me->x>>FIXSHIFT)/TILE_WIDTH);
-			y=((me->y>>FIXSHIFT)/TILE_HEIGHT);
-			me->x=(x*TILE_WIDTH+TILE_WIDTH/2)<<FIXSHIFT;
-			me->y=(y*TILE_HEIGHT+TILE_HEIGHT/2)<<FIXSHIFT;
-			me->dx=0;
-			me->dy=0;	// you are at your destination
-			me->reload=Random(200)+55;
-
-			// this prevents overlapping ones, in cases of ones getting born near-simultaneously
-			me->aiType=MONS_NONE;	// so it doesn't get counted in the moss check
-			if(MossCheck(x,y))
-			{
-				if(!me->friendly)
-					player.totalEnemies--;
-				return;	// with type=MONS_NONE, so it is dead
-			}
-			me->aiType=MONS_WEAKMOSS;
-		}
-		return;
-	}
-
-	// if goodguy steps on you, hurt him
-	if(goodguy && (!me->mind) && RangeToTarget(me,goodguy)<20*FIXAMT)
-	{
-		goodguy->GetShot(0,0,4,map,world);
-		Inflict(goodguy, GEF_WEAK, 32);
-		me->mind=5;	// so as not to hurt him too often
-	}
-	if(me->reload==0)
-	{
-		me->reload=Random(200)+55;
-		// spawn
-		x=(me->x>>FIXSHIFT)/TILE_WIDTH;
-		y=(me->y>>FIXSHIFT)/TILE_HEIGHT;
-		switch(Random(4))
-		{
-			case 0:
-				// left
-				if(x>0 && map->GetTile(x-1,y)->wall==0 &&
-					(GetTerrain(world,map->GetTile(x-1,y)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
-					!(GetItem(map->GetTile(x-1,y)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
-					&& (!MossCheck(x-1,y)))
-				{
-					MossMove(me,ANIM_ATTACK,64,-(32*FIXAMT)/20,0);
-				}
-				break;
-			case 1:
-				// right
-				if(x<map->width-1 && map->GetTile(x+1,y)->wall==0 &&
-					(GetTerrain(world,map->GetTile(x+1,y)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
-					!(GetItem(map->GetTile(x+1,y)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
-					&& (!MossCheck(x+1,y)))
-				{
-					MossMove(me,ANIM_ATTACK,64,(32*FIXAMT)/20,0);
-				}
-				break;
-			case 2:
-				// up
-				if(y>0 && map->GetTile(x,y-1)->wall==0 &&
-					(GetTerrain(world,map->GetTile(x,y-1)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
-					!(GetItem(map->GetTile(x,y-1)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
-					&& (!MossCheck(x,y-1)))
-				{
-					MossMove(me,ANIM_MOVE,64,0,-(24*FIXAMT)/20);
-				}
-				break;
-			case 3:
-				// down
-				if(y<map->height-1 && map->GetTile(x,y+1)->wall==0 &&
-					(GetTerrain(world,map->GetTile(x,y+1)->floor)->flags&(TF_WATER|TF_LAVA|TF_SOLID))==0 &&
-					!(GetItem(map->GetTile(x,y+1)->item)->flags&(IF_SOLID|IF_BULLETPROOF))
-					&& (!MossCheck(x,y+1)))
-				{
-					MossMove(me,ANIM_MOVE,64,0,(24*FIXAMT)/20);
-				}
-				break;
-		}
 	}
 }
 
@@ -1846,12 +1837,11 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	{
 		if(me->seq==ANIM_A1 && me->frm>=1 && me->frm<=15 && me->reload==0 && goodguy)
 		{
+			i=(me->facing*32-16+Random(33))&255;
 			x=me->x+Cosine(me->facing*32)*72;
 			y=me->y+Sine(me->facing*32)*64;
-			i=(me->facing*32-64)&255;
 			x+=Cosine(i)*48;
 			y+=Sine(i)*32;
-			i=(me->facing*32-16+Random(33))&255;
 			FireExactBullet(x,y,FIXAMT*64,Cosine(i)*8,Sine(i)*8,0,0,32,i,BLT_ENERGYPSN,me->friendly);
 			MakeSound(SND_MUSHSPORES,me->x,me->y,SND_CUTOFF,600);
 			me->reload=1;
@@ -2023,117 +2013,167 @@ void AI_SuperShroom(Guy *me,Map *map,world_t *world,Guy *goodguy)
 	}
 }
 
-void AI_GreatPumpkin(Guy *me,Map *map,world_t *world,Guy *goodguy)
+void UltraSpew(Guy* me)
 {
-	int x,y,i;
-	Guy *g;
+	int i;
+	// first a pile of energy bullets
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 4, FIXAMT * 6, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY2, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 2, FIXAMT * 8, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY2, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, 0, FIXAMT * 9, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY2, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 2, FIXAMT * 8, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY2, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 4, FIXAMT * 6, -FIXAMT * 2, 0, 60, 2, BLT_ENERGY2, me->friendly);
+	// now some fire
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 4, FIXAMT * 16, -FIXAMT * 10, 0, 24, 2, BLT_FLAME2, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, 0, FIXAMT * 18, -FIXAMT * 10, 0, 24, 2, BLT_FLAME2, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 4, FIXAMT * 16, -FIXAMT * 10, 0, 24, 2, BLT_FLAME2, me->friendly);
+	// and some rocks
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 8, FIXAMT * 1, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 4, FIXAMT * 4, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 4, FIXAMT * 4, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 8, FIXAMT * 1, -FIXAMT * 1, 0, 60, 2, BLT_ROCK, me->friendly);
+	// and big snowballs
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, -FIXAMT * 5, FIXAMT * 1, -FIXAMT * 2, 0, 40, 2, BLT_BIGSNOW, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, 0, FIXAMT * 6, -FIXAMT * 2, 0, 40, 2, BLT_BIGSNOW, me->friendly);
+	FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, FIXAMT * 5, FIXAMT * 1, -FIXAMT * 2, 0, 40, 2, BLT_BIGSNOW, me->friendly);
+	// and cactus spines
+	for (i = 108; i > 19; i -= 10)
+		FireExactBullet(me->x, me->y + FIXAMT * 30, FIXAMT * 60, Cosine(i) * 8, Sine(i) * 8, -FIXAMT * 2, 0, 40, i / 16, BLT_SPINE, me->friendly);
+}
+
+void AI_GreatPumpkin(Guy* me, Map* map, world_t* world, Guy* goodguy)
+{
+	int x, y, i, j;
+	Guy* g;
 	byte f;
 
-	int pumpkins[5][2] = {{-64,40},{-32,40},{0,40},{32,40},{64,40}};
+	int pumpkins[5][2] = { {-64,40},{-32,40},{0,40},{32,40},{64,40} };
 
-	if(me->reload)
+	if (me->reload)
 		me->reload--;
 
-	if(me->ouch==4)
+	if (me->ouch == 4)
 	{
-		if(me->hp>0)
-			MakeSound(SND_GREATPKOUCH,me->x,me->y,SND_CUTOFF,1200);
+		if (me->hp > 0)
+			MakeSound(SND_GREATPKOUCH, me->x, me->y, SND_CUTOFF, 1200);
 		else
-			MakeSound(SND_GREATPKDIE,me->x,me->y,SND_CUTOFF,1200);
+			MakeSound(SND_GREATPKDIE, me->x, me->y, SND_CUTOFF, 1200);
 	}
 
-	if(me->action==ACTION_BUSY)
+	if (me->action == ACTION_BUSY)
 	{
-		if(me->seq==ANIM_ATTACK && me->frm==6 && me->frmTimer<32)
+		if (me->seq == ANIM_ATTACK && me->frm == 6 && me->frmTimer < 32)
 		{
-			if(me->specialFlags & GSF_NEWAI)
-				i=Random(10);
+			if (me->specialFlags & GSF_NEWAI)
+				i = Random(10);
 			else
-				i=0;
+				i = 0;
 
-			if(i<8)
+			j = i >= 8 ? 2 : 1;
+
+			for (i = 0; i < 5; i += j)
 			{
-				for (i = 0; i < 5; i++)
+				g = AddBaby(me->x + FIXAMT * pumpkins[i][0], me->y + FIXAMT * pumpkins[i][1], 0, j == 2 ? MONS_PUMPKIN2 : MONS_PUMPKIN, me);
+				if (g && (!g->CanWalk(g->x, g->y, map, world)))
+					RemoveGuy(g);
+				else if (g)
 				{
-					g = AddBaby(me->x + FIXAMT * pumpkins[i][0], me->y + FIXAMT * pumpkins[i][1], 0, MONS_PUMPKIN, me);
-					if (g && (!g->CanWalk(g->x, g->y, map, world)))
-						RemoveGuy(g);
-					else if (g)
-					{
-						g->mind = 1;
-						g->mind1 = 120;
-					}
+					g->mind = 1;
+					g->mind1 = 120;
 				}
 			}
-			else
-			{
-				for (i = 0; i < 5; i+=2)
-				{
-					g = AddBaby(me->x + FIXAMT * pumpkins[i][0], me->y + FIXAMT * pumpkins[i][1], 0, MONS_PUMPKIN2, me);
-					if (g && (!g->CanWalk(g->x, g->y, map, world)))
-						RemoveGuy(g);
-					else if (g)
-					{
-						g->mind = 1;
-						g->mind1 = 120;
-					}
-				}
-			}
-			me->reload=60;
-			MakeSound(SND_GREATPKVOMIT,me->x,me->y,SND_CUTOFF,1100);
+
+			me->reload = 60;
+			MakeSound(SND_GREATPKVOMIT, me->x, me->y, SND_CUTOFF, 1100);
 		}
 
-		if(me->seq==ANIM_DIE)
+		if (me->seq == ANIM_DIE)
 		{
-			x=me->x>>FIXSHIFT;
-			y=me->y>>FIXSHIFT;
-			BlowUpGuy(x+me->rectx,y+me->recty,x+me->rectx2,y+me->recty2,me->z,2);
-			BlowSmoke((x+me->rectx+Random(me->rectx2-me->rectx))<<FIXSHIFT,
-					  (y+me->recty+Random(me->recty2-me->recty))<<FIXSHIFT,
-					  me->z,FIXAMT);
+			x = me->x >> FIXSHIFT;
+			y = me->y >> FIXSHIFT;
+			BlowUpGuy(x + me->rectx, y + me->recty, x + me->rectx2, y + me->recty2, me->z, 2);
+			BlowSmoke((x + me->rectx + Random(me->rectx2 - me->rectx)) << FIXSHIFT,
+				(y + me->recty + Random(me->recty2 - me->recty)) << FIXSHIFT,
+				me->z, FIXAMT);
 			ShakeScreen(10);
 		}
 		return;	// can't do nothin' right now
 	}
 
-	if(me->mind>0)
+	if (me->mind > 0)
 		me->mind--;
 
-	if(goodguy)
-		FaceGoodguy(me,goodguy);
+	if (goodguy)
+		FaceGoodguy(me, goodguy);
 
-	if(me->mind==8)
+	if (me->mind == 8)
 	{
 		// left eye fires
-		f=(me->facing*32-32+me->mind1)&255;
+		f = (me->facing * 32 - 32 + me->mind1) & 255;
 
-		FireExactBullet(me->x-64*FIXAMT,me->y+32*FIXAMT,me->z+80*FIXAMT,
-					Cosine(f)*8,Sine(f)*8,-3*FIXAMT,0,30,me->facing,BLT_ENERGY2,me->friendly);
+		FireExactBullet(me->x - 64 * FIXAMT, me->y + 32 * FIXAMT, me->z + 80 * FIXAMT,
+			Cosine(f) * 8, Sine(f) * 8, -3 * FIXAMT, 0, 30, me->facing, BLT_ENERGY2, me->friendly);
 	}
-	if(!me->mind)
+	if (!me->mind)
 	{
 		// right eye fires
-		f=(me->facing*32+32-me->mind1)&255;
+		f = (me->facing * 32 + 32 - me->mind1) & 255;
 		// can't fire backwards
 
-		if(f>128)
-			f=f<192?128:0;
+		if (f > 128)
+			f = f < 192 ? 128 : 0;
 
-		FireExactBullet(me->x+64*FIXAMT,me->y+32*FIXAMT,me->z+80*FIXAMT,
-					Cosine(f)*8,Sine(f)*8,-3*FIXAMT,0,30,me->facing,BLT_ENERGY2,me->friendly);
-		me->mind=16;
-		me->mind1+=8;
-		if(me->mind1>=64)
-			me->mind1=0;
+		FireExactBullet(me->x + 64 * FIXAMT, me->y + 32 * FIXAMT, me->z + 80 * FIXAMT,
+			Cosine(f) * 8, Sine(f) * 8, -3 * FIXAMT, 0, 30, me->facing, BLT_ENERGY2, me->friendly);
+		me->mind = 16;
+		me->mind1 += 8;
+		if (me->mind1 >= 64)
+			me->mind1 = 0;
 	}
 
-	if(me->reload==0 && Random(20)==0)
+	if (me->reload == 0 && Random(20) == 0)
 	{
-		me->seq=ANIM_ATTACK;
-		me->frm=0;
-		me->frmTimer=0;
-		me->frmAdvance=64;
-		me->action=ACTION_BUSY;
+		me->seq = ANIM_ATTACK;
+		me->frm = 0;
+		me->frmTimer = 0;
+		me->frmAdvance = 64;
+		me->action = ACTION_BUSY;
+	}
+}
+
+void AI_Ultrazoid(Guy* me, Map* map, world_t* world, Guy* goodguy)
+{
+	int i;
+
+	if (me->reload)
+		me->reload--;
+
+	if (me->mind1)
+		me->mind1--;
+
+	BasicAI(me, SND_SERPENTOUCH, SND_SERPENTDIE, map, world, goodguy);
+
+	if (me->action == ACTION_BUSY)
+	{
+		if (me->seq == ANIM_ATTACK && (me->frm == 6 || me->frm == 7) && me->frmTimer < 64)
+		{
+			// dump a wad of zoid projectiles
+			UltraSpew(me);
+			MakeSound(SND_SERPENTSPIT, me->x, me->y, SND_CUTOFF, 1100);
+			me->mind1 = 2;
+		}
+		if (me->seq == ANIM_DIE)
+			ShakeScreen(10);
+		return;	// can't do nothin' right now
+	}
+
+	if (me->reload == 0)
+	{
+		me->seq = ANIM_ATTACK;
+		me->frm = 0;
+		me->frmTimer = 0;
+		me->frmAdvance = 72;
+		me->action = ACTION_BUSY;
+		me->reload = 90;
 	}
 }
 

@@ -3664,7 +3664,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{1,2,3,3,3,2,1,2,3,2,1,0,0,0,0,1,2,3,2,1,255},	// A1=sneeze
 			}},
 		{"Spookley",255,255,0,AI_Spook,
-		 30,9,300,1,"!51",0,MF_ONEFACE|MF_FLYING|MF_GHOST|MF_FREEWALK|MF_ENEMYWALK|MF_NOSHADOW|MF_NOHIT,
+		 30,9,300,1,"sleepless/graphics/bigghost.jsp",0,MF_ONEFACE|MF_FLYING|MF_GHOST|MF_FREEWALK|MF_ENEMYWALK|MF_NOSHADOW|MF_NOHIT,
 		 MT_EVIL|MT_BOSS|MT_SPOOKY|MT_BITS,
 			{
 				{0,255},	// idle
@@ -4946,7 +4946,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{5,6,7,6,5,255},	// a4
 				{5,6,7,6,5,255},	// a5
 			}},
-		{"The Chariot",0,2,-2,AI_Tower, //good to go
+		{"The Chariot",0,2,-2,AI_Tower2, //good to go
 		 60,17,750,500,"mystic/graphics/tower.jsp",0,MF_NOMOVE,
 		 MT_EVIL|MT_MINIBOSS,
 			{
@@ -4954,7 +4954,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{1,2,1,0,3,4,3,0,255},	// move
 				{5,5,6,6,7,7,7,8,9,9,9,9,9,10,10,10,11,11,11,255},	// attack (leap)
 				{12,13,14,15,16,16,16,16,16,255},	// die
-				{1,2,2,2,2,2,2,1,255},	// A1
+				{1,2,3,2,3,2,3,2,255},	// A1
 				{1,2,2,2,2,2,2,1,255},	// A2
 				{1,2,2,2,2,2,2,1,255},	// A3
 				{1,2,2,2,2,2,2,1,255},	// A4
@@ -5379,7 +5379,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{0,255},
 				{0,255},
 			}},
-		{"Medic Cap",5,1,5,AI_ShroomLord,
+		{"Medic Cap",5,1,5,AI_Healer,
 		 15,14,40,300,"graphics/shrmlord.jsp",0,0,
 		 MT_EVIL|MT_VEGGIE,
 			{
@@ -5421,7 +5421,7 @@ monsterType_t monsType[NUM_MONSTERS]=
 				{1,2,3,4,3,2,1,0,255},	// attack
 				{1,2,3,4,3,2,1,0,255},	// attack
 			}},
-		{"Mine Cart:Payload",2,4,4,AI_MineCart,
+		{"Payload Cart",2,4,4,AI_Payload,
 		 11,8,100,500,"graphics/minecar.jsp",0,MF_NOMOVE|MF_INVINCIBLE|MF_FREEWALK|MF_NOHIT,
 		 MT_VEHICLE|MT_GOOD,
 			{
